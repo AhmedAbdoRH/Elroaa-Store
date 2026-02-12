@@ -70,8 +70,14 @@ function App() {
 
   // Debug environment variables
   useEffect(() => {
-    console.log('VITE_SUPABASE_URL:', import.meta.env.VITE_SUPABASE_URL);
-    console.log('VITE_SUPABASE_ANON_KEY exists:', !!import.meta.env.VITE_SUPABASE_ANON_KEY);
+    const url = import.meta.env.VITE_SUPABASE_URL;
+    const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    console.log('VITE_SUPABASE_URL:', url);
+    console.log('VITE_SUPABASE_ANON_KEY exists:', !!key);
+
+    if (!url || !key) {
+      console.error('CRITICAL: Supabase environment variables are missing!');
+    }
   }, []);
 
   useEffect(() => {

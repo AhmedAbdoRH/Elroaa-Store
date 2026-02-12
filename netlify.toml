@@ -66,9 +66,14 @@
   path = "/product/*"
   function = "social-preview"
 
-# Redirect www to non-www
+# Redirects for SPA navigation and domain rules
 [[redirects]]
   from = "https://www.elroaa-store.com/*"
   to = "https://elroaa-store.com/:splat"
   status = 301
   force = true
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
