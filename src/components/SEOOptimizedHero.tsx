@@ -22,23 +22,23 @@ export default function SEOOptimizedHero({ storeSettings }: SEOOptimizedHeroProp
         >
           {/* Main Heading with SEO Keywords */}
           <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-            <span className="text-[#FFD700]">معرض السماح</span> للمفروشات
+            <span className="text-[#FFD700]">شركة الرؤى</span> للتجارة والتوريدات والعطارة
           </h1>
           
           <h2 className="text-xl md:text-2xl mb-8 text-white/90 font-medium">
-            أفضل المفروشات والأثاث المنزلي في مصر | أريكة، طاولات، كراسي، غرف نوم، صالونات
+            أفضل أنواع الأعشاب الطبيعية والتوابل والزيوت العطرية في مصر | جودة، نقاء، تميز
           </h2>
           
           {/* SEO-optimized description */}
           <div className="text-lg md:text-xl mb-12 text-white/80 leading-relaxed max-w-3xl mx-auto">
             <p className="mb-4">
-              مرحباً بكم في <strong>معرض السماح للمفروشات</strong> - وجهتكم الأولى للحصول على 
-              <strong> أفضل المفروشات والأثاث المنزلي</strong> في مصر. نقدم مجموعة واسعة من 
-              <strong> الأريكة والطاولات والكراسي</strong> و<strong>غرف النوم والصالونات</strong> 
-              بأسعار تنافسية وجودة عالية.
+              مرحباً بكم في <strong>شركة الرؤى للتجارة والتوريدات والعطارة</strong> - وجهتكم الأولى للحصول على 
+              <strong> أجود أنواع الأعشاب الطبيعية والتوابل والزيوت العطرية</strong> في مصر. نقدم مجموعة واسعة من 
+              <strong> المنتجات المحلية والمستوردة</strong> و<strong>الخلطات الخاصة</strong> 
+              بأسعار تنافسية وجودة عالية طبقاً للمواصفات القياسية.
             </p>
             <p>
-              نوفر خدمة التوصيل في <strong>بنها وأسنيت كفر شكر</strong> مع ضمان الجودة والرضا التام.
+              نوفر خدمة التوريد لجميع المحافظات مع ضمان الجودة والالتزام التام بالمواعيد.
             </p>
           </div>
 
@@ -101,18 +101,18 @@ export default function SEOOptimizedHero({ storeSettings }: SEOOptimizedHeroProp
               <div className="flex items-start gap-3">
                 <MapPin className="h-5 w-5 text-[#FFD700] mt-1 flex-shrink-0" />
                 <div>
-                  <h4 className="font-semibold">الفرع الأول - بنها</h4>
+                  <h4 className="font-semibold">قسم المبيعات</h4>
                   <p className="text-sm text-white/80">
-                    شارع الكوبري. بجوار مول الأهرام والبمبي للأجهزة الكهربائية
+                    تواصل معنا لطلبات التوريد والجملة للمحلات والمطاعم والمصانع
                   </p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <MapPin className="h-5 w-5 text-[#FFD700] mt-1 flex-shrink-0" />
                 <div>
-                  <h4 className="font-semibold">الفرع الثاني - أسنيت كفر شكر</h4>
+                  <h4 className="font-semibold">مقر الشركة</h4>
                   <p className="text-sm text-white/80">
-                    شارع الجمعية الزراعية بجوار صيدلية الدكتور أحمد كرم مسعود
+                    القليوبية - بنها / كفر شكر
                   </p>
                 </div>
               </div>

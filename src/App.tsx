@@ -179,11 +179,11 @@ function App() {
         // Set default settings if fetch fails
         setStoreSettings({
           id: '00000000-0000-0000-0000-000000000001',
-          store_name: 'معرض السماح للمفروشات',
-          store_description: 'أفضل المفروشات والأثاث المنزلي',
+          store_name: 'شركة الرؤى للتجارة والتوريدات والعطارة',
+          store_description: 'أفضل أنواع الأعشاب الطبيعية، التوابل، والزيوت العطرية',
           logo_url: '/logo.png',
-          meta_title: 'معرض السماح للمفروشات',
-          meta_description: 'أفضل المفروشات والأثاث المنزلي بأسعار تنافسية',
+          meta_title: 'شركة الرؤى للتجارة والتوريدات والعطارة',
+          meta_description: 'نقدم أفضل أنواع الأعشاب الطبيعية، التوابل، والزيوت العطرية بأسعار تنافسية وجودة عالية',
           theme_settings: {
             primaryColor: '#f5f6db',
             secondaryColor: '#4f170c',
@@ -201,11 +201,11 @@ function App() {
         // No data found, set default settings
         setStoreSettings({
           id: '00000000-0000-0000-0000-000000000001',
-          store_name: 'معرض السماح للمفروشات',
-          store_description: 'أفضل المفروشات والأثاث المنزلي',
+          store_name: 'شركة الرؤى للتجارة والتوريدات والعطارة',
+          store_description: 'أفضل أنواع الأعشاب الطبيعية، التوابل، والزيوت العطرية',
           logo_url: '/logo.png',
-          meta_title: 'معرض السماح للمفروشات',
-          meta_description: 'أفضل المفروشات والأثاث المنزلي بأسعار تنافسية',
+          meta_title: 'شركة الرؤى للتجارة والتوريدات والعطارة',
+          meta_description: 'نقدم أفضل أنواع الأعشاب الطبيعية، التوابل، والزيوت العطرية بأسعار تنافسية وجودة عالية',
           theme_settings: {
             primaryColor: '#f5f6db',
             secondaryColor: '#4f170c',
@@ -220,11 +220,11 @@ function App() {
       // Set default settings on any unexpected error
       setStoreSettings({
         id: '00000000-0000-0000-0000-000000000001',
-        store_name: 'معرض السماح - فوربيد',
-        store_description: 'أفضل المفروشات والأثاث المنزلي',
+        store_name: 'شركة الرؤى للتجارة والتوريدات والعطارة',
+        store_description: 'أفضل أنواع الأعشاب الطبيعية، التوابل، والزيوت العطرية',
         logo_url: '/Logo.png',
-        meta_title: 'معرض السماح - فوربيد للمفروشات',
-        meta_description: 'أفضل المفروشات والأثاث المنزلي بأسعار تنافسية',
+        meta_title: 'شركة الرؤى للتجارة والتوريدات والعطارة',
+        meta_description: 'نقدم أفضل أنواع الأعشاب الطبيعية، التوابل، والزيوت العطرية بأسعار تنافسية وجودة عالية',
         theme_settings: {
           primaryColor: '#f5f6db',
           secondaryColor: '#4f170c',
@@ -293,10 +293,10 @@ function App() {
     <ThemeProvider>
       <CartProvider>
         <Helmet>
-          <title>{storeSettings?.meta_title || storeSettings?.store_name || 'معرض السماح للمفروشات | أفضل المفروشات والأثاث المنزلي في مصر'}</title>
-          <meta name="description" content={storeSettings?.meta_description || storeSettings?.store_description || 'معرض السماح للمفروشات - نقدم أفضل أنواع المفروشات والأثاث المنزلي بأسعار تنافسية وجودة عالية. أريكة، طاولات، كراسي، غرف نوم، صالونات في بنها وأسنيت كفر شكر.'} />
-          <meta name="keywords" content={storeSettings?.keywords ? storeSettings.keywords.join(', ') : 'معرض السماح للمفروشات, مفروشات, أثاث منزلي, أريكة, طاولات, كراسي, غرف نوم, صالونات, بنها, أسنيت كفر شكر, مصر, أثاث, ديكور, منزل'} />
-          <meta name="author" content="معرض السماح للمفروشات" />
+          <title>{storeSettings?.meta_title || storeSettings?.store_name || 'شركة الرؤى للتجارة والتوريدات والعطارة | أفضل أنواع الأعشاب والتوابل في مصر'}</title>
+          <meta name="description" content={storeSettings?.meta_description || storeSettings?.store_description || 'شركة الرؤى للتجارة والتوريدات والعطارة - نقدم أفضل أنواع الأعشاب الطبيعية، التوابل، والزيوت العطرية بأسعار تنافسية وجودة عالية.'} />
+          <meta name="keywords" content={storeSettings?.keywords ? storeSettings.keywords.join(', ') : 'شركة الرؤى, عطارة, توابل, أعشاب طبيعية, زيوت عطرية, مكسرات, توريدات, مصر, صحي, طبيعي'} />
+          <meta name="author" content="شركة الرؤى للتجارة والتوريدات والعطارة" />
           <meta name="robots" content="index, follow" />
           <meta name="language" content="Arabic" />
           <meta name="revisit-after" content="7 days" />
@@ -308,7 +308,7 @@ function App() {
           <meta name="ICBM" content="30.0444, 31.2357" />
 
           {/* Canonical URL */}
-          <link rel="canonical" href="https://alsamah-store.com/" />
+          <link rel="canonical" href="https://elroaa-store.com/" />
 
           {/* Favicon */}
           {storeSettings?.favicon_url && (

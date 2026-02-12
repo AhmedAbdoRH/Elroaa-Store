@@ -48,9 +48,9 @@ export default function Footer({ storeSettings }: FooterProps) {
                 <div className="flex items-start gap-3">
                   <MapPin className="h-5 w-5 text-accent mt-1 flex-shrink-0" />
                   <div>
-                    <h3 className="text-secondary font-semibold mb-2">الفرع الأول - بنها</h3>
+                    <h3 className="text-secondary font-semibold mb-2">قسم المبيعات</h3>
                     <p className="text-secondary/80 text-sm leading-relaxed">
-                      شارع الكوبري. بجوار مول الأهرام والبمبي للأجهزة الكهربائية
+                      تواصل معنا لطلبات التوريد والجملة
                     </p>
                   </div>
                 </div>
@@ -61,9 +61,9 @@ export default function Footer({ storeSettings }: FooterProps) {
                 <div className="flex items-start gap-3">
                   <MapPin className="h-5 w-5 text-accent mt-1 flex-shrink-0" />
                   <div>
-                    <h3 className="text-secondary font-semibold mb-2">الفرع الثاني - أسنيت كفر شكر</h3>
+                    <h3 className="text-secondary font-semibold mb-2">مقر الشركة</h3>
                     <p className="text-secondary/80 text-sm leading-relaxed">
-                      شارع الجمعية الزراعية بجوار صيدلية الدكتور أحمد كرم مسعود
+                      القليوبية - بنها / كفر شكر
                     </p>
                   </div>
                 </div>

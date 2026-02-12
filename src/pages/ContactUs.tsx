@@ -6,10 +6,10 @@ export default function ContactUs() {
   return (
     <>
       <Helmet>
-        <title>اتصل بنا - معرض السماح للمفروشات | بنها وأسنيت كفر شكر</title>
-        <meta name="description" content="تواصل مع معرض السماح للمفروشات - فرع بنها: 01222582955، فرع أسنيت كفر شكر: 01013210146. نقدم أفضل المفروشات والأثاث المنزلي في مصر." />
-        <meta name="keywords" content="اتصل بنا, معرض السماح للمفروشات, بنها, أسنيت كفر شكر, هاتف, واتساب, مفروشات, أثاث منزلي" />
-        <link rel="canonical" href="https://alsamah-store.com/contact" />
+        <title>اتصل بنا - شركة الرؤى للتجارة والتوريدات والعطارة | تواصل معنا</title>
+        <meta name="description" content="تواصل مع شركة الرؤى للتجارة والتوريدات والعطارة - نقدم أفضل أنواع الأعشاب الطبيعية، التوابل، والزيوت العطرية. متاحون لخدمتكم وتلبية طلبات التوريد." />
+        <meta name="keywords" content="اتصل بنا, شركة الرؤى, عطارة, توابل, هاتف, واتساب, توريدات مطاعم, توريد مصانع" />
+        <link rel="canonical" href="https://elroaa-store.com/contact" />
       </Helmet>
 
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 py-16">
@@ -17,11 +17,11 @@ export default function ContactUs() {
           {/* Header */}
           <div className="text-center mb-16">
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-              <span className="text-[#FFD700]">اتصل بنا</span> - معرض السماح للمفروشات
+              <span className="text-[#FFD700]">اتصل بنا</span> - شركة الرؤى للتجارة
             </h1>
             <p className="text-xl text-white/80 max-w-3xl mx-auto leading-relaxed">
-              نحن هنا لخدمتكم! تواصلوا معنا للحصول على أفضل المفروشات والأثاث المنزلي 
-              في بنها وأسنيت كفر شكر. فريقنا متاح لمساعدتكم في اختيار المنتجات المناسبة.
+              نحن هنا لخدمتكم! تواصلوا معنا للحصول على أفضل أنواع الأعشاب والتوابل والزيوت العطرية. 
+              فريقنا متاح لمساعدتكم في اختيار المنتجات المناسبة وتلبية طلبات التوريد.
             </p>
           </div>
 
@@ -37,7 +37,7 @@ export default function ContactUs() {
                   <div className="flex items-center gap-4">
                     <Phone className="h-8 w-8 text-green-400 flex-shrink-0" />
                     <div>
-                      <h3 className="text-xl font-semibold text-white">الفرع الأول - بنها</h3>
+                      <h3 className="text-xl font-semibold text-white">قسم المبيعات والتوريدات</h3>
                       <a 
                         href="tel:01222582955" 
                         className="text-green-400 text-lg hover:text-green-300 transition-colors"
@@ -50,7 +50,7 @@ export default function ContactUs() {
                   <div className="flex items-center gap-4">
                     <Phone className="h-8 w-8 text-green-400 flex-shrink-0" />
                     <div>
-                      <h3 className="text-xl font-semibold text-white">الفرع الثاني - أسنيت كفر شكر</h3>
+                      <h3 className="text-xl font-semibold text-white">خدمة العملاء</h3>
                       <a 
                         href="tel:01013210146" 
                         className="text-green-400 text-lg hover:text-green-300 transition-colors"
@@ -68,7 +68,7 @@ export default function ContactUs() {
                     <h3 className="text-xl font-semibold text-white">واتساب</h3>
                   </div>
                   <p className="text-white/80 mb-4">
-                    تواصلوا معنا عبر الواتساب للحصول على استشارة مجانية
+                    تواصلوا معنا عبر الواتساب للاستفسارات وطلبات التوريد السريعة
                   </p>
                   <a 
                     href="https://wa.me/201013210146" 
@@ -89,74 +89,44 @@ export default function ContactUs() {
                   <div className="flex items-center gap-4">
                     <Clock className="h-6 w-6 text-[#FFD700]" />
                     <div>
-                      <h3 className="text-lg font-semibold text-white">الأحد - الخميس</h3>
-                      <p className="text-white/80">9:00 صباحاً - 10:00 مساءً</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <Clock className="h-6 w-6 text-[#FFD700]" />
-                    <div>
-                      <h3 className="text-lg font-semibold text-white">الجمعة - السبت</h3>
+                      <h3 className="text-lg font-semibold text-white">يومياً</h3>
                       <p className="text-white/80">9:00 صباحاً - 10:00 مساءً</p>
                     </div>
                   </div>
                 </div>
                 <p className="text-white/60 text-sm mt-4">
-                  * نحن متاحون على مدار الساعة عبر الهاتف والواتساب
+                  * نحن متاحون للرد على استفساراتكم عبر الواتساب على مدار الساعة
                 </p>
               </div>
             </div>
 
             {/* Branches Info */}
             <div className="space-y-8">
-              {/* Branch 1 */}
               <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
-                <h2 className="text-3xl font-bold text-[#FFD700] mb-6">الفرع الأول - بنها</h2>
+                <h2 className="text-3xl font-bold text-[#FFD700] mb-6">مقر الشركة</h2>
                 <div className="space-y-4">
                   <div className="flex items-start gap-4">
                     <MapPin className="h-6 w-6 text-[#FFD700] mt-1 flex-shrink-0" />
                     <div>
                       <h3 className="text-lg font-semibold text-white mb-2">العنوان</h3>
                       <p className="text-white/80 leading-relaxed">
-                        شارع الكوبري. بجوار مول الأهرام والبمبي للأجهزة الكهربائية، بنها، القليوبية
+                        جمهورية مصر العربية، القليوبية، بنها / كفر شكر
                       </p>
                     </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-4">
-                    <Phone className="h-6 w-6 text-green-400" />
-                    <a 
-                      href="tel:01222582955" 
-                      className="text-green-400 hover:text-green-300 transition-colors"
-                    >
-                      01222582955
-                    </a>
                   </div>
                 </div>
               </div>
 
-              {/* Branch 2 */}
               <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
-                <h2 className="text-3xl font-bold text-[#FFD700] mb-6">الفرع الثاني - أسنيت كفر شكر</h2>
-                <div className="space-y-4">
-                  <div className="flex items-start gap-4">
-                    <MapPin className="h-6 w-6 text-[#FFD700] mt-1 flex-shrink-0" />
-                    <div>
-                      <h3 className="text-lg font-semibold text-white mb-2">العنوان</h3>
-                      <p className="text-white/80 leading-relaxed">
-                        شارع الجمعية الزراعية بجوار صيدلية الدكتور أحمد كرم مسعود، أسنيت كفر شكر، القليوبية
-                      </p>
-                    </div>
+                <h2 className="text-3xl font-bold text-[#FFD700] mb-6">خدماتنا</h2>
+                <div className="grid grid-cols-1 gap-4">
+                  <div className="bg-white/5 rounded-xl p-4">
+                    <h3 className="text-lg font-semibold text-white mb-2">توريدات للمطاعم والمصانع</h3>
+                    <p className="text-white/70 text-sm">نوفر أجود أنواع التوابل والأعشاب بكميات تجارية وأسعار تنافسية.</p>
                   </div>
-                  
-                  <div className="flex items-center gap-4">
-                    <Phone className="h-6 w-6 text-green-400" />
-                    <a 
-                      href="tel:01013210146" 
-                      className="text-green-400 hover:text-green-300 transition-colors"
-                    >
-                      01013210146
-                    </a>
+                  <div className="bg-white/5 rounded-xl p-4">
+                    <h3 className="text-lg font-semibold text-white mb-2">خلطات عطارة خاصة</h3>
+                    <p className="text-white/70 text-sm">تجهيز خلطات وتوابل حصرية حسب طلب العملاء لضمان مذاق فريد.</p>
                   </div>
                 </div>
               </div>

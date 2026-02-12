@@ -11,7 +11,7 @@ interface StructuredDataProps {
 
 export default function StructuredData({ type, data, services, categories, breadcrumbs }: StructuredDataProps) {
   const generateStructuredData = () => {
-    const baseUrl = 'https://alsamah-store.com';
+    const baseUrl = 'https://elroaa-store.com';
     
     switch (type) {
       case 'organization':
@@ -19,22 +19,22 @@ export default function StructuredData({ type, data, services, categories, bread
         return {
           "@context": "https://schema.org",
           "@type": "Organization",
-          "name": storeSettings?.store_name || "معرض السماح للمفروشات",
-          "description": storeSettings?.store_description || "أفضل المفروشات والأثاث المنزلي في مصر",
+          "name": storeSettings?.store_name || "شركة الرؤى للتجارة والتوريدات والعطارة",
+          "description": storeSettings?.store_description || "أجود أنواع الأعشاب الطبيعية والتوابل والزيوت العطرية في مصر",
           "url": baseUrl,
           "logo": storeSettings?.logo_url ? `${baseUrl}${storeSettings.logo_url}` : `${baseUrl}/logo.png`,
           "image": storeSettings?.og_image_url ? `${baseUrl}${storeSettings.og_image_url}` : `${baseUrl}/logo-social.png`,
           "address": [
             {
               "@type": "PostalAddress",
-              "streetAddress": "شارع الكوبري. بجوار مول الأهرام والبمبي للأجهزة الكهربائية",
+              "streetAddress": "تواصل معنا لطلبات التوريد والجملة",
               "addressLocality": "بنها",
               "addressCountry": "EG"
             },
             {
               "@type": "PostalAddress",
-              "streetAddress": "شارع الجمعية الزراعية بجوار صيدلية الدكتور أحمد كرم مسعود",
-              "addressLocality": "أسنيت كفر شكر",
+              "streetAddress": "القليوبية - بنها / كفر شكر",
+              "addressLocality": "كفر شكر",
               "addressCountry": "EG"
             }
           ],
@@ -63,7 +63,7 @@ export default function StructuredData({ type, data, services, categories, bread
           ].filter(Boolean),
           "hasOfferCatalog": {
             "@type": "OfferCatalog",
-            "name": "مفروشات وأثاث منزلي",
+            "name": "عطارة وتوريدات",
             "itemListElement": services?.map((service, index) => ({
               "@type": "Offer",
               "itemOffered": {
@@ -91,9 +91,9 @@ export default function StructuredData({ type, data, services, categories, bread
           "url": `${baseUrl}/product/${service.id}`,
           "brand": {
             "@type": "Brand",
-            "name": "معرض السماح للمفروشات"
+            "name": "شركة الرؤى للتجارة والتوريدات والعطارة"
           },
-          "category": service.category?.name || "مفروشات",
+          "category": service.category?.name || "عطارة",
           "offers": {
             "@type": "Offer",
             "price": service.sale_price || service.price,
@@ -101,13 +101,13 @@ export default function StructuredData({ type, data, services, categories, bread
             "availability": "https://schema.org/InStock",
             "seller": {
               "@type": "Organization",
-              "name": "معرض السماح للمفروشات"
+              "name": "شركة الرؤى للتجارة والتوريدات والعطارة"
             }
           },
           "aggregateRating": {
             "@type": "AggregateRating",
-            "ratingValue": "4.5",
-            "reviewCount": "50"
+            "ratingValue": "4.8",
+            "reviewCount": "150"
           }
         };
 
@@ -117,7 +117,7 @@ export default function StructuredData({ type, data, services, categories, bread
           "@context": "https://schema.org",
           "@type": "CollectionPage",
           "name": category.name,
-          "description": category.description || `منتجات ${category.name} من معرض السماح للمفروشات`,
+          "description": category.description || `منتجات ${category.name} من شركة الرؤى للتجارة والتوريدات والعطارة`,
           "url": `${baseUrl}/category/${category.id}`,
           "mainEntity": {
             "@type": "ItemList",

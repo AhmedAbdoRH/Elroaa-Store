@@ -56,7 +56,7 @@ export default function AIChatBot() {
     const [messages, setMessages] = useState<Message[]>([
         {
             id: '1',
-            text: 'أهلاً بيك في معرض السماح - فوربيد 🏠\nازاي أقدر أساعدك في اختيار المفروشات؟',
+            text: 'أهلاً بيك في شركة الرؤى للتجارة والتوريدات والعطارة 🌿\nازاي أقدر أساعدك في اختيار أجود أنواع التوابل والأعشاب؟',
             isUser: false,
             timestamp: new Date()
         }
@@ -110,12 +110,12 @@ export default function AIChatBot() {
 
     const generateStoreContext = () => {
         const { products, storeSettings } = storeData;
-        let context = `أنت مساعد ذكي لمعرض "${storeSettings?.store_name || 'معرض السماح - فوربيد'}".\n\n`;
+        let context = `أنت مساعد ذكي لـ "${storeSettings?.store_name || 'شركة الرؤى للتجارة والتوريدات والعطارة'}".\n\n`;
 
         if (products.length > 0) {
             context += `قائمة مختصرة للمنتجات (أهم 40 منتج):\n`;
             products.slice(0, 40).forEach(product => {
-                const productUrl = `https://alsamah-store.com/product/${product.id}`;
+                const productUrl = `https://elroaa-store.com/product/${product.id}`;
                 context += `▫️ ${product.title}`;
                 
                 if (product.has_multiple_sizes && product.sizes && product.sizes.length > 0) {
@@ -257,7 +257,7 @@ export default function AIChatBot() {
                                     <Bot className="w-6 h-6 text-emerald-500" />
                                 </div>
                                 <div>
-                                    <h3 className="font-bold text-white">مساعد معرض السماح</h3>
+                                    <h3 className="font-bold text-white">مساعد شركة الرؤى</h3>
                                     <p className="text-xs text-emerald-500 flex items-center gap-1">
                                         <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
                                         متصل الآن
@@ -339,7 +339,7 @@ export default function AIChatBot() {
                                 </button>
                             </form>
                             <p className="text-[10px] text-center text-slate-500 mt-2">
-                                مساعد ذكي مدعوم بالذكاء الاصطناعي لمعرض السماح
+                                مساعد ذكي مدعوم بالذكاء الاصطناعي لشركة الرؤى
                             </p>
                         </div>
                     </motion.div>

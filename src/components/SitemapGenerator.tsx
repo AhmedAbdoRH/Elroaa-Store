@@ -23,7 +23,7 @@ export default function SitemapGenerator({ onSitemapGenerated }: SitemapGenerato
       const categories = categoriesResult.data || [];
       const subcategories = subcategoriesResult.data || [];
 
-      const baseUrl = 'https://alsamah-store.com';
+      const baseUrl = 'https://elroaa-store.com';
       const currentDate = new Date().toISOString();
 
       // Generate sitemap XML

@@ -1,7 +1,7 @@
 // SEO utility functions
 
 // Generate meta title
-export const generateMetaTitle = (title: string, siteName: string = 'معرض السماح للمفروشات') => {
+export const generateMetaTitle = (title: string, siteName: string = 'شركة الرؤى للتجارة والتوريدات والعطارة') => {
   return `${title} | ${siteName}`;
 };
 
@@ -14,20 +14,21 @@ export const generateMetaDescription = (description: string, maxLength: number =
 // Generate keywords from content
 export const generateKeywords = (content: string): string[] => {
   const keywords = [
-    'معرض السماح للمفروشات',
-    'مفروشات',
-    'أثاث منزلي',
-    'أريكة',
-    'طاولات',
-    'كراسي',
-    'غرف نوم',
-    'صالونات',
+    'شركة الرؤى للتجارة والتوريدات والعطارة',
+    'عطارة',
+    'توابل',
+    'أعشاب طبيعية',
+    'زيوت عطرية',
+    'مكسرات',
+    'توريدات مطاعم',
+    'توريد مصانع',
+    'خلطات خاصة',
     'بنها',
-    'أسنيت كفر شكر',
+    'كفر شكر',
     'مصر',
-    'أثاث',
-    'ديكور',
-    'منزل'
+    'صحة',
+    'طبيعي',
+    'تغذية'
   ];
 
   // Extract additional keywords from content
