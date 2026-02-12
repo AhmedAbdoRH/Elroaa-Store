@@ -141,7 +141,7 @@ export default function ProductDetails() {
     <div className="min-h-screen flex flex-col pt-24 relative" style={backgroundStyles}>
       {service && (
         <Helmet>
-          <title>{`${service.title} | معرض السماح للمفروشات`}</title>
+          <title>{`${service.title} | شركة الرؤى للتجارة والتوريدات والعطارة`}</title>
           <meta
             name="description"
             content={(service.description || '').slice(0, 160)}
@@ -151,16 +151,16 @@ export default function ProductDetails() {
           {/* Open Graph */}
           <meta property="og:type" content="product" />
           <meta property="og:url" content={window.location.href} />
-          <meta property="og:title" content={`${service.title} | معرض السماح للمفروشات`} />
+          <meta property="og:title" content={`${service.title} | شركة الرؤى للتجارة والتوريدات والعطارة`} />
           <meta property="og:description" content={(service.description || '').slice(0, 200)} />
           <meta property="og:image" content={productImageForShare} />
-          <meta property="og:site_name" content="معرض السماح للمفروشات" />
+          <meta property="og:site_name" content="شركة الرؤى للتجارة والتوريدات والعطارة" />
           <meta property="og:locale" content="ar_EG" />
 
           {/* Twitter */}
           <meta property="twitter:card" content="summary_large_image" />
           <meta property="twitter:url" content={window.location.href} />
-          <meta property="twitter:title" content={`${service.title} | معرض السماح للمفروشات`} />
+          <meta property="twitter:title" content={`${service.title} | شركة الرؤى للتجارة والتوريدات والعطارة`} />
           <meta property="twitter:description" content={(service.description || '').slice(0, 200)} />
           <meta property="twitter:image" content={productImageForShare} />
         </Helmet>

@@ -48,9 +48,9 @@ export default function Footer({ storeSettings }: FooterProps) {
                 <div className="flex items-start gap-3">
                   <MapPin className="h-5 w-5 text-accent mt-1 flex-shrink-0" />
                   <div>
-                    <h3 className="text-secondary font-semibold mb-2">قسم المبيعات</h3>
+                    <h3 className="text-secondary font-semibold mb-2">قسم التوريدات</h3>
                     <p className="text-secondary/80 text-sm leading-relaxed">
-                      تواصل معنا لطلبات التوريد والجملة
+                      توريد للمطاعم، المصانع، والمحلات بأسعار الجملة
                     </p>
                   </div>
                 </div>

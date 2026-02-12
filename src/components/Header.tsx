@@ -141,11 +141,9 @@ export default function Header({ storeSettings }: HeaderProps) {
             </button>
 
             <Link to="/" className="flex-shrink-0">
-              <img
-                src={storeSettings?.logo_url || '/logo.png'}
-                alt={storeSettings?.store_name || 'Logo'}
-                className="h-12 md:h-16 w-auto"
-              />
+              <span className="text-xl md:text-2xl font-bold text-[#FFD700] tracking-tight">
+                شركة الرؤى للتجارة
+              </span>
             </Link>
           </div>
 

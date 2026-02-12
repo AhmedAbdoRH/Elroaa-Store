@@ -156,7 +156,7 @@ const Cart: React.FC = () => {
                       )}
                       <div className="mr-3 flex-1">
                         <h3 className="font-medium">{item.title}</h3>
-                        <p className="text-gray-600">{item.price} ر.س</p>
+                        <p className="text-gray-600">{item.price} ج</p>
                         <div className="flex items-center mt-2">
                           <button
                             onClick={(e) => {
@@ -206,17 +206,17 @@ const Cart: React.FC = () => {
               <div className="border-t p-4">
                 <div className="flex justify-between text-lg font-medium mb-4">
                   <span>المجموع</span>
-                  <span>{cartTotal} ر.س</span>
+                  <span>{cartTotal} ج</span>
                 </div>
                 <button
                   onClick={() => {
                     // Handle checkout
                     const message = cartItems
-                      .map(item => `${item.title} - ${item.quantity} × ${item.price} ر.س`)
+                      .map(item => `${item.title} - ${item.quantity} × ${item.price} ج`)
                       .join('\n');
                     window.open(
                       `https://wa.me/201013210146?text=${encodeURIComponent(
-                        `الطلبية:\n${message}\n\nالمجموع: ${calculateTotal()} ر.س`
+                        `الطلبية:\n${message}\n\nالمجموع: ${cartTotal} ج`
                       )}`,
                       '_blank'
                     );

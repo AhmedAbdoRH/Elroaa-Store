@@ -95,7 +95,7 @@ export const generateProductStructuredData = (product: any) => {
     "image": product.image_url,
     "brand": {
       "@type": "Brand",
-      "name": "معرض السماح للمفروشات"
+      "name": "شركة الرؤى للتجارة والتوريدات والعطارة"
     },
     "offers": {
       "@type": "Offer",
@@ -111,14 +111,14 @@ export const generateOrganizationStructuredData = (storeSettings: any) => {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": storeSettings?.store_name || "معرض السماح للمفروشات",
-    "description": storeSettings?.store_description || "أفضل المفروشات والأثاث المنزلي في مصر",
-    "url": "https://alsamah-store.com",
+    "name": storeSettings?.store_name || "شركة الرؤى للتجارة والتوريدات والعطارة",
+    "description": storeSettings?.store_description || "أجود أنواع الأعشاب الطبيعية والتوابل والزيوت العطرية في مصر",
+    "url": "https://elroaa-store.com",
     "logo": storeSettings?.logo_url || "/favicon.png",
     "address": [
       {
         "@type": "PostalAddress",
-        "streetAddress": "شارع الكوبري. بجوار مول الأهرام والبمبي للأجهزة الكهربائية",
+        "streetAddress": "القليوبية - بنها / كفر شكر",
         "addressLocality": "بنها",
         "addressCountry": "EG"
       }

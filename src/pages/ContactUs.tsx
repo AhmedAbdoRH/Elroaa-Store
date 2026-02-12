@@ -139,15 +139,15 @@ export default function ContactUs() {
             <div className="grid md:grid-cols-3 gap-6">
               <div className="bg-white/5 rounded-xl p-6">
                 <h3 className="text-xl font-semibold text-white mb-2">استشارة مجانية</h3>
-                <p className="text-white/80">نقدم استشارة مجانية لاختيار المفروشات المناسبة</p>
+                <p className="text-white/80">نقدم استشارة مجانية لاختيار أفضل أنواع التوابل والتركيبات</p>
               </div>
               <div className="bg-white/5 rounded-xl p-6">
-                <h3 className="text-xl font-semibold text-white mb-2">توصيل مجاني</h3>
-                <p className="text-white/80">توصيل مجاني للمناطق القريبة من فروعنا</p>
+                <h3 className="text-xl font-semibold text-white mb-2">توصيل سريع</h3>
+                <p className="text-white/80">توصيل سريع لطلبات التوريد والجملة لجميع المحافظات</p>
               </div>
               <div className="bg-white/5 rounded-xl p-6">
-                <h3 className="text-xl font-semibold text-white mb-2">ضمان الجودة</h3>
-                <p className="text-white/80">ضمان شامل على جميع منتجاتنا</p>
+                <h3 className="text-xl font-semibold text-white mb-2">ضمان النقاء</h3>
+                <p className="text-white/80">نضمن أعلى درجات النقاء والجودة لجميع منتجاتنا الطبيعية</p>
               </div>
             </div>
           </div>

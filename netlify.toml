@@ -68,7 +68,7 @@
 
 # Redirect www to non-www
 [[redirects]]
-  from = "https://www.alsamah-store.com/*"
-  to = "https://alsamah-store.com/:splat"
+  from = "https://www.elroaa-store.com/*"
+  to = "https://elroaa-store.com/:splat"
   status = 301
   force = true

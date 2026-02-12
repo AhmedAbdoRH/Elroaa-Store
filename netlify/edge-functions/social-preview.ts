@@ -58,7 +58,7 @@ export default async (request: Request, context: Context) => {
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>${product.title} | معرض السماح للمفروشات</title>
+  <title>${product.title} | شركة الرؤى للتجارة والتوريدات والعطارة</title>
   <meta name="description" content="${(product.description || '').slice(0, 160)}">
   
   <meta property="og:type" content="product">
