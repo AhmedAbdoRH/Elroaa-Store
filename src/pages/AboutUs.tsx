@@ -17,7 +17,7 @@ export default function AboutUs() {
           {/* Header */}
           <div className="text-center mb-16">
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-              من نحن - <span className="text-[#FFD700]">شركة الرؤى للتجارة والتوريدات والعطارة</span>
+              من نحن - <span className="text-[#B8860B]">شركة الرؤى للتجارة والتوريدات والعطارة</span>
             </h1>
             <p className="text-xl text-white/80 max-w-3xl mx-auto leading-relaxed">
               نحن رواد في مجال العطارة والتوريدات، نقدم جودة حقيقية بسعر عادل وننشر ثقافة المنتجات الطبيعية الصحية.
@@ -44,10 +44,10 @@ export default function AboutUs() {
 
             {/* Our Values */}
             <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
-              <h2 className="text-3xl font-bold text-[#FFD700] mb-6">قيمنا الأساسية</h2>
+              <h2 className="text-3xl font-bold text-[#B8860B] mb-6">قيمنا الأساسية</h2>
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
-                  <Award className="h-8 w-8 text-[#FFD700] mt-1 flex-shrink-0" />
+                  <Award className="h-8 w-8 text-[#B8860B] mt-1 flex-shrink-0" />
                   <div>
                     <h3 className="text-xl font-semibold text-white mb-2">الجودة</h3>
                     <p className="text-white/80">نوفر أفضل أنواع الأعشاب والتوابل طبقاً للمواصفات القياسية</p>

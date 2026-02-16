@@ -6,7 +6,7 @@ import { supabase } from '../lib/supabase';
 const brownDark = '#3d2c1d'; // Dark brown color
 
 // Define the light gold color using the hex code
-const lightGold = '#FFD700'; // Standard gold color
+const lightGold = '#B8860B'; // Darker gold for better contrast
 
 export default function AdminLogin() {
   const [email, setEmail] = useState('');

@@ -30,7 +30,7 @@ export default function ContactUs() {
             {/* Contact Info */}
             <div className="space-y-8">
               <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
-                <h2 className="text-3xl font-bold text-[#FFD700] mb-6">معلومات الاتصال</h2>
+                <h2 className="text-3xl font-bold text-[#B8860B] mb-6">معلومات الاتصال</h2>
                 
                 {/* Phone Numbers */}
                 <div className="space-y-6">

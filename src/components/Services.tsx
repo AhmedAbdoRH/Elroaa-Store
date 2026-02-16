@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabase';
 import type { Service, Category, Subcategory } from '../types/database';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const lightGold = '#FFD700';
+const lightGold = '#B8860B';
 const brownDark = '#3d2c1d';
 
 export default function Services() {

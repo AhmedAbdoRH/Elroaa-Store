@@ -22,7 +22,7 @@ export default function SEOOptimizedHero({ storeSettings }: SEOOptimizedHeroProp
         >
           {/* Main Heading with SEO Keywords */}
           <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-            <span className="text-[#FFD700]">شركة الرؤى</span> للتجارة والتوريدات والعطارة
+            <span className="text-[#B8860B]">شركة الرؤى</span> للتجارة والتوريدات والعطارة
           </h1>
           
           <h2 className="text-xl md:text-2xl mb-8 text-white/90 font-medium">

@@ -261,7 +261,7 @@ export default function ProductDetails() {
                         <div className="flex items-center justify-between bg-black/60 rounded-lg p-4 border border-white/10 shadow-lg">
                           <div className="text-right flex-1">
                             <span className="text-gray-300 text-sm font-medium block mb-1">الوزن المحدد</span>
-                            <span className="text-2xl font-bold text-[#FFD700] drop-shadow-sm">
+                            <span className="text-2xl font-bold text-[#B8860B] drop-shadow-sm">
                               {selectedWeight >= 1000 
                                 ? `1 كجم` 
                                 : selectedWeight >= 100 
