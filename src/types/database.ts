@@ -33,6 +33,9 @@ export interface Service {
   price?: number | null;
   sale_price?: number | null;
   has_multiple_sizes?: boolean;
+  has_weight_pricing?: boolean; // نظام التسعير بالوزن
+  price_per_kg?: number | null; // سعر الكيلوجرام
+  sale_price_per_kg?: number | null; // سعر الكيلوجرام بعد التخفيض
   sizes?: ProductSize[]; // Array of product sizes
   is_featured?: boolean; // أحدث العروض
   is_best_seller?: boolean; // الأكثر مبيعاً

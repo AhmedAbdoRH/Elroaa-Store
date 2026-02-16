@@ -12,14 +12,16 @@ interface ProductCardProps {
   salePrice?: number | null; // Make salePrice optional and number type
   id: string | number;
   has_multiple_sizes?: boolean;
+  has_weight_pricing?: boolean;
+  price_per_kg?: number | null;
+  sale_price_per_kg?: number | null;
   sizes?: ProductSize[];
 }
-
 
 // Define the light gold color using the hex code from the Hero component
 const lightGold = '#FFD700'; // This is standard gold color
 
-export default function ProductCard({ title, description, imageUrl, price, salePrice, id, has_multiple_sizes, sizes }: ProductCardProps) {
+export default function ProductCard({ title, description, imageUrl, price, salePrice, id, has_multiple_sizes, has_weight_pricing, price_per_kg, sale_price_per_kg, sizes }: ProductCardProps) {
 
   const { addToCart } = useCart();
   const [isAdding, setIsAdding] = useState(false);
@@ -27,6 +29,17 @@ export default function ProductCard({ title, description, imageUrl, price, saleP
 
   // Smart pricing system with intelligent fallbacks
   const { displayPrice, displaySalePrice, priceRange, hasMultiplePrices, pricingStrategy } = useMemo(() => {
+    // Check for weight pricing first
+    if (has_weight_pricing && price_per_kg) {
+      return {
+        displayPrice: price_per_kg,
+        displaySalePrice: sale_price_per_kg,
+        priceRange: null,
+        hasMultiplePrices: false,
+        pricingStrategy: 'weight'
+      };
+    }
+
     // Helper function to generate smart pricing based on product name
     const generateSmartPricing = (productTitle: string) => {
       const title = productTitle.toLowerCase();
@@ -120,7 +133,7 @@ export default function ProductCard({ title, description, imageUrl, price, saleP
       hasMultiplePrices: false,
       pricingStrategy: 'smart-fallback'
     };
-  }, [has_multiple_sizes, sizes, price, salePrice, title]);
+  }, [has_multiple_sizes, sizes, price, salePrice, title, has_weight_pricing, price_per_kg, sale_price_per_kg]);
 
   console.log('ProductCard Debug - title:', title, 'has_multiple_sizes:', has_multiple_sizes, 'sizes:', sizes, 'price:', price, 'salePrice:', salePrice, 'displayPrice:', displayPrice, 'displaySalePrice:', displaySalePrice, 'pricingStrategy:', pricingStrategy);
 
@@ -184,7 +197,22 @@ export default function ProductCard({ title, description, imageUrl, price, saleP
       <div className="px-6 pb-6 pt-0">
         <div className="flex justify-between items-center">
           <div className="flex flex-col items-end">
-            {has_multiple_sizes && (displayPrice || displaySalePrice) ? (
+            {has_weight_pricing ? (
+              <>
+                 <div className="flex items-center gap-1">
+                  <span className={`font-bold text-lg sm:text-xl text-accent`}>
+                    {displaySalePrice || displayPrice}
+                  </span>
+                  <span className={`font-bold text-lg sm:text-xl text-accent`}>ج/كجم</span>
+                </div>
+                {displaySalePrice && displayPrice && (
+                  <div className="flex items-center gap-1">
+                    <span className="text-sm text-secondary/40 line-through">{displayPrice}</span>
+                    <span className="text-sm text-secondary/40 line-through">ج/كجم</span>
+                  </div>
+                )}
+              </>
+            ) : has_multiple_sizes && (displayPrice || displaySalePrice) ? (
               <>
                 <div className="flex items-center gap-1">
                   <span className={`font-bold text-lg sm:text-xl text-accent`}>

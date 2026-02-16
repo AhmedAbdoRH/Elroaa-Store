@@ -64,6 +64,9 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
     is_featured: false,
     is_best_seller: false,
     has_multiple_sizes: false,
+    has_weight_pricing: false,
+    price_per_kg: null as number | null,
+    sale_price_per_kg: null as number | null,
     price: 0,
     sale_price: null as number | null,
     sizes: [{ size: '', price: 0, sale_price: null as number | null }],
@@ -816,7 +819,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
             has_multiple_sizes: newService.has_multiple_sizes,
         };
 
-        if (!newService.has_multiple_sizes) {
+        if (!newService.has_multiple_sizes && !newService.has_weight_pricing) {
           serviceToAdd.price = newService.price;
           serviceToAdd.sale_price = newService.sale_price;
         } else {
@@ -847,6 +850,9 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
             is_featured: false,
             is_best_seller: false,
             has_multiple_sizes: false,
+            has_weight_pricing: false,
+            price_per_kg: null,
+            sale_price_per_kg: null,
             price: 0,
             sale_price: null,
             sizes: [{ size: '', price: 0, sale_price: null as number | null}],
@@ -885,6 +891,9 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
       is_featured: service.is_featured || false,
       is_best_seller: service.is_best_seller || false,
       has_multiple_sizes: service.has_multiple_sizes || false,
+      has_weight_pricing: service.has_weight_pricing || false,
+      price_per_kg: service.price_per_kg || null,
+      sale_price_per_kg: service.sale_price_per_kg || null,
       price: service.price || 0,
       sale_price: service.sale_price || null,
       sizes: (sizes && sizes.length > 0) ? sizes : [{ size: '', price: 0, sale_price: null as number | null }],
@@ -916,7 +925,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
         has_multiple_sizes: newService.has_multiple_sizes,
       };
 
-      if (!newService.has_multiple_sizes) {
+      if (!newService.has_multiple_sizes && !newService.has_weight_pricing) {
           serviceToUpdate.price = newService.price;
           serviceToUpdate.sale_price = newService.sale_price;
       } else {
@@ -952,6 +961,8 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
         is_featured: false,
         is_best_seller: false,
         has_multiple_sizes: false,
+        has_weight_pricing: false,
+        price_per_kg: null,
         price: 0,
         sale_price: null,
         sizes: [{ size: '', price: 0, sale_price: null as number | null}],
@@ -979,6 +990,8 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
       is_featured: false,
       is_best_seller: false,
       has_multiple_sizes: false,
+      has_weight_pricing: false,
+      price_per_kg: null,
       price: 0,
       sale_price: null,
       sizes: [{ size: '', price: 0, sale_price: null as number | null}],
@@ -1860,10 +1873,94 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                           )}
                         </select>
                         
-                        <div className="flex items-center gap-2 p-2 bg-gray-700/50 rounded-md">
-                            <input type="checkbox" id="has_multiple_sizes" checked={newService.has_multiple_sizes} onChange={(e) => setNewService({ ...newService, has_multiple_sizes: e.target.checked })} className="h-4 w-4 accent-blue-500"/>
-                            <label htmlFor="has_multiple_sizes" className="text-white">نظام متعدد الاسعار</label>
+                        {/* نظام التسعير */}
+                        <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-600">
+                            <h4 className="text-lg font-bold mb-3 text-white">اختر نظام التسعير:</h4>
+                            <div className="flex flex-col gap-3">
+                                {/* النظام العادي */}
+                                <label className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${!newService.has_multiple_sizes && !newService.has_weight_pricing ? 'bg-blue-600/30 border-2 border-blue-500' : 'bg-gray-700/50 border-2 border-transparent hover:border-gray-500'}`}>
+                                    <input 
+                                        type="radio" 
+                                        name="pricing_type" 
+                                        checked={!newService.has_multiple_sizes && !newService.has_weight_pricing}
+                                        onChange={() => {
+                                            setNewService({ 
+                                                ...newService, 
+                                                has_multiple_sizes: false, 
+                                                has_weight_pricing: false 
+                                            });
+                                        }}
+                                        className="h-5 w-5 accent-blue-500"
+                                    />
+                                    <div className="flex-1">
+                                        <span className="text-white font-bold block">سعر ثابت</span>
+                                        <span className="text-gray-400 text-sm">منتج بسعر واحد فقط</span>
+                                    </div>
+                                </label>
+
+                                {/* نظام المقاسات */}
+                                <label className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${newService.has_multiple_sizes ? 'bg-blue-600/30 border-2 border-blue-500' : 'bg-gray-700/50 border-2 border-transparent hover:border-gray-500'}`}>
+                                    <input 
+                                        type="radio" 
+                                        name="pricing_type" 
+                                        checked={newService.has_multiple_sizes}
+                                        onChange={() => {
+                                            setNewService({ 
+                                                ...newService, 
+                                                has_multiple_sizes: true, 
+                                                has_weight_pricing: false 
+                                            });
+                                        }}
+                                        className="h-5 w-5 accent-blue-500"
+                                    />
+                                    <div className="flex-1">
+                                        <span className="text-white font-bold block">متعدد المقاسات/المتغيرات</span>
+                                        <span className="text-gray-400 text-sm">سعر مختلف لكل مقاس أو متغير</span>
+                                    </div>
+                                </label>
+
+                                {/* نظام الوزن */}
+                                <label className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${newService.has_weight_pricing ? 'bg-blue-600/30 border-2 border-blue-500' : 'bg-gray-700/50 border-2 border-transparent hover:border-gray-500'}`}>
+                                    <input 
+                                        type="radio" 
+                                        name="pricing_type" 
+                                        checked={newService.has_weight_pricing}
+                                        onChange={() => {
+                                            setNewService({ 
+                                                ...newService, 
+                                                has_multiple_sizes: false, 
+                                                has_weight_pricing: true 
+                                            });
+                                        }}
+                                        className="h-5 w-5 accent-blue-500"
+                                    />
+                                    <div className="flex-1">
+                                        <span className="text-white font-bold block">تسعير بالوزن</span>
+                                        <span className="text-gray-400 text-sm">سعر الكيلوجرام (اختيار العميل للوزن)</span>
+                                    </div>
+                                </label>
+                            </div>
                         </div>
+
+                        {newService.has_weight_pricing && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <input 
+                                    type="number" 
+                                    placeholder="سعر الكيلوجرام" 
+                                    value={newService.price_per_kg || ''} 
+                                    onChange={(e) => setNewService({ ...newService, price_per_kg: parseFloat(e.target.value) || null })} 
+                                    className="w-full p-3 rounded text-white bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    required
+                                />
+                                <input 
+                                    type="number" 
+                                    placeholder="سعر الكيلوجرام بعد التخفيض (اختياري)" 
+                                    value={newService.sale_price_per_kg || ''} 
+                                    onChange={(e) => setNewService({ ...newService, sale_price_per_kg: parseFloat(e.target.value) || null })} 
+                                    className="w-full p-3 rounded text-white bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+                        )}
 
                         {newService.has_multiple_sizes ? (
                           <div>
@@ -1929,12 +2026,12 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                              + مقاس اضافي
                             </button>
                           </div>
-                        ) : (
+                        ) : !newService.has_weight_pricing ? (
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <input type="number" placeholder="السعر" value={newService.price || ''} onChange={(e) => setNewService({ ...newService, price: parseFloat(e.target.value) })} className="w-full p-3 rounded text-white bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" required disabled={isLoading}/>
                             <input type="number" placeholder="سعر التخفيض (اختياري)" value={newService.sale_price || ''} onChange={(e) => setNewService({ ...newService, sale_price: parseFloat(e.target.value) || null })} className="w-full p-3 rounded text-white bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" disabled={isLoading}/>
                           </div>
-                        )}
+                        ) : null}
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                             <div className="flex items-center gap-2 p-2 bg-gray-700/50 rounded-md">

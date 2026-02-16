@@ -162,6 +162,11 @@ export default function SubcategoryProducts() {
                   imageUrl={service.image_url || ''}
                   price={service.price || ''}
                   salePrice={service.sale_price || null}
+                  has_multiple_sizes={service.has_multiple_sizes}
+                  sizes={service.sizes}
+                  has_weight_pricing={service.has_weight_pricing}
+                  price_per_kg={service.price_per_kg}
+                  sale_price_per_kg={service.sale_price_per_kg}
                 />
               ))}
             </div>

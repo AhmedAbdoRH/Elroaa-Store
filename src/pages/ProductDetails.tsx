@@ -20,6 +20,10 @@ export default function ProductDetails() {
   // Image slider states - removed as we're using ProductImageSlider component
   const { addToCart } = useCart();
   const [selectedSize, setSelectedSize] = useState<ProductSize | null>(null);
+  
+  // Weight pricing states
+  const [selectedWeight, setSelectedWeight] = useState<number>(100); // Default 100g
+  const [calculatedPrice, setCalculatedPrice] = useState<number>(0);
 
   // Scroll to top when product changes
   useEffect(() => {
@@ -39,6 +43,15 @@ export default function ProductDetails() {
       fetchSuggested();
     }
   }, [service]);
+
+  // Calculate price when weight or price_per_kg changes
+  useEffect(() => {
+    if (service?.has_weight_pricing && service.price_per_kg) {
+      const pricePerKg = service.sale_price_per_kg || service.price_per_kg;
+      const price = (selectedWeight / 1000) * pricePerKg;
+      setCalculatedPrice(Math.round(price * 100) / 100);
+    }
+  }, [selectedWeight, service?.price_per_kg, service?.sale_price_per_kg, service?.has_weight_pricing]);
 
   const fetchService = async (serviceId: string) => {
     try {
@@ -181,6 +194,90 @@ export default function ProductDetails() {
   {service.description}
 </p>
                 <div className="border-t border-gray-700 pt-6 mb-6">
+                  {service.has_weight_pricing && (
+                    <div className="mb-8">
+                      <h4 className="text-lg font-bold mb-4 text-[#FFD700] text-right flex items-center justify-end gap-2">
+                        <span>حدد الكمية المطلوبة</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0115 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.633-.585l-.196-.45a1.083 1.083 0 01-.229-.022l-2.155-1.077V19a1 1 0 01-2 0v-6.93l-2.155 1.077a1.083 1.083 0 01-.229.022l-.196.45a1 1 0 01-.633.585A3.989 3.989 0 015 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.788l1.599.799L9 4.323V3a1 1 0 011-1zm-5 8.274l-.818 2.552c.25.112.526.174.818.174.292 0 .569-.062.818-.174L5 10.274zm10 0l-.818 2.552c.25.112.526.174.818.174.292 0 .569-.062.818-.174L15 10.274z" clipRule="evenodd" />
+                        </svg>
+                      </h4>
+                      
+                      <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-6 rounded-xl shadow-inner">
+                        <div className="relative mb-6">
+                           {/* Custom Range Slider Styles */}
+                          <style>{`
+                            input[type=range] {
+                              -webkit-appearance: none;
+                              width: 100%;
+                              background: transparent;
+                              direction: rtl; /* Set direction to RTL */
+                            }
+                            input[type=range]::-webkit-slider-thumb {
+                              -webkit-appearance: none;
+                              height: 24px;
+                              width: 24px;
+                              border-radius: 50%;
+                              background: #FFD700;
+                              cursor: pointer;
+                              margin-top: -10px;
+                              box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+                              border: 2px solid #fff;
+                              transition: transform 0.1s;
+                            }
+                            input[type=range]::-webkit-slider-thumb:hover {
+                              transform: scale(1.1);
+                            }
+                            input[type=range]::-webkit-slider-runnable-track {
+                              width: 100%;
+                              height: 6px;
+                              cursor: pointer;
+                              /* Gradient direction reversed for RTL: starts yellow from right, goes to gray on left */
+                              background: linear-gradient(to left, #FFD700 ${((selectedWeight - 100) / 900) * 100}%, #4B5563 ${((selectedWeight - 100) / 900) * 100}%);
+                              border-radius: 3px;
+                            }
+                            input[type=range]:focus {
+                              outline: none;
+                            }
+                          `}</style>
+
+                          <input
+                            type="range"
+                            min="100"
+                            max="1000"
+                            step="10"
+                            value={selectedWeight}
+                            onChange={(e) => setSelectedWeight(parseInt(e.target.value))}
+                            className="w-full"
+                          />
+                        </div>
+
+                        <div className="flex justify-between items-center text-xs font-bold text-gray-300 mb-4 px-1" style={{direction: 'rtl'}}>
+                          <span>0 جم</span>
+                          <span>500 جم</span>
+                          <span>1000 جم</span>
+                        </div>
+
+                        <div className="flex items-center justify-between bg-black/60 rounded-lg p-4 border border-white/10 shadow-lg">
+                          <div className="text-right flex-1">
+                            <span className="text-gray-300 text-sm font-medium block mb-1">الوزن المحدد</span>
+                            <span className="text-2xl font-bold text-[#FFD700] drop-shadow-sm">
+                              {selectedWeight >= 1000 
+                                ? `1 كجم` 
+                                : selectedWeight >= 100 
+                                  ? `${(selectedWeight / 1000).toFixed(2)} كجم`
+                                  : `${selectedWeight} جم`}
+                            </span>
+                          </div>
+                          <div className="h-12 w-px bg-white/20 mx-4"></div>
+                          <div className="text-left flex-1">
+                            <span className="text-gray-300 text-sm font-medium block mb-1">السعر التقريبي</span>
+                            <span className="text-2xl font-bold text-white drop-shadow-sm">{calculatedPrice} ج</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   {service.has_multiple_sizes && service.sizes && service.sizes.length > 0 && (
                     <div className="mb-4">
                       <h4 className="text-lg font-bold mb-2 text-secondary text-right">المقاسات المتوفرة</h4>
@@ -200,7 +297,19 @@ export default function ProductDetails() {
                     </div>
                   )}
                   <div className="text-2xl font-bold text-accent mb-6 text-right">
-                    {service.has_multiple_sizes ? (
+                    {service.has_weight_pricing ? (
+                      <div className="flex flex-col items-end">
+                        <span className="text-2xl text-[#FFD700]">{calculatedPrice} ج</span>
+                        {service.sale_price_per_kg ? (
+                           <div className="flex gap-2">
+                             <span className="text-sm text-gray-400 line-through">الكيلو: {service.price_per_kg} ج</span>
+                             <span className="text-sm text-green-400">الكيلو: {service.sale_price_per_kg} ج</span>
+                           </div>
+                        ) : (
+                           <span className="text-lg text-gray-400">سعر الكيلوجرام: {service.price_per_kg} ج</span>
+                        )}
+                      </div>
+                    ) : service.has_multiple_sizes ? (
                       selectedSize?.sale_price ? (
                         <div className="flex flex-col items-end">
                           <span className="text-2xl text-[#FFD700]">{selectedSize.sale_price} ج</span>
@@ -231,12 +340,26 @@ export default function ProductDetails() {
                     <button
                       onClick={(e) => {
                         e.preventDefault();
-                        if (service.has_multiple_sizes) {
+                        if (service.has_weight_pricing) {
+                          const weightText = selectedWeight >= 1000 
+                            ? '1 كجم' 
+                            : selectedWeight >= 100 
+                              ? `${(selectedWeight / 1000).toFixed(2)} كجم`
+                              : `${selectedWeight} جم`;
+                          addToCart({
+                            productId: String(service.id),
+                            title: service.title,
+                            price: String(calculatedPrice),
+                            imageUrl: service.image_url || '',
+                            size: weightText,
+                          });
+                          toast.success('تمت إضافة المنتج إلى السلة');
+                        } else if (service.has_multiple_sizes) {
                           if (selectedSize) {
                             addToCart({
-                              id: service.id,
+                              productId: String(service.id),
                               title: service.title,
-                              price: selectedSize.sale_price || selectedSize.price,
+                              price: String(selectedSize.sale_price || selectedSize.price),
                               imageUrl: service.image_url || '',
                               size: selectedSize.size,
                             });
@@ -246,9 +369,9 @@ export default function ProductDetails() {
                           }
                         } else {
                           addToCart({
-                            id: service.id,
+                            productId: String(service.id),
                             title: service.title,
-                            price: service.sale_price || service.price || 0,
+                            price: String(service.sale_price || service.price || 0),
                             imageUrl: service.image_url || '',
                           });
                           toast.success('تمت إضافة المنتج إلى السلة');
@@ -307,7 +430,16 @@ export default function ProductDetails() {
                   />
                   <div className="mt-2 text-sm md:text-base font-bold text-secondary truncate text-right">{item.title}</div>
                   <div className="flex flex-col items-end">
-                    {item.has_multiple_sizes && item.sizes && item.sizes.length > 0 && item.sizes[0].sale_price ? (
+                    {item.has_weight_pricing ? (
+                      item.sale_price_per_kg ? (
+                        <>
+                          <span className="text-xs md:text-sm text-[#FFD700]">{item.sale_price_per_kg} ج/كجم</span>
+                          <span className="text-xs text-gray-400 line-through">{item.price_per_kg} ج/كجم</span>
+                        </>
+                      ) : (
+                        <span className="text-xs md:text-sm text-accent">{item.price_per_kg} ج/كجم</span>
+                      )
+                    ) : item.has_multiple_sizes && item.sizes && item.sizes.length > 0 && item.sizes[0].sale_price ? (
                       <>
                         <span className="text-xs md:text-sm text-[#FFD700]">{item.sizes[0].sale_price} ج</span>
                         <span className="text-xs text-gray-400 line-through">{item.sizes[0].price} ج</span>
