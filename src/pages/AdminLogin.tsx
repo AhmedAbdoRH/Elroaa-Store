@@ -6,7 +6,7 @@ import { supabase } from '../lib/supabase';
 const brownDark = '#3d2c1d'; // Dark brown color
 
 // Define the light gold color using the hex code
-const lightGold = '#B8860B'; // Darker gold for better contrast
+const lightGold = '#CA8A04'; // Darker gold
 
 export default function AdminLogin() {
   const [email, setEmail] = useState('');
@@ -100,7 +100,7 @@ export default function AdminLogin() {
           <button
             type="submit"
             disabled={isLoading}
-            className={`w-full bg-[${lightGold}] text-black py-3 rounded hover:bg-yellow-500 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-bold`}
+            className={`w-full bg-[${lightGold}] text-black py-3 rounded hover:bg-[#A16207] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-bold`}
           >
             {isLoading ? 'جاري تسجيل الدخول...' : 'دخول'}
           </button>

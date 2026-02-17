@@ -3,7 +3,7 @@ import ServiceCard from './ServiceCard';
 import { supabase } from '../lib/supabase';
 import type { Service, Category } from '../types/database';
 
-const lightGold = '#B8860B';
+const lightGold = '#CA8A04';
 const brownDark = '#3d2c1d';
 const accentColor = '#d99323'; // New accent color for selected categories
 

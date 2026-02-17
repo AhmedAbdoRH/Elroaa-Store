@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase';
 import type { Service, Category, Subcategory } from '../types/database';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const lightGold = '#B8860B';
+const lightGold = '#CA8A04';
 const brownDark = '#3d2c1d';
 
 
@@ -53,8 +53,8 @@ const ProductCardDirect = ({ service }: { service: Service }) => {
                 return (
                   <>
                     <div className="flex items-center gap-1">
-                      <span className={`text-lg text-[#FFD700]`}>{minSalePrice}</span>
-                      <span className={`text-lg text-[#FFD700]`}>ج</span>
+                      <span className={`text-lg text-[#CA8A04]`}>{minSalePrice}</span>
+                      <span className={`text-lg text-[#CA8A04]`}>ج</span>
                     </div>
                     {minSalePrice !== maxSalePrice && (
                       <span className="text-xs text-gray-400">ابتداءً من</span>
@@ -65,8 +65,8 @@ const ProductCardDirect = ({ service }: { service: Service }) => {
                 return (
                   <>
                     <div className="flex items-center gap-1">
-                      <span className={`text-lg text-[#FFD700]`}>{minPrice}</span>
-                      <span className={`text-lg text-[#FFD700]`}>ج</span>
+                      <span className={`text-lg text-[#CA8A04]`}>{minPrice}</span>
+                      <span className={`text-lg text-[#CA8A04]`}>ج</span>
                     </div>
                     {minPrice !== maxPrice && (
                       <span className="text-xs text-gray-400">ابتداءً من</span>
@@ -94,8 +94,8 @@ const ProductCardDirect = ({ service }: { service: Service }) => {
                 return (
                   <>
                     <div className="flex items-center gap-1">
-                      <span className={`text-lg text-[#FFD700]`}>{smartPrice}</span>
-                      <span className={`text-lg text-[#FFD700]`}>ج</span>
+                      <span className={`text-lg text-[#CA8A04]`}>{smartPrice}</span>
+                      <span className={`text-lg text-[#CA8A04]`}>ج</span>
                     </div>
                     <span className="text-xs text-gray-400">ابتداءً من</span>
                   </>
@@ -105,8 +105,8 @@ const ProductCardDirect = ({ service }: { service: Service }) => {
           ) : service.sale_price ? (
             <>
               <div className="flex items-center gap-1">
-                <span className={`text-lg text-[#FFD700]`}>{service.sale_price}</span>
-                <span className={`text-lg text-[#FFD700]`}>ج</span>
+                <span className={`text-lg text-[#CA8A04]`}>{service.sale_price}</span>
+                <span className={`text-lg text-[#CA8A04]`}>ج</span>
               </div>
               <div className="flex items-center gap-1">
                 <span className="text-sm text-gray-400 line-through">{service.price}</span>
@@ -115,8 +115,8 @@ const ProductCardDirect = ({ service }: { service: Service }) => {
             </>
           ) : service.price ? (
             <div className="flex items-center gap-1">
-              <span className={`text-lg text-[#FFD700]`}>{service.price}</span>
-              <span className={`text-lg text-[#FFD700]`}>ج</span>
+              <span className={`text-lg text-[#CA8A04]`}>{service.price}</span>
+              <span className={`text-lg text-[#CA8A04]`}>ج</span>
             </div>
           ) : (
             (() => {
@@ -140,8 +140,8 @@ const ProductCardDirect = ({ service }: { service: Service }) => {
               return (
                 <>
                   <div className="flex items-center gap-1">
-                    <span className={`text-lg text-[#FFD700]`}>{smartPrice}</span>
-                    <span className={`text-lg text-[#FFD700]`}>ج</span>
+                    <span className={`text-lg text-[#CA8A04]`}>{smartPrice}</span>
+                    <span className={`text-lg text-[#CA8A04]`}>ج</span>
                   </div>
                   <span className="text-xs text-gray-400">ابتداءً من</span>
                 </>
@@ -237,7 +237,7 @@ export default function Products() {
         variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.11 } } }}
       >
         <motion.h2
-          className={`text-3xl font-bold text-center mb-12 text-[#FFD700]`}
+          className={`text-3xl font-bold text-center mb-12 text-[#CA8A04]`}
           initial={{ opacity: 0, y: -32 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, ease: 'easeOut' }}

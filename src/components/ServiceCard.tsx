@@ -19,7 +19,7 @@ interface ProductCardProps {
 }
 
 // Define the light gold color using the hex code from the Hero component
-const lightGold = '#B8860B'; // Darker gold for better contrast on light backgrounds
+const lightGold = '#CA8A04'; // Darker gold (Yellow-600) for better visibility on light backgrounds
 
 export default function ProductCard({ title, description, imageUrl, price, salePrice, id, has_multiple_sizes, has_weight_pricing, price_per_kg, sale_price_per_kg, sizes }: ProductCardProps) {
 

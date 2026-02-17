@@ -26,7 +26,7 @@ export default function BannerStrip({ banners }: BannerStripProps) {
           key={banner.id}
           className="w-full py-1 px-4 text-center md:py-3"
           style={{
-            backgroundColor: (banner as any).strip_background_color || '#b8860b',
+            backgroundColor: (banner as any).strip_background_color || '#CA8A04',
             color: (banner as any).strip_text_color || '#ffffff',
           }}
         >

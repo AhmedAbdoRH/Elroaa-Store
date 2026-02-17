@@ -22,7 +22,7 @@ export default function SEOOptimizedHero({ storeSettings }: SEOOptimizedHeroProp
         >
           {/* Main Heading with SEO Keywords */}
           <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-            <span className="text-[#B8860B]">شركة الرؤى</span> للتجارة والتوريدات والعطارة
+            <span className="text-[#CA8A04]">شركة الرؤى</span> للتجارة والتوريدات والعطارة
           </h1>
           
           <h2 className="text-xl md:text-2xl mb-8 text-white/90 font-medium">
@@ -50,7 +50,7 @@ export default function SEOOptimizedHero({ storeSettings }: SEOOptimizedHeroProp
               transition={{ duration: 0.6, delay: 0.2 }}
               className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20"
             >
-              <Award className="h-8 w-8 text-[#FFD700] mx-auto mb-2" />
+              <Award className="h-8 w-8 text-[#CA8A04] mx-auto mb-2" />
               <h3 className="font-semibold text-sm">جودة عالية</h3>
               <p className="text-xs text-white/70">أفضل المواد الخام</p>
             </motion.div>
@@ -61,7 +61,7 @@ export default function SEOOptimizedHero({ storeSettings }: SEOOptimizedHeroProp
               transition={{ duration: 0.6, delay: 0.3 }}
               className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20"
             >
-              <Truck className="h-8 w-8 text-[#FFD700] mx-auto mb-2" />
+              <Truck className="h-8 w-8 text-[#CA8A04] mx-auto mb-2" />
               <h3 className="font-semibold text-sm">توصيل مجاني</h3>
               <p className="text-xs text-white/70">للمناطق القريبة</p>
             </motion.div>
@@ -72,7 +72,7 @@ export default function SEOOptimizedHero({ storeSettings }: SEOOptimizedHeroProp
               transition={{ duration: 0.6, delay: 0.4 }}
               className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20"
             >
-              <Shield className="h-8 w-8 text-[#FFD700] mx-auto mb-2" />
+              <Shield className="h-8 w-8 text-[#CA8A04] mx-auto mb-2" />
               <h3 className="font-semibold text-sm">ضمان الجودة</h3>
               <p className="text-xs text-white/70">ضمان شامل</p>
             </motion.div>
@@ -83,7 +83,7 @@ export default function SEOOptimizedHero({ storeSettings }: SEOOptimizedHeroProp
               transition={{ duration: 0.6, delay: 0.5 }}
               className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20"
             >
-              <Star className="h-8 w-8 text-[#FFD700] mx-auto mb-2" />
+              <Star className="h-8 w-8 text-[#CA8A04] mx-auto mb-2" />
               <h3 className="font-semibold text-sm">تقييم 5 نجوم</h3>
               <p className="text-xs text-white/70">من عملائنا</p>
             </motion.div>
@@ -96,10 +96,10 @@ export default function SEOOptimizedHero({ storeSettings }: SEOOptimizedHeroProp
             transition={{ duration: 0.6, delay: 0.6 }}
             className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 max-w-2xl mx-auto"
           >
-            <h3 className="text-xl font-bold mb-4 text-[#FFD700]">فروعنا</h3>
+            <h3 className="text-xl font-bold mb-4 text-[#CA8A04]">فروعنا</h3>
             <div className="grid md:grid-cols-2 gap-4 text-right">
               <div className="flex items-start gap-3">
-                <MapPin className="h-5 w-5 text-[#FFD700] mt-1 flex-shrink-0" />
+                <MapPin className="h-5 w-5 text-[#CA8A04] mt-1 flex-shrink-0" />
                 <div>
                   <h4 className="font-semibold">قسم المبيعات</h4>
                   <p className="text-sm text-white/80">
@@ -108,7 +108,7 @@ export default function SEOOptimizedHero({ storeSettings }: SEOOptimizedHeroProp
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <MapPin className="h-5 w-5 text-[#FFD700] mt-1 flex-shrink-0" />
+                <MapPin className="h-5 w-5 text-[#CA8A04] mt-1 flex-shrink-0" />
                 <div>
                   <h4 className="font-semibold">مقر الشركة</h4>
                   <p className="text-sm text-white/80">

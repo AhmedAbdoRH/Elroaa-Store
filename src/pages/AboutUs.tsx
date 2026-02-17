@@ -17,7 +17,7 @@ export default function AboutUs() {
           {/* Header */}
           <div className="text-center mb-16">
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-              من نحن - <span className="text-[#B8860B]">شركة الرؤى للتجارة والتوريدات والعطارة</span>
+              من نحن - <span className="text-[#CA8A04]">شركة الرؤى للتجارة والتوريدات والعطارة</span>
             </h1>
             <p className="text-xl text-white/80 max-w-3xl mx-auto leading-relaxed">
               نحن رواد في مجال العطارة والتوريدات، نقدم جودة حقيقية بسعر عادل وننشر ثقافة المنتجات الطبيعية الصحية.
@@ -28,7 +28,7 @@ export default function AboutUs() {
           <div className="grid lg:grid-cols-2 gap-12 mb-16">
             {/* Our Story */}
             <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
-              <h2 className="text-3xl font-bold text-[#FFD700] mb-6">رؤيتنا ورسالتنا</h2>
+              <h2 className="text-3xl font-bold text-[#CA8A04] mb-6">رؤيتنا ورسالتنا</h2>
               <div className="space-y-4 text-white/90 leading-relaxed">
                 <p>
                   <strong>رؤيتنا:</strong> أن نكون من الرواد في مجال العطارة والتوريدات داخل مصر، من خلال تقديم منتجات طبيعية موثوقة وخدمة احترافية تبني الثقة طويلة المدى مع عملائنا.
@@ -44,24 +44,24 @@ export default function AboutUs() {
 
             {/* Our Values */}
             <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
-              <h2 className="text-3xl font-bold text-[#B8860B] mb-6">قيمنا الأساسية</h2>
+              <h2 className="text-3xl font-bold text-[#CA8A04] mb-6">قيمنا الأساسية</h2>
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
-                  <Award className="h-8 w-8 text-[#B8860B] mt-1 flex-shrink-0" />
+                  <Award className="h-8 w-8 text-[#CA8A04] mt-1 flex-shrink-0" />
                   <div>
                     <h3 className="text-xl font-semibold text-white mb-2">الجودة</h3>
                     <p className="text-white/80">نوفر أفضل أنواع الأعشاب والتوابل طبقاً للمواصفات القياسية</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <Users className="h-8 w-8 text-[#FFD700] mt-1 flex-shrink-0" />
+                  <Users className="h-8 w-8 text-[#CA8A04] mt-1 flex-shrink-0" />
                   <div>
                     <h3 className="text-xl font-semibold text-white mb-2">التنوع والخبرة</h3>
                     <p className="text-white/80">فريق متخصص يقدم استشارات لاختيار أفضل المنتجات والتركيبات</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <Star className="h-8 w-8 text-[#FFD700] mt-1 flex-shrink-0" />
+                  <Star className="h-8 w-8 text-[#CA8A04] mt-1 flex-shrink-0" />
                   <div>
                     <h3 className="text-xl font-semibold text-white mb-2">الالتزام</h3>
                     <p className="text-white/80">نلتزم بالدقة في المواعيد والشفافية التامة في التعامل</p>
@@ -74,22 +74,22 @@ export default function AboutUs() {
           {/* Statistics */}
           <div className="grid md:grid-cols-3 gap-8 mb-16">
             <div className="text-center bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
-              <div className="text-4xl font-bold text-[#FFD700] mb-2">100%</div>
+              <div className="text-4xl font-bold text-[#CA8A04] mb-2">100%</div>
               <div className="text-white/80">منتجات طبيعية</div>
             </div>
             <div className="text-center bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
-              <div className="text-4xl font-bold text-[#FFD700] mb-2">500+</div>
+              <div className="text-4xl font-bold text-[#CA8A04] mb-2">500+</div>
               <div className="text-white/80">صنف متاح</div>
             </div>
             <div className="text-center bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
-              <div className="text-4xl font-bold text-[#FFD700] mb-2">24/7</div>
+              <div className="text-4xl font-bold text-[#CA8A04] mb-2">24/7</div>
               <div className="text-white/80">خدمة عملاء</div>
             </div>
           </div>
 
           {/* Services */}
           <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10 mb-16">
-            <h2 className="text-3xl font-bold text-[#FFD700] mb-8 text-center">خدمات التوريد</h2>
+            <h2 className="text-3xl font-bold text-[#CA8A04] mb-8 text-center">خدمات التوريد</h2>
             <div className="grid md:grid-cols-2 gap-8">
               <div className="bg-white/5 rounded-xl p-6">
                 <h3 className="text-xl font-semibold text-white mb-4">توريدات تجارية</h3>
@@ -108,9 +108,9 @@ export default function AboutUs() {
 
           {/* Working Hours */}
           <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10 text-center">
-            <h2 className="text-3xl font-bold text-[#FFD700] mb-6">ساعات العمل</h2>
+            <h2 className="text-3xl font-bold text-[#CA8A04] mb-6">ساعات العمل</h2>
             <div className="flex items-center justify-center gap-4 mb-4">
-              <Clock className="h-6 w-6 text-[#FFD700]" />
+              <Clock className="h-6 w-6 text-[#CA8A04]" />
               <span className="text-xl text-white">يومياً من 9:00 صباحاً إلى 10:00 مساءً</span>
             </div>
             <p className="text-white/80">

@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabase';
 import type { Service, Category, Subcategory } from '../types/database';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const lightGold = '#B8860B';
+const lightGold = '#CA8A04';
 const brownDark = '#3d2c1d';
 
 export default function Services() {
@@ -244,7 +244,7 @@ export default function Services() {
               }}
             >
               <h3 className="text-lg font-semibold flex items-center gap-2">
-                <span className="text-yellow-400">✨</span> أحدث العروض
+                <span className="text-[#CA8A04]">✨</span> أحدث العروض
               </h3>
             </motion.button>
           )}

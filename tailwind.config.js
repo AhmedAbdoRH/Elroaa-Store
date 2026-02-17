@@ -8,7 +8,7 @@ export default {
         secondary: '#4f170c',   // لون الكتابة الرئيسي
         accent: '#2d1711',     // لون الكتابة الفرعي
         'accent-light': '#f5f6db', // لون فرعي
-        gold: '#B8860B',       // لون ذهبي داكن للكتابة
+        gold: '#CA8A04',       // لون ذهبي داكن (Yellow-600) للكتابة
       },
       fontFamily: {
         cairo: ['Cairo', 'sans-serif'],

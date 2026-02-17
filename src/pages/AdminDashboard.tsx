@@ -6,7 +6,6 @@ import { Trash2, Edit, Plus, Save, X, Upload, ChevronDown, ChevronUp, Facebook, 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const lightGold = '#00BFFF';
 const brownDark = '#3d2c1d';
 const successGreen = '#228B22'; // Natural green color
 const greenButtonClass = `bg-[${successGreen}] text-white px-6 py-2 rounded flex items-center gap-2 disabled:opacity-50`;
