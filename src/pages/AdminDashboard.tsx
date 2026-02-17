@@ -676,9 +676,18 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
 
     uploadingState(true);
     try {
-      if (!file.type.startsWith('image/')) throw new Error('الرجاء اختيار ملف صورة صالح');
+      if (!file.type.startsWith('image/') && !file.type.startsWith('video/webm')) {
+        throw new Error('الرجاء اختيار ملف صورة صالح أو فيديو بصيغة WEBM');
+      }
       
-      let fileToUpload = await resizeImageIfNeeded(file, 2); // This will be the file we eventually upload
+      let fileToUpload: File;
+
+      if (file.type.startsWith('image/')) {
+        fileToUpload = await resizeImageIfNeeded(file, 2);
+      } else {
+        // For video files (webm), skip resizing
+        fileToUpload = file;
+      }
 
       const fileExt = fileToUpload.name.split('.').pop();
       const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
@@ -691,10 +700,10 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
       const { data: { publicUrl } } = supabase.storage.from('services').getPublicUrl(filePath);
       
       setNewState(prev => ({ ...prev, image_url: publicUrl }));
-      setSuccessMsg("تم رفع الصورة بنجاح!");
+      setSuccessMsg("تم رفع الملف بنجاح!");
 
     } catch (err: any) {
-      setError(`خطأ في رفع الصورة: ${err.message}`);
+      setError(`خطأ في رفع الملف: ${err.message}`);
       setNewState(prev => ({ ...prev, image_url: '' }));
     } finally {
       uploadingState(false);
@@ -1747,12 +1756,12 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                         </div>
                         <label htmlFor="banner-image-upload" className={`w-full flex flex-col items-center justify-center p-4 rounded-md border-2 border-dashed border-gray-600 cursor-pointer hover:bg-gray-700/50 hover:border-blue-500 transition-colors ${uploadingBannerImage || isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}>
                             <Upload className={`w-8 h-8 mb-2 text-blue-400 ${uploadingBannerImage ? 'animate-pulse' : ''}`} />
-                            <span className="text-white font-semibold">{uploadingBannerImage ? 'جاري رفع الصورة...' : (newBanner.image_url ? 'تغيير الصورة' : 'اختر صورة للبانر')}</span>
-                            <span className="text-xs text-gray-500 mt-1">المقاس الموصى به: 1920x700 بكسل</span>
+                            <span className="text-white font-semibold">{uploadingBannerImage ? 'جاري رفع الملف...' : (newBanner.image_url ? 'تغيير الملف' : 'اختر صورة أو فيديو (WEBM) للبانر')}</span>
+                            <span className="text-xs text-gray-500 mt-1">المقاس الموصى به: 1920x700 بكسل (صور) أو فيديو WEBM</span>
                         </label>
                          <input
                           type="file"
-                          accept="image/*"
+                          accept="image/*,video/webm"
                           onChange={(e) => handleImageUpload(e, 'banner')}
                           className="hidden"
                           id="banner-image-upload"
@@ -1760,9 +1769,13 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                         />
                         {newBanner.image_url && !uploadingBannerImage && (
                           <div className="mt-3 flex items-center justify-center gap-4 bg-gray-900/50 p-2 rounded border border-gray-700">
-                            <img src={newBanner.image_url} alt="معاينة" className="w-24 h-auto object-cover rounded border border-gray-600" />
-                            <span className="text-gray-400 text-xs">صورة البانر الحالية/الجديدة</span>
-                            <button type="button" onClick={() => setNewBanner({...newBanner, image_url: ''})} className="text-red-500 hover:text-red-400 p-1" title="إزالة الصورة"><X size={16}/></button>
+                            {newBanner.image_url.endsWith('.webm') ? (
+                              <video src={newBanner.image_url} className="w-24 h-auto object-cover rounded border border-gray-600" autoPlay loop muted playsInline />
+                            ) : (
+                              <img src={newBanner.image_url} alt="معاينة" className="w-24 h-auto object-cover rounded border border-gray-600" />
+                            )}
+                            <span className="text-gray-400 text-xs">ملف البانر الحالي/الجديد</span>
+                            <button type="button" onClick={() => setNewBanner({...newBanner, image_url: ''})} className="text-red-500 hover:text-red-400 p-1" title="إزالة الملف"><X size={16}/></button>
                           </div>
                         )}
                       </div>
@@ -1787,7 +1800,11 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                     {banners.filter(b => b.type === bannersSubTab).map((banner) => (
                       <div key={banner.id} className={`relative group border border-gray-700 rounded-lg bg-gray-900/50 shadow-lg overflow-hidden ${editingBanner === banner.id ? `ring-2 ring-blue-500` : ''}`}>
                         {banner.type === 'image' && banner.image_url ? (
-                          <img src={banner.image_url} alt={banner.title || 'صورة البانر'} className="w-full h-32 object-cover"/>
+                          banner.image_url.endsWith('.webm') ? (
+                            <video src={banner.image_url} className="w-full h-32 object-cover" autoPlay loop muted playsInline />
+                          ) : (
+                            <img src={banner.image_url} alt={banner.title || 'صورة البانر'} className="w-full h-32 object-cover"/>
+                          )
                         ) : (
                           <div className="p-4">
                             <h4 className="font-bold text-white text-lg truncate">{banner.title || 'بدون عنوان'}</h4>

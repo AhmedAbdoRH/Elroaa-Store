@@ -49,12 +49,24 @@ export default function BannerSlider({ banners }: BannerSliderProps) {
           className={`absolute top-0 left-0 w-full h-full transition-opacity duration-700 ${idx === current ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
         >
           {banner.type === 'image' && banner.image_url ? (
-            <img
-              src={banner.image_url}
-              alt={banner.title || 'Banner'}
-              className="w-full h-full min-h-full object-cover object-center"
-              style={{ borderRadius: 0 }}
-            />
+            banner.image_url.endsWith('.webm') ? (
+              <video
+                src={banner.image_url}
+                className="w-full h-full min-h-full object-cover object-center"
+                autoPlay
+                loop
+                muted
+                playsInline
+                style={{ borderRadius: 0 }}
+              />
+            ) : (
+              <img
+                src={banner.image_url}
+                alt={banner.title || 'Banner'}
+                className="w-full h-full min-h-full object-cover object-center"
+                style={{ borderRadius: 0 }}
+              />
+            )
           ) : (
             <div className="w-full h-full min-h-full flex flex-col justify-center items-center bg-white/5 backdrop-blur-xl p-8 sm:p-12 border border-white/10 shadow-2xl">
               {banner.title && (
