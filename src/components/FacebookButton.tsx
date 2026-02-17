@@ -80,7 +80,7 @@ export default function FacebookButton({
                 />
               </svg>
             </div>
-            {/* Herb 3 - tall stem */}
+            {/* Herb 3 - tall herb with side leaves */}
             <div className="btn-herb">
               <svg viewBox="0 0 40 100">
                 <path
@@ -89,6 +89,7 @@ export default function FacebookButton({
                   strokeWidth="3"
                   fill="none"
                 />
+                {/* side leaves */}
                 <ellipse
                   cx="12"
                   cy="55"
@@ -107,7 +108,7 @@ export default function FacebookButton({
                 />
               </svg>
             </div>
-            {/* Herb 4 - center highlight */}
+            {/* Herb 4 - gentle flower (chamomile-like) */}
             <div className="btn-herb">
               <svg viewBox="0 0 40 100">
                 <path
@@ -116,18 +117,13 @@ export default function FacebookButton({
                   strokeWidth="3.2"
                   fill="none"
                 />
-                <circle
-                  cx="20"
-                  cy="44"
-                  r="10"
-                  fill="rgba(200, 230, 201, 0.98)"
-                />
-                <circle
-                  cx="20"
-                  cy="26"
-                  r="7"
-                  fill="rgba(232, 245, 233, 1)"
-                />
+                {/* flower petals */}
+                <circle cx="20" cy="44" r="4" fill="rgba(253, 216, 53, 0.95)" />
+                <circle cx="20" cy="36" r="3" fill="rgba(248, 249, 249, 0.98)" />
+                <circle cx="26" cy="42" r="3" fill="rgba(248, 249, 249, 0.98)" />
+                <circle cx="24" cy="50" r="3" fill="rgba(248, 249, 249, 0.98)" />
+                <circle cx="16" cy="50" r="3" fill="rgba(248, 249, 249, 0.98)" />
+                <circle cx="14" cy="42" r="3" fill="rgba(248, 249, 249, 0.98)" />
               </svg>
             </div>
             {/* Herb 5 - layered side */}
