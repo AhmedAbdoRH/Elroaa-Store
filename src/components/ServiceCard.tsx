@@ -141,7 +141,7 @@ export default function ProductCard({ title, description, imageUrl, price, saleP
     e.preventDefault();
     const productUrl = `${window.location.origin}/product/${id}`;
     const message = `استفسار عن المنتج: ${title}\nرابط المنتج: ${productUrl}`;
-    window.open(`https://wa.me/201013210146?text=${encodeURIComponent(message)}`, '_blank');
+    window.open(`https://wa.me/201003046674?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   const handleAddToCart = (e: React.MouseEvent) => {

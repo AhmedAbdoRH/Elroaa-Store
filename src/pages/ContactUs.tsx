@@ -52,10 +52,10 @@ export default function ContactUs() {
                     <div>
                       <h3 className="text-xl font-semibold text-white">خدمة العملاء</h3>
                       <a 
-                        href="tel:01013210146" 
+                        href="tel:01003046674" 
                         className="text-green-400 text-lg hover:text-green-300 transition-colors"
                       >
-                        01013210146
+                        01003046674
                       </a>
                     </div>
                   </div>
@@ -71,7 +71,7 @@ export default function ContactUs() {
                     تواصلوا معنا عبر الواتساب للاستفسارات وطلبات التوريد السريعة
                   </p>
                   <a 
-                    href="https://wa.me/201013210146" 
+                    href="https://wa.me/201003046674" 
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition-colors"

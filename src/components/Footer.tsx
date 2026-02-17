@@ -81,13 +81,13 @@ export default function Footer({ storeSettings }: FooterProps) {
               </a>
 
               <a
-                href="https://wa.me/201013210146"
+                href="https://wa.me/201003046674"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 bg-green-600/20 hover:bg-green-600/30 px-4 py-2 rounded-lg border border-green-500/30 transition-all duration-300"
               >
                 <MessageCircle className="h-4 w-4 text-green-400" />
-                <span className="text-secondary text-sm font-medium">01013210146</span>
+                <span className="text-secondary text-sm font-medium">01003046674</span>
               </a>
             </div>
           </div>

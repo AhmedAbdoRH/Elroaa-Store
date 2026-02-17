@@ -95,7 +95,7 @@ export default function ProductDetails() {
     if (!service) return;
     const productUrl = window.location.href;
     const message = `استفسار عن المنتج: ${service.title}\nرابط المنتج: ${productUrl}`;
-    window.open(`https://wa.me/201013210146?text=${encodeURIComponent(message)}`, '_blank');
+    window.open(`https://wa.me/201003046674?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   // Get all images for the main product carousel

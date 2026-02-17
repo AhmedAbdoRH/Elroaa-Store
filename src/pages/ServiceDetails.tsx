@@ -77,7 +77,7 @@ export default function ProductDetails() {
     const productUrl = window.location.href;
     const message = `استفسار عن المنتج: ${service.title}
 رابط المنتج: ${productUrl}`;
-    window.open(`https://wa.me/201013210146?text=${encodeURIComponent(message)}`, '_blank');
+    window.open(`https://wa.me/201003046674?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   // التقليب التلقائي للصور في المنتج الرئيسي فقط
@@ -291,7 +291,7 @@ export default function ProductDetails() {
                       </button>
                       {/* زر مشاركة رابط المنتج مباشرة على واتساب */}
                       <a
-                        href={`https://wa.me/201013210146?text=${encodeURIComponent(`شاهد هذا المنتج: ${service.title}\n${window.location.href}`)}`}
+                        href={`https://wa.me/201003046674?text=${encodeURIComponent(`شاهد هذا المنتج: ${service.title}\n${window.location.href}`)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex-1 bg-[#128C7E] text-white py-3 px-6 rounded-lg font-bold hover:bg-opacity-90 flex items-center justify-center gap-2"

@@ -103,7 +103,7 @@ export default function Testimonials() {
   return (
     <section className="bg-black/70 py-12 px-4 md:px-0 border-t border-gray-700 mt-16 overflow-x-hidden"> {/* overflow-x-hidden is important */}
       <div className="max-w-4xl mx-auto">
-        <h2 className="text-3xl font-bold text-center text-white mb-10">آراء عملائنا</h2>
+        <h2 className="text-3xl font-bold text-center text-[#CA8A04] mb-10">آراء عملائنا</h2>
 
         <div className="relative h-[400px] md:h-[500px] w-full"> {/* Fixed height container for cards */}
           {/* Testimonial Cards */}
