@@ -155,12 +155,18 @@ export default function ProductCard({ title, description, imageUrl, price, saleP
       ? (displaySalePrice || displayPrice || 0)
       : (displaySalePrice || displayPrice || 0);
 
+    let sizeLabel = undefined;
+    if (has_weight_pricing) {
+      sizeLabel = '1000 جم';
+    }
+
     addToCart({
       id,
       title,
       price: cartPrice.toString(),
       numericPrice: parseFloat(cartPrice.toString()),
       imageUrl,
+      size: sizeLabel,
     });
 
     setIsAdded(true);
@@ -203,12 +209,12 @@ export default function ProductCard({ title, description, imageUrl, price, saleP
                   <span className={`font-bold text-lg sm:text-xl text-accent`}>
                     {displaySalePrice || displayPrice}
                   </span>
-                  <span className={`font-bold text-lg sm:text-xl text-accent`}>ج/كجم</span>
+                  <span className={`font-bold text-lg sm:text-xl text-accent`}>ج/كيلو</span>
                 </div>
                 {displaySalePrice && displayPrice && (
                   <div className="flex items-center gap-1">
                     <span className="text-sm text-secondary/40 line-through">{displayPrice}</span>
-                    <span className="text-sm text-secondary/40 line-through">ج/كجم</span>
+                    <span className="text-sm text-secondary/40 line-through">ج/كيلو</span>
                   </div>
                 )}
               </>

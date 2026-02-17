@@ -218,10 +218,10 @@ export default function ProductDetails() {
                               height: 24px;
                               width: 24px;
                               border-radius: 50%;
-                              background: #CA8A04;
+                              background: #FACC15;
                               cursor: pointer;
                               margin-top: -10px;
-                              box-shadow: 0 0 15px rgba(202, 138, 4, 0.6);
+                              box-shadow: 0 0 15px rgba(250, 204, 21, 0.6);
                               border: 2px solid #fff;
                               transition: transform 0.1s;
                             }
@@ -233,7 +233,7 @@ export default function ProductDetails() {
                               height: 6px;
                               cursor: pointer;
                               /* Gradient direction reversed for RTL: starts yellow from right, goes to gray on left */
-                              background: linear-gradient(to left, #CA8A04 ${((selectedWeight - 100) / 900) * 100}%, #4B5563 ${((selectedWeight - 100) / 900) * 100}%);
+                              background: linear-gradient(to left, #FACC15 ${((selectedWeight - 1) / 999) * 100}%, #4B5563 ${((selectedWeight - 1) / 999) * 100}%);
                               border-radius: 3px;
                             }
                             input[type=range]:focus {
@@ -243,9 +243,9 @@ export default function ProductDetails() {
 
                           <input
                             type="range"
-                            min="100"
+                            min="1"
                             max="1000"
-                            step="10"
+                            step="1"
                             value={selectedWeight}
                             onChange={(e) => setSelectedWeight(parseInt(e.target.value))}
                             className="w-full"
@@ -253,7 +253,7 @@ export default function ProductDetails() {
                         </div>
 
                         <div className="flex justify-between items-center text-xs font-bold text-gray-300 mb-4 px-1" style={{direction: 'rtl'}}>
-                          <span>0 جم</span>
+                          <span>1 جم</span>
                           <span>500 جم</span>
                           <span>1000 جم</span>
                         </div>
@@ -261,13 +261,10 @@ export default function ProductDetails() {
                         <div className="flex items-center justify-between bg-black/60 rounded-lg p-4 border border-white/10 shadow-lg">
                           <div className="text-right flex-1">
                             <span className="text-gray-300 text-sm font-medium block mb-1">الوزن المحدد</span>
-                            <span className="text-2xl font-bold text-[#CA8A04] drop-shadow-sm">
-                              {selectedWeight >= 1000 
-                                ? `1 كجم` 
-                                : selectedWeight >= 100 
-                                  ? `${(selectedWeight / 1000).toFixed(2)} كجم`
-                                  : `${selectedWeight} جم`}
+                            <span className="text-2xl font-bold text-[#FACC15] drop-shadow-sm block">
+                              {selectedWeight} جم
                             </span>
+
                           </div>
                           <div className="h-12 w-px bg-white/20 mx-4"></div>
                           <div className="text-left flex-1">
@@ -306,7 +303,7 @@ export default function ProductDetails() {
                              <span className="text-sm text-green-400">الكيلو: {service.sale_price_per_kg} ج</span>
                            </div>
                         ) : (
-                           <span className="text-lg text-gray-400">سعر الكيلوجرام: {service.price_per_kg} ج</span>
+                           <span className="text-lg text-gray-400">سعر الكيلو: {service.price_per_kg} ج</span>
                         )}
                       </div>
                     ) : service.has_multiple_sizes ? (
@@ -341,11 +338,7 @@ export default function ProductDetails() {
                       onClick={(e) => {
                         e.preventDefault();
                         if (service.has_weight_pricing) {
-                          const weightText = selectedWeight >= 1000 
-                            ? '1 كجم' 
-                            : selectedWeight >= 100 
-                              ? `${(selectedWeight / 1000).toFixed(2)} كجم`
-                              : `${selectedWeight} جم`;
+                          const weightText = `${selectedWeight} جم`;
                           addToCart({
                             productId: String(service.id),
                             title: service.title,
@@ -433,11 +426,11 @@ export default function ProductDetails() {
                     {item.has_weight_pricing ? (
                       item.sale_price_per_kg ? (
                         <>
-                          <span className="text-xs md:text-sm text-[#CA8A04]">{item.sale_price_per_kg} ج/كجم</span>
-                          <span className="text-xs text-gray-400 line-through">{item.price_per_kg} ج/كجم</span>
+                          <span className="text-xs md:text-sm text-[#CA8A04]">{item.sale_price_per_kg} ج/كيلو</span>
+                          <span className="text-xs text-gray-400 line-through">{item.price_per_kg} ج/كيلو</span>
                         </>
                       ) : (
-                        <span className="text-xs md:text-sm text-accent">{item.price_per_kg} ج/كجم</span>
+                        <span className="text-xs md:text-sm text-accent">{item.price_per_kg} ج/كيلو</span>
                       )
                     ) : item.has_multiple_sizes && item.sizes && item.sizes.length > 0 && item.sizes[0].sale_price ? (
                       <>

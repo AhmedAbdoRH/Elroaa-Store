@@ -1952,7 +1952,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                                     />
                                     <div className="flex-1">
                                         <span className="text-white font-bold block">تسعير بالوزن</span>
-                                        <span className="text-gray-400 text-sm">سعر الكيلوجرام (اختيار العميل للوزن)</span>
+                                        <span className="text-gray-400 text-sm">سعر الكيلو (اختيار العميل للوزن)</span>
                                     </div>
                                 </label>
                             </div>
@@ -1962,7 +1962,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <input 
                                     type="number" 
-                                    placeholder="سعر الكيلوجرام" 
+                                    placeholder="سعر الكيلو" 
                                     value={newService.price_per_kg || ''} 
                                     onChange={(e) => setNewService({ ...newService, price_per_kg: parseFloat(e.target.value) || null })} 
                                     className="w-full p-3 rounded text-white bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -1970,7 +1970,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                                 />
                                 <input 
                                     type="number" 
-                                    placeholder="سعر الكيلوجرام بعد التخفيض (اختياري)" 
+                                    placeholder="سعر الكيلو بعد التخفيض (اختياري)" 
                                     value={newService.sale_price_per_kg || ''} 
                                     onChange={(e) => setNewService({ ...newService, sale_price_per_kg: parseFloat(e.target.value) || null })} 
                                     className="w-full p-3 rounded text-white bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"

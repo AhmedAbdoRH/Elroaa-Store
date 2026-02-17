@@ -141,9 +141,17 @@ export default function Header({ storeSettings }: HeaderProps) {
             </button>
 
             <Link to="/" className="flex-shrink-0">
-              <span className="text-xl md:text-2xl font-bold text-[#CA8A04] tracking-tight">
-                شركة الرؤى للتجارة
-              </span>
+              <img 
+                src={storeSettings?.logo_url || '/logo.png'} 
+                alt={storeSettings?.store_name || 'معرض السماح للمفروشات'} 
+                className="h-12 md:h-16 w-auto object-contain"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  if (target.src !== '/logo.png') {
+                    target.src = '/logo.png';
+                  }
+                }}
+              />
             </Link>
           </div>
 
@@ -247,7 +255,10 @@ export default function Header({ storeSettings }: HeaderProps) {
                 <div key={item.id} className="flex gap-3 items-center">
                   <img src={item.imageUrl} alt="" className="w-12 h-12 rounded object-cover" />
                   <div className="flex-1 text-right">
-                    <h4 className="text-secondary text-sm font-medium">{item.title}</h4>
+                    <h4 className="text-secondary text-sm font-medium">
+                      {item.title}
+                      {item.size && <span className="text-xs font-normal text-secondary/70 mr-1">({item.size})</span>}
+                    </h4>
                     <span className="text-accent font-bold text-xs">{item.price} ج</span>
                   </div>
                   <div className="flex items-center gap-2">

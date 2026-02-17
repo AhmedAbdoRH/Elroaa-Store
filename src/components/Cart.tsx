@@ -86,7 +86,8 @@ const Cart: React.FC = () => {
     toggleCart, 
     removeFromCart, 
     updateQuantity,
-    cartTotal 
+    cartTotal,
+    sendOrderViaWhatsApp
   } = useCart();
   
   return (
@@ -155,7 +156,10 @@ const Cart: React.FC = () => {
                         </div>
                       )}
                       <div className="mr-3 flex-1">
-                        <h3 className="font-medium">{item.title}</h3>
+                        <h3 className="font-medium">
+                          {item.title}
+                          {item.size && <span className="text-sm font-normal text-gray-500 mr-1">({item.size})</span>}
+                        </h3>
                         <p className="text-gray-600">{item.price} ج</p>
                         <div className="flex items-center mt-2">
                           <button
@@ -209,20 +213,7 @@ const Cart: React.FC = () => {
                   <span>{cartTotal} ج</span>
                 </div>
                 <button
-                  onClick={() => {
-                    // Handle checkout
-                    const message = cartItems
-                      .map(item => `${item.title} - ${item.quantity} × ${item.price} ج`)
-                      .join('\n');
-                    window.open(
-                      `https://wa.me/201013210146?text=${encodeURIComponent(
-                        `الطلبية:\n${message}\n\nالمجموع: ${cartTotal} ج`
-                      )}`,
-                      '_blank'
-                    );
-                    // Close cart after checkout
-                    toggleCart(false);
-                  }}
+                  onClick={sendOrderViaWhatsApp}
                   className="w-full bg-green-600 text-white py-3 rounded-md hover:bg-green-700 transition-colors"
                 >
                   إتمام الطلب
