@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from "react";
 
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#e8ddd0;min-height:100vh;display:flex;align-items:center;justify-content:center;}
 
 .fb-btn{
   position:relative;
@@ -183,11 +185,27 @@ const CSS = `
 
 .particle{position:absolute;width:5px;height:5px;border-radius:50%;pointer-events:none;animation:burst .7s ease-out forwards;z-index:25;}
 @keyframes burst{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--px),var(--py)) scale(0);opacity:0}}
+
+/* ── Floating botanicals ── */
+.floaters{position:absolute;inset:0;z-index:6;pointer-events:none;overflow:hidden;border-radius:16px;}
+.floater{
+  position:absolute;
+  transform:rotate(var(--rot)) scale(var(--sc));
+  opacity:var(--op);
+  animation:gentleFloat var(--dur) ease-in-out infinite var(--delay);
+  will-change:transform;
+}
+@keyframes gentleFloat{
+  0%,100%{ transform:rotate(var(--rot)) scale(var(--sc)) translate(0px, 0px); }
+  25%    { transform:rotate(calc(var(--rot) + 4deg)) scale(var(--sc)) translate(1.5px, -2.5px); }
+  50%    { transform:rotate(var(--rot)) scale(var(--sc)) translate(2px, -1px); }
+  75%    { transform:rotate(calc(var(--rot) - 3deg)) scale(var(--sc)) translate(0.5px, -3px); }
+}
 `;
 
 function WoodGrain() {
   const W = 440, H = 80;
-  const lines: JSX.Element[] = [];
+  const lines = [];
 
   // Dark grain lines (deep shadows between fibers)
   const darkGrains = [
@@ -238,7 +256,7 @@ function WoodGrain() {
   // Knots — 3 this time, with wrapping grain distortion
   const knots = [
     { cx:62,  cy:38, rx:16, ry:10 },
-    { cx:285, cy:22, rx:12, ry:8, cy2: 0  },
+    { cx:285, cy:22, rx:12, ry:8  },
     { cx:390, cy:54, rx:9,  cy2:54, ry:6 },
   ];
   knots.forEach((k, ki) => {
@@ -275,23 +293,125 @@ function WoodGrain() {
   );
 }
 
-interface FacebookButtonProps {
-  facebookUrl?: string;
-  className?: string;
+
+/* ── Scattered dried herbs & seeds — fixed positions, gentle float ── */
+function FloatShape({ type, w, h, fill }) {
+  if (type === 'leaf') {
+    return (
+      <svg width={w*2} height={h*2} viewBox={`0 0 ${w*2} ${h*2}`} style={{overflow:'visible'}}>
+        <ellipse cx={w} cy={h} rx={w*.88} ry={h*.82} fill={fill}/>
+        <line x1={w*.15} y1={h} x2={w*1.85} y2={h} stroke="rgba(50,28,5,.4)" strokeWidth=".7" strokeLinecap="round"/>
+        <line x1={w*.85} y1={h} x2={w*.5}  y2={h*.3}  stroke="rgba(50,28,5,.28)" strokeWidth=".45"/>
+        <line x1={w*.85} y1={h} x2={w*.5}  y2={h*1.7} stroke="rgba(50,28,5,.28)" strokeWidth=".45"/>
+        <line x1={w*1.15} y1={h} x2={w*1.5} y2={h*.35} stroke="rgba(50,28,5,.28)" strokeWidth=".45"/>
+        <line x1={w*1.15} y1={h} x2={w*1.5} y2={h*1.65} stroke="rgba(50,28,5,.28)" strokeWidth=".45"/>
+      </svg>
+    );
+  }
+  if (type === 'curl') {
+    return (
+      <svg width={w*2} height={h*2} viewBox={`0 0 ${w*2} ${h*2}`} style={{overflow:'visible'}}>
+        <path d={`M ${w*.1} ${h} Q ${w*.5} ${h*.2} ${w} ${h*.3} Q ${w*1.5} ${h*.4} ${w*1.9} ${h} Q ${w*1.4} ${h*1.5} ${w} ${h*1.6} Q ${w*.5} ${h*1.7} ${w*.1} ${h} Z`} fill={fill}/>
+        <path d={`M ${w*.2} ${h} Q ${w*.9} ${h*.6} ${w*1.8} ${h*.9}`} stroke="rgba(45,25,5,.35)" strokeWidth=".6" fill="none" strokeLinecap="round"/>
+      </svg>
+    );
+  }
+  if (type === 'seed') {
+    return (
+      <svg width={w*2} height={h*2} viewBox={`0 0 ${w*2} ${h*2}`} style={{overflow:'visible'}}>
+        <path d={`M ${w} ${h*.1} Q ${w*1.7} ${h} ${w} ${h*1.9} Q ${w*.3} ${h} ${w} ${h*.1} Z`} fill={fill}/>
+        <path d={`M ${w} ${h*.3} Q ${w*1.3} ${h} ${w} ${h*1.7}`} stroke="rgba(255,215,150,.22)" strokeWidth=".55" fill="none" strokeLinecap="round"/>
+      </svg>
+    );
+  }
+  if (type === 'twig') {
+    return (
+      <svg width={w*2} height={h*4} viewBox={`0 0 ${w*2} ${h*4}`} style={{overflow:'visible'}}>
+        <path d={`M 0 ${h*2} Q ${w*.6} ${h*1.5} ${w} ${h*2} Q ${w*1.4} ${h*2.5} ${w*2} ${h*2}`} stroke={fill} strokeWidth={h*1.4} fill="none" strokeLinecap="round"/>
+        <circle cx={w*.45}  cy={h*1.82} r={h*.7} fill={fill}/>
+        <circle cx={w*1.55} cy={h*2.18} r={h*.6} fill={fill}/>
+      </svg>
+    );
+  }
+  return (
+    <svg width={w*2} height={h*2} viewBox={`0 0 ${w*2} ${h*2}`} style={{overflow:'visible'}}>
+      <circle cx={w} cy={h} r={w*.88} fill={fill}/>
+      <circle cx={w*.7} cy={h*.7} r={w*.28} fill="rgba(255,225,170,.22)"/>
+    </svg>
+  );
 }
 
-interface Particle {
-    id: number;
-    angle: number;
-    color: string;
-    dist: number;
+// Each floater has a fixed position (left/top as % of button) + gentle bob animation
+const SCATTERED = [
+  // ── big visible leaves — green/olive dried tones
+  { type:'leaf', w:16,h:9,  fill:'rgba(155,185,80,.92)',  left:'4%',  top:'16%', rot:'-12deg', dur:'3.8s', delay:'0s',    op:.9,  sc:1.1 },
+  { type:'leaf', w:14,h:8,  fill:'rgba(130,165,58,.88)',  left:'13%', top:'65%', rot:'28deg',  dur:'4.2s', delay:'-1.5s', op:.85, sc:1.0 },
+  { type:'leaf', w:18,h:10, fill:'rgba(160,195,75,.9)',   left:'23%', top:'10%', rot:'10deg',  dur:'3.5s', delay:'-0.8s', op:.88, sc:1.2 },
+  { type:'leaf', w:13,h:7,  fill:'rgba(140,172,65,.85)',  left:'32%', top:'72%', rot:'-32deg', dur:'4.6s', delay:'-2.3s', op:.82, sc:.95 },
+  { type:'leaf', w:15,h:8,  fill:'rgba(148,180,70,.88)',  left:'40%', top:'20%', rot:'20deg',  dur:'3.9s', delay:'-3.1s', op:.85, sc:1.05},
+  { type:'leaf', w:16,h:9,  fill:'rgba(155,188,72,.9)',   left:'48%', top:'68%', rot:'-10deg', dur:'4.0s', delay:'-0.4s', op:.88, sc:1.1 },
+  { type:'leaf', w:14,h:8,  fill:'rgba(132,168,60,.86)',  left:'57%', top:'12%', rot:'38deg',  dur:'3.6s', delay:'-1.9s', op:.83, sc:.98 },
+  { type:'leaf', w:17,h:9,  fill:'rgba(158,190,74,.9)',   left:'65%', top:'75%', rot:'-25deg', dur:'4.3s', delay:'-2.7s', op:.88, sc:1.15},
+  { type:'leaf', w:13,h:7,  fill:'rgba(136,170,62,.85)',  left:'74%', top:'8%',  rot:'16deg',  dur:'3.7s', delay:'-0.6s', op:.82, sc:.95 },
+  { type:'leaf', w:15,h:8,  fill:'rgba(150,182,68,.88)',  left:'82%', top:'62%', rot:'-20deg', dur:'4.1s', delay:'-3.4s', op:.85, sc:1.0 },
+  { type:'leaf', w:14,h:8,  fill:'rgba(142,175,64,.86)',  left:'89%', top:'25%', rot:'30deg',  dur:'3.8s', delay:'-1.2s', op:.83, sc:.98 },
+  { type:'leaf', w:16,h:9,  fill:'rgba(152,185,70,.9)',   left:'94%', top:'70%', rot:'-6deg',  dur:'4.5s', delay:'-2.0s', op:.88, sc:1.1 },
+  // ── curled/brown dried leaves
+  { type:'curl', w:14,h:10, fill:'rgba(168,132,55,.88)',  left:'8%',  top:'48%', rot:'42deg',  dur:'4.4s', delay:'-0.9s', op:.85, sc:1.05},
+  { type:'curl', w:12,h:8,  fill:'rgba(148,115,45,.84)',  left:'19%', top:'35%', rot:'-28deg', dur:'3.6s', delay:'-2.5s', op:.80, sc:.95 },
+  { type:'curl', w:13,h:9,  fill:'rgba(160,125,50,.86)',  left:'43%', top:'45%', rot:'18deg',  dur:'4.0s', delay:'-1.7s', op:.82, sc:1.0 },
+  { type:'curl', w:14,h:10, fill:'rgba(155,120,48,.88)',  left:'69%', top:'40%', rot:'-38deg', dur:'3.8s', delay:'-3.0s', op:.84, sc:1.05},
+  { type:'curl', w:11,h:8,  fill:'rgba(145,112,44,.84)',  left:'86%', top:'52%', rot:'24deg',  dur:'4.2s', delay:'-0.3s', op:.80, sc:.92 },
+  // ── seeds — warm ochre/tan
+  { type:'seed', w:6, h:11, fill:'rgba(195,155,70,.92)',  left:'6%',  top:'36%', rot:'12deg',  dur:'3.2s', delay:'-1.1s', op:.90, sc:1.1 },
+  { type:'seed', w:5, h:9,  fill:'rgba(178,140,58,.88)',  left:'17%', top:'80%', rot:'-18deg', dur:'3.8s', delay:'-2.8s', op:.85, sc:.95 },
+  { type:'seed', w:7, h:12, fill:'rgba(205,162,72,.92)',  left:'27%', top:'28%', rot:'32deg',  dur:'3.4s', delay:'-0.5s', op:.90, sc:1.15},
+  { type:'seed', w:6, h:10, fill:'rgba(188,148,62,.88)',  left:'36%', top:'55%', rot:'-22deg', dur:'4.0s', delay:'-3.5s', op:.85, sc:1.0 },
+  { type:'seed', w:7, h:12, fill:'rgba(198,158,68,.92)',  left:'53%', top:'26%', rot:'8deg',   dur:'3.6s', delay:'-1.4s', op:.90, sc:1.1 },
+  { type:'seed', w:6, h:10, fill:'rgba(182,142,60,.88)',  left:'61%', top:'60%', rot:'-30deg', dur:'3.9s', delay:'-2.1s', op:.85, sc:.98 },
+  { type:'seed', w:7, h:12, fill:'rgba(202,160,70,.92)',  left:'76%', top:'30%', rot:'20deg',  dur:'3.3s', delay:'-0.7s', op:.90, sc:1.15},
+  { type:'seed', w:6, h:10, fill:'rgba(176,138,56,.88)',  left:'83%', top:'76%', rot:'-12deg', dur:'4.1s', delay:'-3.2s', op:.85, sc:1.0 },
+  { type:'seed', w:7, h:11, fill:'rgba(196,155,66,.92)',  left:'96%', top:'42%', rot:'28deg',  dur:'3.7s', delay:'-1.8s', op:.88, sc:1.05},
+  // ── dots — round seeds, darker
+  { type:'dot',  w:5, h:5,  fill:'rgba(165,125,48,.9)',   left:'10%', top:'26%', rot:'0deg',   dur:'2.8s', delay:'-0.2s', op:.88, sc:1.1 },
+  { type:'dot',  w:6, h:6,  fill:'rgba(178,138,55,.92)',  left:'21%', top:'58%', rot:'0deg',   dur:'3.2s', delay:'-1.6s', op:.90, sc:1.0 },
+  { type:'dot',  w:5, h:5,  fill:'rgba(158,120,46,.88)',  left:'34%', top:'84%', rot:'0deg',   dur:'2.9s', delay:'-3.0s', op:.85, sc:.95 },
+  { type:'dot',  w:7, h:7,  fill:'rgba(185,145,58,.92)',  left:'45%', top:'14%', rot:'0deg',   dur:'3.5s', delay:'-0.8s', op:.90, sc:1.1 },
+  { type:'dot',  w:5, h:5,  fill:'rgba(162,124,48,.88)',  left:'59%', top:'78%', rot:'0deg',   dur:'3.0s', delay:'-2.2s', op:.85, sc:1.0 },
+  { type:'dot',  w:6, h:6,  fill:'rgba(175,136,52,.9)',   left:'71%', top:'20%', rot:'0deg',   dur:'2.7s', delay:'-1.0s', op:.88, sc:.98 },
+  { type:'dot',  w:5, h:5,  fill:'rgba(155,118,45,.88)',  left:'79%', top:'56%', rot:'0deg',   dur:'3.3s', delay:'-3.6s', op:.85, sc:1.05},
+  { type:'dot',  w:7, h:7,  fill:'rgba(182,142,56,.92)',  left:'91%', top:'36%', rot:'0deg',   dur:'3.1s', delay:'-0.4s', op:.90, sc:1.1 },
+  { type:'dot',  w:5, h:5,  fill:'rgba(160,122,47,.88)',  left:'98%', top:'63%', rot:'0deg',   dur:'2.8s', delay:'-2.6s', op:.85, sc:.95 },
+  // ── twigs
+  { type:'twig', w:18,h:4,  fill:'rgba(162,120,50,.85)',  left:'15%', top:'43%', rot:'16deg',  dur:'4.8s', delay:'-1.3s', op:.82, sc:1.0 },
+  { type:'twig', w:14,h:3,  fill:'rgba(145,108,42,.82)',  left:'51%', top:'83%', rot:'-10deg', dur:'4.5s', delay:'-3.8s', op:.78, sc:.9  },
+  { type:'twig', w:16,h:4,  fill:'rgba(155,115,46,.84)',  left:'77%', top:'46%', rot:'22deg',  dur:'5.0s', delay:'-0.9s', op:.80, sc:1.0 },
+];
+
+function FloatingBotanicals() {
+  return (
+    <div className="floaters">
+      {SCATTERED.map((f, i) => (
+        <div key={i} className="floater" style={{
+          left: f.left,
+          top:  f.top,
+          '--dur':   f.dur,
+          '--delay': f.delay,
+          '--rot':   f.rot,
+          '--sc':    f.sc,
+          '--op':    f.op,
+        }}>
+          <FloatShape type={f.type} w={f.w} h={f.h} fill={f.fill}/>
+        </div>
+      ))}
+    </div>
+  );
 }
 
-export default function FacebookButton({
-  facebookUrl = "https://www.facebook.com/share/1bZQQuQinu/",
-  className = ""
-}: FacebookButtonProps) {
-  const [particles, setParticles] = useState<Particle[]>([]);
+export default function FacebookWoodButton({
+  facebookUrl = "https://www.facebook.com/profile.php?id=61573723094947",
+}) {
+  const [particles, setParticles] = useState([]);
 
   const handleClick = () => {
     const ps = Array.from({ length: 12 }, (_, i) => ({
@@ -308,7 +428,7 @@ export default function FacebookButton({
   return (
     <>
       <style>{CSS}</style>
-      <div className={`flex justify-center my-12 ${className}`}>
+      <div style={{ display:'flex', justifyContent:'center', margin:'48px 0' }}>
         <button className="fb-btn" onClick={handleClick} type="button">
 
           <div className="wood-bg"/>
@@ -317,6 +437,7 @@ export default function FacebookButton({
           <div className="wood-vignette"/>
           <div className="wood-lacquer"/>
           <div className="wood-border"/>
+          <FloatingBotanicals/>
 
           {particles.map(p => {
             const rad = (p.angle * Math.PI) / 180;
@@ -325,8 +446,8 @@ export default function FacebookButton({
                 top:'50%', left:'50%',
                 background: p.color,
                 boxShadow: `0 0 5px ${p.color}`,
-                ['--px' as any]: `${Math.cos(rad) * p.dist}px`,
-                ['--py' as any]: `${Math.sin(rad) * p.dist}px`,
+                '--px': `${Math.cos(rad) * p.dist}px`,
+                '--py': `${Math.sin(rad) * p.dist}px`,
               }}/>
             );
           })}

@@ -9,7 +9,7 @@ interface FooterProps {
 
 export default function Footer({ storeSettings }: FooterProps) {
   const socialLinks = [
-    { url: storeSettings?.facebook_url, icon: Facebook, label: 'Facebook' },
+    { url: storeSettings?.facebook_url || "https://www.facebook.com/share/1bZQQuQinu/", icon: Facebook, label: 'Facebook' },
     { url: storeSettings?.instagram_url, icon: Instagram, label: 'Instagram' },
     { url: storeSettings?.twitter_url, icon: Twitter, label: 'Twitter' },
     { url: storeSettings?.snapchat_url, icon: Snapchat, label: 'Snapchat' },

@@ -77,9 +77,9 @@ export default function Testimonials() {
 
   if (loading) {
     return (
-      <div className="relative py-12 px-4 md:px-0 border-t border-gray-700/30 overflow-hidden">
-        <div className="absolute inset-0 bg-black/30 backdrop-blur-md -z-10"></div>
-        <div className="text-center text-white py-8 backdrop-blur-xl bg-white/10 max-w-4xl mx-auto rounded-xl p-8 border border-white/20">
+      <div className="relative py-12 px-4 md:px-0 border-t border-secondary/10 overflow-hidden">
+        <div className="absolute inset-0 bg-primary/90 backdrop-blur-md -z-10"></div>
+        <div className="text-center text-secondary py-8 backdrop-blur-xl bg-secondary/5 max-w-4xl mx-auto rounded-xl p-8 border border-secondary/10">
 
         </div>
       </div>
@@ -88,11 +88,11 @@ export default function Testimonials() {
 
   if (totalTestimonials === 0) {
     return (
-      <section className="relative py-12 px-4 md:px-0 border-t border-gray-700/30 mt-16 overflow-hidden">
-        <div className="absolute inset-0 bg-black/30 backdrop-blur-md -z-10"></div>
+      <section className="relative py-12 px-4 md:px-0 border-t border-secondary/10 mt-16 overflow-hidden">
+        <div className="absolute inset-0 bg-primary/90 backdrop-blur-md -z-10"></div>
         <div className="max-w-4xl mx-auto relative z-10">
-          <h2 className="text-3xl font-bold text-center text-white mb-10 drop-shadow-lg">آراء عملائنا</h2>
-          <div className="text-center text-gray-200 backdrop-blur-xl bg-white/10 rounded-xl shadow-2xl p-8 border border-white/20">
+          <h2 className="text-3xl font-bold text-center text-secondary mb-10 drop-shadow-sm">آراء عملائنا</h2>
+          <div className="text-center text-secondary/80 backdrop-blur-xl bg-secondary/5 rounded-xl shadow-lg p-8 border border-secondary/10">
             لا توجد صور آراء لعرضها حالياً.
           </div>
         </div>
@@ -101,9 +101,9 @@ export default function Testimonials() {
   }
 
   return (
-    <section className="bg-black/70 py-12 px-4 md:px-0 border-t border-gray-700 mt-16 overflow-x-hidden"> {/* overflow-x-hidden is important */}
+    <section className="bg-primary/90 py-12 px-4 md:px-0 border-t border-secondary/10 mt-16 overflow-x-hidden"> {/* overflow-x-hidden is important */}
       <div className="max-w-4xl mx-auto">
-        <h2 className="text-3xl font-bold text-center text-[#CA8A04] mb-10">آراء عملائنا</h2>
+        <h2 className="text-3xl font-bold text-center text-secondary mb-10">آراء عملائنا</h2>
 
         <div className="relative h-[400px] md:h-[500px] w-full"> {/* Fixed height container for cards */}
           {/* Testimonial Cards */}
@@ -179,7 +179,7 @@ export default function Testimonials() {
           <div className="flex justify-center items-center mt-8 space-x-4 rtl:space-x-reverse">
             <button
               onClick={prevTestimonial}
-              className="bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-300 transform hover:scale-110 focus:outline-none disabled:opacity-50"
+              className="bg-secondary/10 hover:bg-secondary/20 text-secondary p-3 rounded-full transition-all duration-300 transform hover:scale-110 focus:outline-none disabled:opacity-50"
               aria-label="التعليق السابق"
               disabled={isAnimating}
             >
@@ -194,7 +194,7 @@ export default function Testimonials() {
                   onClick={() => goToTestimonial(index)}
                   disabled={isAnimating}
                   className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                    index === currentIndex ? 'bg-white w-6' : 'bg-white/30 hover:bg-white/50'
+                    index === currentIndex ? 'bg-secondary w-6' : 'bg-secondary/30 hover:bg-secondary/50'
                   } disabled:opacity-50`}
                   aria-label={`انتقل إلى التعليق ${index + 1}`}
                 />
@@ -203,7 +203,7 @@ export default function Testimonials() {
 
             <button
               onClick={nextTestimonial}
-              className="bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-300 transform hover:scale-110 focus:outline-none disabled:opacity-50"
+              className="bg-secondary/10 hover:bg-secondary/20 text-secondary p-3 rounded-full transition-all duration-300 transform hover:scale-110 focus:outline-none disabled:opacity-50"
               aria-label="التعليق التالي"
               disabled={isAnimating}
             >
