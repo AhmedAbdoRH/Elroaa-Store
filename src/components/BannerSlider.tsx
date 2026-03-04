@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Banner } from '../types/database';
 
 interface BannerSliderProps {
@@ -21,15 +21,18 @@ export default function BannerSlider({ banners }: BannerSliderProps) {
     timeoutRef.current = setTimeout(() => {
       setCurrent((prev) => (prev + 1) % banners.length);
     }, SLIDE_INTERVAL);
-    return () => timeoutRef.current && clearTimeout(timeoutRef.current);
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
   }, [current, banners]);
 
   if (!banners.length) return null;
 
   return (
     <div
-      className={`relative w-full h-[200px] md:h-[350px] lg:h-[500px] flex items-center justify-center overflow-hidden rounded-none mt-32 md:mt-32 fade-in-banner${fadeIn ? ' fade-in-active' : ''}`}
-      style={{ marginTop: 'var(--header-height, 4.9rem)' }}
+      className={`relative w-full h-[170px] md:h-[100px] lg:h-[260px] xl:h-[300px] flex items-center justify-center overflow-hidden rounded-none mt-16 md:mt-8 fade-in-banner${fadeIn ? ' fade-in-active' : ''}`}
     >
       {/* تأثير Fade-in للبانر عند أول تحميل */}
       <style>{`
@@ -68,19 +71,19 @@ export default function BannerSlider({ banners }: BannerSliderProps) {
               />
             )
           ) : (
-            <div className="w-full h-full min-h-full flex flex-col justify-center items-center bg-white/5 backdrop-blur-xl p-8 sm:p-12 border border-white/10 shadow-2xl">
+            <div className="w-full h-full min-h-full flex flex-col justify-center items-center bg-white/5 backdrop-blur-xl p-2 sm:p-4 md:p-5 lg:p-6 border border-white/10 shadow-2xl">
               {banner.title && (
   <h1
-  className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-2 text-center text-white"
-  style={{ fontFamily: `'Cairo', 'Tajawal', 'Amiri', 'Arial', 'sans-serif'`, letterSpacing: '0.03em', lineHeight: '1.2', marginBottom: '1rem' }}
+  className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold mb-1 text-center text-white max-w-lg lg:max-w-2xl"
+  style={{ fontFamily: `'Cairo', 'Tajawal', 'Amiri', 'Arial', 'sans-serif'`, letterSpacing: '0.03em', lineHeight: '1.2', marginBottom: '0.4rem' }}
 >
   {banner.title}
 </h1>
 )}
 {banner.description && (
   <p
-    className="text-lg sm:text-xl mb-4 text-center text-gray-300"
-    style={{ fontFamily: `'Cairo', 'Tajawal', 'Amiri', 'Arial', 'sans-serif'`, letterSpacing: '0.02em', lineHeight: '1.7', marginTop: '0', marginBottom: '1.2rem' }}
+    className="text-xs sm:text-xs md:text-sm lg:text-base mb-2 text-center text-gray-300 max-w-md lg:max-w-lg"
+    style={{ fontFamily: `'Cairo', 'Tajawal', 'Amiri', 'Arial', 'sans-serif'`, letterSpacing: '0.02em', lineHeight: '1.5', marginTop: '0', marginBottom: '0.6rem' }}
   >
     {banner.description}
   </p>
@@ -91,16 +94,15 @@ export default function BannerSlider({ banners }: BannerSliderProps) {
       ))}
       {/* المؤشرات */}
       {banners.length > 1 && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-0.5 z-20">
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-20">
           {banners.map((_, idx) => (
             <button
               key={idx}
-              className={`w-1.5 h-1.5 rounded-full transition-colors border border-white/15
-                ${current === idx ? 'bg-white/20' : 'bg-white/10'}
+              className={`w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full transition-all duration-300 border border-white/20 hover:scale-110
+                ${current === idx ? 'bg-white/40 w-4 sm:w-5' : 'bg-white/15 hover:bg-white/25'}
               `}
               onClick={() => setCurrent(idx)}
               aria-label={`انتقل إلى البانر رقم ${idx + 1}`}
-              style={{ minWidth: 6, minHeight: 6 }}
             />
           ))}
         </div>
