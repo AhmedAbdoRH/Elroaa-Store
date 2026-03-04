@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { MessageCircle, Sparkles, ShoppingCart, Check } from 'lucide-react';
+import { Sparkles, ShoppingCart, Check } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import type { ProductSize } from '../types/database';
 
@@ -8,8 +8,8 @@ interface ProductCardProps {
   title: string;
   description: string;
   imageUrl: string;
-  price?: number | null; // Make price optional and number type
-  salePrice?: number | null; // Make salePrice optional and number type
+  price?: number | null;
+  salePrice?: number | null;
   id: string | number;
   has_multiple_sizes?: boolean;
   has_weight_pricing?: boolean;
@@ -17,9 +17,6 @@ interface ProductCardProps {
   sale_price_per_kg?: number | null;
   sizes?: ProductSize[];
 }
-
-// Define the light gold color using the hex code from the Hero component
-const lightGold = '#CA8A04'; // Darker gold (Yellow-600) for better visibility on light backgrounds
 
 export default function ProductCard({ title, description, imageUrl, price, salePrice, id, has_multiple_sizes, has_weight_pricing, price_per_kg, sale_price_per_kg, sizes }: ProductCardProps) {
 
@@ -135,15 +132,6 @@ export default function ProductCard({ title, description, imageUrl, price, saleP
     };
   }, [has_multiple_sizes, sizes, price, salePrice, title, has_weight_pricing, price_per_kg, sale_price_per_kg]);
 
-  console.log('ProductCard Debug - title:', title, 'has_multiple_sizes:', has_multiple_sizes, 'sizes:', sizes, 'price:', price, 'salePrice:', salePrice, 'displayPrice:', displayPrice, 'displaySalePrice:', displaySalePrice, 'pricingStrategy:', pricingStrategy);
-
-  const handleContactClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    const productUrl = `${window.location.origin}/product/${id}`;
-    const message = `استفسار عن المنتج: ${title}\nرابط المنتج: ${productUrl}`;
-    window.open(`https://wa.me/201003046674?text=${encodeURIComponent(message)}`, '_blank');
-  };
-
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -210,16 +198,22 @@ export default function ProductCard({ title, description, imageUrl, price, saleP
           <div className="flex flex-col items-end flex-1">
             {has_weight_pricing ? (
               <>
-                 <div className="flex items-center gap-1">
-                  <span className={`font-bold text-lg sm:text-xl text-accent`}>
-                    {displaySalePrice || displayPrice}
-                  </span>
-                  <span className={`font-bold text-lg sm:text-xl text-accent`}>ج/كيلو</span>
+                <div className="flex flex-col items-end">
+                  <div className="flex items-center gap-1">
+                    <span className={`font-bold text-lg sm:text-xl text-accent`}>
+                      {((displaySalePrice || displayPrice || 0) / 10).toFixed(1)}
+                    </span>
+                    <span className={`font-bold text-lg sm:text-xl text-accent`}>ج</span>
+                  </div>
+                  <span className="text-xs text-secondary/40">/100 جرام</span>
                 </div>
                 {displaySalePrice && displayPrice && (
-                  <div className="flex items-center gap-1">
-                    <span className="text-sm text-secondary/40 line-through">{displayPrice}</span>
-                    <span className="text-sm text-secondary/40 line-through">ج/كيلو</span>
+                  <div className="flex flex-col items-end">
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm text-secondary/40 line-through">{((displayPrice || 0) / 10).toFixed(1)}</span>
+                      <span className="text-sm text-secondary/40 line-through">ج</span>
+                    </div>
+                    <span className="text-xs text-secondary/30">/100 جرام</span>
                   </div>
                 )}
               </>
@@ -283,13 +277,6 @@ export default function ProductCard({ title, description, imageUrl, price, saleP
                 <ShoppingCart className="h-5 w-5" />
               )}
               <span className="hidden sm:inline text-xs">سلة</span>
-            </button>
-
-            <button
-              onClick={handleContactClick}
-              className={`flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-300 font-semibold text-sm bg-accent/10 hover:bg-accent/20 text-accent border border-accent/20 hover:border-accent/40 hover:shadow-md`}
-            >
-              <MessageCircle className="h-5 w-5" />
             </button>
           </div>
         </div>
