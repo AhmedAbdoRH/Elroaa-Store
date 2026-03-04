@@ -277,7 +277,7 @@ export default function Header({ storeSettings }: HeaderProps) {
               </div>
               <button
                 onClick={() => { sendOrderViaWhatsApp(); toggleCart(false); }}
-                className="w-full bg-accent text-primary font-bold py-2 rounded-lg flex items-center justify-center gap-2"
+                className="w-full bg-[#25D366] text-white font-bold py-2 rounded-lg flex items-center justify-center gap-2"
               >
                 اكمال الطلب عبر واتساب
               </button>

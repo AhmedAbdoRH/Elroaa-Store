@@ -106,12 +106,14 @@ export default function ProductImageSlider({ mainImageUrl, additionalImages }: P
 
       {/* Custom Navigation Arrows - Hidden */}
 
-      {/* Touch indicator for mobile */}
-      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10 md:hidden">
-        <div className="bg-black/50 text-white text-xs px-2 py-1 rounded backdrop-blur-sm">
-          اسحب للتنقل
+      {/* Touch indicator for mobile - Only show if there are multiple images */}
+      {images.length > 1 && (
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10 md:hidden">
+          <div className="bg-black/50 text-white text-xs px-2 py-1 rounded backdrop-blur-sm">
+            اسحب للتنقل
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Image counter */}
       {images.length > 1 && (

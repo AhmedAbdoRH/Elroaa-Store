@@ -264,6 +264,11 @@ export default function ProductDetails() {
                             <span className="text-2xl font-bold text-secondary drop-shadow-sm">{calculatedPrice} ج</span>
                           </div>
                         </div>
+                        {service.price_per_kg && (
+                          <p className="text-center text-xs text-secondary/60 mt-4">
+                            سعر الكيلو: {service.price_per_kg} ج
+                          </p>
+                        )}
                       </div>
                     </div>
                   )}
@@ -289,14 +294,6 @@ export default function ProductDetails() {
                     {service.has_weight_pricing ? (
                       <div className="flex flex-col items-end">
                         <span className="text-2xl text-secondary">{calculatedPrice} ج</span>
-                        {service.sale_price_per_kg ? (
-                           <div className="flex gap-2">
-                             <span className="text-sm text-secondary/60 line-through">الكيلو: {service.price_per_kg} ج</span>
-                             <span className="text-sm text-green-600">الكيلو: {service.sale_price_per_kg} ج</span>
-                           </div>
-                        ) : (
-                           <span className="text-lg text-secondary/60">سعر الكيلو: {service.price_per_kg} ج</span>
-                        )}
                       </div>
                     ) : service.has_multiple_sizes ? (
                       selectedSize?.sale_price ? (
@@ -321,10 +318,10 @@ export default function ProductDetails() {
                   <div className="flex gap-4 items-center">
                     <button
                       onClick={handleContact}
-                      className="flex-1 bg-[#25D366] text-white py-3 px-6 rounded-lg font-bold hover:bg-opacity-90 flex items-center justify-center gap-2"
+                      className="w-14 h-14 bg-[#CA8A04] text-white rounded-lg font-bold hover:bg-opacity-90 flex items-center justify-center"
+                      title="تواصل معنا للطلب"
                     >
-                      <MessageCircle className="h-5 w-5" />
-                      تواصل معنا للطلب
+                      <MessageCircle className="h-6 w-6" />
                     </button>
                     <button
                       onClick={(e) => {
@@ -362,7 +359,7 @@ export default function ProductDetails() {
                           toast.success('تمت إضافة المنتج إلى السلة');
                         }
                       }}
-                      className="bg-[#CA8A04] hover:bg-[#A16207] text-black p-3 rounded-lg font-bold flex items-center justify-center"
+                      className="flex-1 h-14 bg-[#25D366] hover:bg-opacity-90 text-white p-3 rounded-lg font-bold flex items-center justify-center"
                       title="أضف إلى السلة"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -370,6 +367,7 @@ export default function ProductDetails() {
                         <circle cx="20" cy="21" r="1"></circle>
                         <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
                       </svg>
+                      <span className="mr-2">أضف للسلة للطلب</span>
                     </button>
                   </div>
                 </div>
