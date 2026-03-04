@@ -400,7 +400,7 @@ function StaggeredHome({
   return (
     <>
       {/* Social Buttons Section - Added below hero */}
-      <div className="py-8" style={{ backgroundColor: 'var(--color-primary)' }}>
+      <div className="pt-4 -mb-8" style={{ backgroundColor: 'var(--color-primary)' }}>
         <div className="container mx-auto px-4">
           <div className="flex flex-wrap justify-center items-center gap-6">
             <div className="flex justify-center">

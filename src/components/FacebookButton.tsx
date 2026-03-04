@@ -308,7 +308,7 @@ export default function FacebookButton({
   return (
     <>
       <style>{CSS}</style>
-      <div className={`flex justify-center my-12 ${className}`}>
+      <div className={`flex justify-center ${className}`}>
         <button className="fb-btn" onClick={handleClick} type="button">
 
           <div className="wood-bg"/>
