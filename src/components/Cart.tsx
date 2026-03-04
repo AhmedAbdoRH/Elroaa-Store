@@ -106,7 +106,7 @@ const Cart: React.FC = () => {
           
           {/* Cart panel with slide animation */}
           <motion.div
-            className="absolute inset-y-0 right-0 w-full max-w-md bg-white shadow-xl flex flex-col"
+            className="absolute inset-y-0 right-0 w-full max-w-md bg-gradient-to-b from-gray-50 to-white shadow-2xl flex flex-col"
             initial="hidden"
             animate="visible"
             exit="exit"
@@ -114,8 +114,8 @@ const Cart: React.FC = () => {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="p-4 border-b flex justify-between items-center">
-              <h2 className="text-xl font-bold">سلة التسوق</h2>
+            <div className="p-5 border-b border-gray-200 flex justify-between items-center bg-gradient-to-r from-blue-50 to-transparent">
+              <h2 className="text-2xl font-bold text-gray-800">سلة التسوق</h2>
               <button
                 onClick={() => toggleCart(false)}
                 className="text-gray-500 hover:text-gray-700"
@@ -126,7 +126,7 @@ const Cart: React.FC = () => {
             </div>
 
             {/* Cart items */}
-            <div className="flex-1 overflow-y-auto p-4">
+            <div className="flex-1 overflow-y-auto p-5 space-y-3">
               {cartItems.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-center p-8">
                   <ShoppingCart className="w-16 h-16 text-gray-300 mb-4" />
@@ -134,11 +134,11 @@ const Cart: React.FC = () => {
                   <p className="mt-1 text-gray-500">ابدأ بإضافة بعض المنتجات</p>
                 </div>
               ) : (
-                <motion.ul className="space-y-4">
+                <motion.ul className="space-y-3">
                   {cartItems.map((item, index) => (
                     <motion.li
                       key={item.id}
-                      className="flex items-center p-3 border rounded-lg"
+                      className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg bg-white hover:shadow-md hover:border-blue-200 transition-all"
                       variants={itemVariants}
                       custom={index}
                       initial="hidden"
@@ -147,20 +147,20 @@ const Cart: React.FC = () => {
                       layout
                     >
                       {item.imageUrl && (
-                        <div className="w-20 h-20 flex-shrink-0 rounded-md overflow-hidden border">
+                        <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden border border-gray-200 shadow-sm">
                           <img
                             src={item.imageUrl}
                             alt={item.title}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
                           />
                         </div>
                       )}
-                      <div className="mr-3 flex-1">
-                        <h3 className="font-medium">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-gray-800 text-sm">
                           {item.title}
-                          {item.size && <span className="text-sm font-normal text-gray-500 mr-1">({item.size})</span>}
+                          {item.size && <span className="text-xs font-normal text-gray-500 ml-1">({item.size})</span>}
                         </h3>
-                        <p className="text-gray-600">{item.price} ج</p>
+                        <p className="text-blue-600 font-bold text-sm mt-1">{item.price} ج</p>
                         <div className="flex items-center mt-2">
                           <button
                             onClick={(e) => {
@@ -207,14 +207,14 @@ const Cart: React.FC = () => {
 
             {/* Footer with total and checkout button */}
             {cartItems.length > 0 && (
-              <div className="border-t p-4">
-                <div className="flex justify-between text-lg font-medium mb-4">
-                  <span>المجموع</span>
-                  <span>{cartTotal} ج</span>
+              <div className="border-t border-gray-200 p-5 bg-gradient-to-t from-gray-50 to-transparent space-y-4">
+                <div className="flex justify-between items-center bg-white rounded-lg p-4 shadow-sm">
+                  <span className="text-gray-700 font-bold text-lg">المجموع</span>
+                  <span className="text-blue-600 font-bold text-2xl">{cartTotal} ج</span>
                 </div>
                 <button
                   onClick={sendOrderViaWhatsApp}
-                  className="w-full bg-green-600 text-white py-3 rounded-md hover:bg-green-700 transition-colors"
+                  className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-3 rounded-lg hover:from-green-600 hover:to-green-700 transition-all font-bold shadow-md hover:shadow-lg"
                 >
                   إتمام الطلب
                 </button>

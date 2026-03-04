@@ -192,17 +192,22 @@ export default function ProductCard({ title, description, imageUrl, price, saleP
           />
           <div className="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
         </div>
-        <div className="p-6">
-          <h3 className="text-xl font-bold mb-2 text-secondary flex items-center gap-2">
+        <div className="p-5">
+          <h3 className="text-lg font-bold mb-2 text-secondary flex items-center gap-2">
             {title}
             <Sparkles className={`h-4 w-4 text-accent`} />
           </h3>
+          {description && (
+            <p className="text-sm text-secondary/70 line-clamp-2">
+              {description}
+            </p>
+          )}
         </div>
       </Link>
 
-      <div className="px-6 pb-6 pt-0">
-        <div className="flex justify-between items-center">
-          <div className="flex flex-col items-end">
+      <div className="px-6 pb-4">
+        <div className="flex justify-between items-end gap-3">
+          <div className="flex flex-col items-end flex-1">
             {has_weight_pricing ? (
               <>
                  <div className="flex items-center gap-1">
@@ -260,31 +265,31 @@ export default function ProductCard({ title, description, imageUrl, price, saleP
             )}
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-shrink-0">
             <button
               onClick={handleAddToCart}
               disabled={isAdding || isAdded}
-              className={`flex items-center justify-center p-2 rounded-lg transition-all duration-300 ${isAdded
+              className={`flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-all duration-300 font-semibold text-sm min-w-max ${isAdded
                   ? 'bg-green-600 text-white'
-                  : `bg-accent text-primary hover:bg-opacity-90 shadow-sm`
+                  : `bg-accent text-primary hover:bg-opacity-90 shadow-md hover:shadow-lg`
                 } ${isAdding ? 'opacity-75' : ''}`}
               title={isAdded ? 'تمت الإضافة' : 'أضف إلى السلة'}
             >
               {isAdding ? (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
               ) : isAdded ? (
                 <Check className="h-5 w-5" />
               ) : (
                 <ShoppingCart className="h-5 w-5" />
               )}
+              <span className="hidden sm:inline text-xs">سلة</span>
             </button>
 
             <button
               onClick={handleContactClick}
-              className={`bg-accent/10 hover:bg-accent/20 text-accent px-4 py-2 rounded-lg transition-colors duration-300 flex items-center gap-2 border border-accent/20`}
+              className={`flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-300 font-semibold text-sm bg-accent/10 hover:bg-accent/20 text-accent border border-accent/20 hover:border-accent/40 hover:shadow-md`}
             >
               <MessageCircle className="h-5 w-5" />
-              <span className="hidden sm:inline">اطلب الآن</span>
             </button>
           </div>
         </div>
