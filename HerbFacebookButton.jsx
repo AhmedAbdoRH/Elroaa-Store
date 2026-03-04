@@ -186,6 +186,27 @@ body{background:#e8ddd0;min-height:100vh;display:flex;align-items:center;justify
 .particle{position:absolute;width:5px;height:5px;border-radius:50%;pointer-events:none;animation:burst .7s ease-out forwards;z-index:25;}
 @keyframes burst{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--px),var(--py)) scale(0);opacity:0}}
 
+/* ── Mobile Responsive ── */
+@media (max-width: 768px) {
+  .fb-btn{
+    height:48px;min-width:240px;
+    padding:0 20px 0 14px;
+    gap:8px;
+  }
+  .fb-icon{
+    width:28px;height:28px;border-radius:8px;
+  }
+  .fb-icon svg{
+    width:14px;height:14px;
+  }
+  .divider{
+    height:20px;
+  }
+  .btn-label{
+    font-size:16px;
+  }
+}
+
 /* ── Floating botanicals ── */
 .floaters{position:absolute;inset:0;z-index:6;pointer-events:none;overflow:hidden;border-radius:16px;}
 .floater{

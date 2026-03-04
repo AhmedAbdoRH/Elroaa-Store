@@ -406,7 +406,7 @@ function StaggeredHome({
             <div className="flex justify-center">
               <FacebookButton
                 facebookUrl={storeSettings?.facebook_url || undefined}
-                className="scale-110 transform transition-transform hover:scale-105 !my-0"
+                className="scale-75 md:scale-110 transform transition-transform hover:scale-105 !my-0"
               />
             </div>
           </div>
