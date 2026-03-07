@@ -73,11 +73,11 @@ export default function Footer({ storeSettings }: FooterProps) {
             {/* Contact Numbers */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
               <a
-                href="tel:01222582955"
+                href="tel:01553218800"
                 className="flex items-center gap-2 bg-green-600/20 hover:bg-green-600/30 px-4 py-2 rounded-lg border border-green-500/30 transition-all duration-300"
               >
                 <Phone className="h-4 w-4 text-green-400" />
-                <span className="text-secondary text-sm font-medium">01222582955</span>
+                <span className="text-secondary text-sm font-medium">01553218800</span>
               </a>
 
               <a

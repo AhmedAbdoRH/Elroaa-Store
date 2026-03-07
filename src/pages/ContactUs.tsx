@@ -39,10 +39,10 @@ export default function ContactUs() {
                     <div>
                       <h3 className="text-xl font-semibold text-white">قسم المبيعات والتوريدات</h3>
                       <a 
-                        href="tel:01222582955" 
+                        href="tel:01553218800" 
                         className="text-green-400 text-lg hover:text-green-300 transition-colors"
                       >
-                        01222582955
+                        01553218800
                       </a>
                     </div>
                   </div>

@@ -41,7 +41,7 @@ export default function StructuredData({ type, data, services, categories, bread
           "contactPoint": [
             {
               "@type": "ContactPoint",
-              "telephone": "+201222582955",
+              "telephone": "+201553218800",
               "contactType": "customer service",
               "areaServed": "EG",
               "availableLanguage": "Arabic"

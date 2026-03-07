@@ -127,11 +127,11 @@ export default function SEOOptimizedHero({ storeSettings }: SEOOptimizedHeroProp
             className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4"
           >
             <a
-              href="tel:01222582955"
+              href="tel:01553218800"
               className="flex items-center gap-2 bg-green-600/20 hover:bg-green-600/30 px-6 py-3 rounded-lg border border-green-500/30 transition-all duration-300"
             >
               <Phone className="h-5 w-5 text-green-400" />
-              <span className="font-medium">01222582955</span>
+              <span className="font-medium">01553218800</span>
             </a>
             
             <a
