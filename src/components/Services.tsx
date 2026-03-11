@@ -161,7 +161,7 @@ export default function Services() {
           }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
         >
-          <h2 className="text-3xl font-bold mb-4 text-secondary">
+          <h2 className="text-3xl font-bold mb-2 text-secondary">
             {selectedSubcategory ? (
               <>
                 {subcategories.find(sc => sc.id === selectedSubcategory)?.name} -
@@ -175,7 +175,7 @@ export default function Services() {
           </h2>
 
           {/* SEO-optimized description */}
-          <div className="max-w-3xl mx-auto text-secondary/80 text-lg leading-relaxed">
+          <div className="max-w-3xl mx-auto text-secondary/80 text-lg leading-relaxed mb-3">
             {selectedSubcategory ? (
               <p>
                 اكتشف مجموعة واسعة من <strong>{subcategories.find(sc => sc.id === selectedSubcategory)?.name}</strong>
@@ -195,7 +195,7 @@ export default function Services() {
 
         {/* Special Categories */}
         <motion.div
-          className="flex flex-wrap gap-4 justify-center mb-6"
+          className="flex flex-wrap gap-2 justify-center mb-6"
           variants={{
             hidden: { opacity: 0 },
             visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
@@ -208,7 +208,7 @@ export default function Services() {
               setSelectedSubcategory(null);
               setOpenCategoryId(null);
             }}
-            className={`p-4 rounded-xl transition-all duration-300 ${!selectedCategory
+            className={`flex-1 min-w-[140px] px-3 py-2 md:p-4 rounded-xl transition-all duration-300 text-sm md:text-base ${!selectedCategory
                 ? 'bg-accent text-primary font-bold shadow-md'
                 : 'bg-secondary/10 text-secondary hover:bg-secondary/20 hover:shadow-md'
               }`}
@@ -228,7 +228,7 @@ export default function Services() {
                 setSelectedSubcategory(null);
                 setOpenCategoryId(null);
               }}
-              className={`p-4 rounded-xl transition-all duration-300 ${selectedCategory === 'featured'
+              className={`flex-1 min-w-[140px] px-3 py-2 md:p-4 rounded-xl transition-all duration-300 ${selectedCategory === 'featured'
                   ? 'bg-accent text-primary font-bold shadow-md'
                   : 'bg-accent/20 text-accent hover:bg-accent/30 hover:shadow-md'
                 }`}
@@ -237,7 +237,7 @@ export default function Services() {
                 visible: { opacity: 1, y: 0 },
               }}
             >
-              <h3 className="text-lg font-semibold flex items-center gap-2">
+              <h3 className="text-sm md:text-lg font-bold flex items-center gap-1 md:gap-2">
                 <span className="text-[#CA8A04]">✨</span> أحدث العروض
               </h3>
             </motion.button>
@@ -251,7 +251,7 @@ export default function Services() {
                 setSelectedSubcategory(null);
                 setOpenCategoryId(null);
               }}
-              className={`p-4 rounded-xl transition-all duration-300 ${selectedCategory === 'best_sellers'
+              className={`flex-1 min-w-[140px] px-3 py-2 md:p-4 rounded-xl transition-all duration-300 ${selectedCategory === 'best_sellers'
                   ? 'bg-red-500 text-white font-bold shadow-md'
                   : 'bg-red-500/20 text-red-500 hover:bg-red-500/30 hover:shadow-md'
                 }`}
@@ -260,7 +260,7 @@ export default function Services() {
                 visible: { opacity: 1, y: 0 },
               }}
             >
-              <h3 className="text-lg font-semibold flex items-center gap-2">
+              <h3 className="text-sm md:text-lg font-bold flex items-center gap-1 md:gap-2">
                 <span className="text-red-400">🔥</span> الأكثر مبيعاً
               </h3>
             </motion.button>
@@ -269,7 +269,7 @@ export default function Services() {
 
         {/* Regular Categories */}
         <motion.div
-          className="flex flex-wrap gap-4 justify-center mb-8"
+          className="flex flex-wrap gap-2 justify-center mb-8"
           variants={{
             hidden: { opacity: 0 },
             visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
@@ -280,7 +280,7 @@ export default function Services() {
               <motion.button
                 key={category.id}
                 onClick={() => handleCategoryClick(category.id)}
-                className={`p-4 rounded-xl transition-all duration-300 ${category.id === selectedCategory
+                className={`flex-1 min-w-[120px] px-3 py-2 md:p-4 rounded-xl transition-all duration-300 ${category.id === selectedCategory
                     ? 'bg-accent text-primary font-bold shadow-md'
                     : 'bg-secondary/10 text-secondary hover:bg-secondary/20 hover:shadow-md'
                   }`}
@@ -289,7 +289,7 @@ export default function Services() {
                   visible: { opacity: 1, y: 0 },
                 }}
               >
-                <h3 className="text-lg font-semibold">{category.name}</h3>
+                <h3 className="text-sm md:text-lg font-bold text-center">{category.name}</h3>
               </motion.button>
             ))}
           </AnimatePresence>
@@ -307,7 +307,7 @@ export default function Services() {
               {/* زر الكل */}
               <motion.button
                 onClick={() => handleSubcategoryClick(null)}
-                className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-300 transform hover:scale-105 ${selectedSubcategory === null
+                className={`px-4 py-1.5 md:px-6 md:py-2 rounded-full text-xs md:text-sm font-semibold transition-all duration-300 transform hover:scale-105 ${selectedSubcategory === null
                     ? 'bg-accent text-primary shadow-xl'
                     : 'bg-secondary/10 text-secondary border-2 border-secondary/20 hover:bg-secondary/20 hover:border-secondary/40 hover:shadow-lg'
                   }`}
@@ -328,7 +328,7 @@ export default function Services() {
                     <motion.button
                       key={subcategory.id}
                       onClick={() => handleSubcategoryClick(subcategory.id)}
-                      className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-300 transform hover:scale-105 ${selectedSubcategory === subcategory.id
+                      className={`px-4 py-1.5 md:px-6 md:py-2 rounded-full text-xs md:text-sm font-semibold transition-all duration-300 transform hover:scale-105 ${selectedSubcategory === subcategory.id
                           ? 'bg-accent text-primary shadow-xl'
                           : 'bg-secondary/10 text-secondary border-2 border-secondary/20 hover:bg-secondary/20 hover:border-secondary/40 hover:shadow-lg'
                         }`}

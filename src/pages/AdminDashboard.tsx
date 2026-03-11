@@ -62,13 +62,11 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
     gallery: [] as string[],
     is_featured: false,
     is_best_seller: false,
-    has_multiple_sizes: false,
     has_weight_pricing: false,
     price_per_kg: null as number | null,
     sale_price_per_kg: null as number | null,
     price: 0,
     sale_price: null as number | null,
-    sizes: [{ size: '', price: 0, sale_price: null as number | null }],
   });
   const [editingSubcategory, setEditingSubcategory] = useState<string | null>(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>('');
@@ -816,7 +814,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
     }
     setIsLoading(true);
     try {
-        const { sizes, ...serviceData } = newService;
+        const { ...serviceData } = newService;
         
         let serviceToAdd: Partial<Service> = {
             ...serviceData,
@@ -824,10 +822,9 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
             subcategory_id: selectedSubcategory || null,
             is_featured: newService.is_featured || false,
             is_best_seller: newService.is_best_seller || false,
-            has_multiple_sizes: newService.has_multiple_sizes,
         };
 
-        if (!newService.has_multiple_sizes && !newService.has_weight_pricing) {
+        if (!newService.has_weight_pricing) {
           serviceToAdd.price = newService.price;
           serviceToAdd.sale_price = newService.sale_price;
         } else {
@@ -839,15 +836,6 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
 
         if (error) throw error;
 
-        if (service && newService.has_multiple_sizes && sizes) {
-            const sizesToInsert = sizes.map(size => ({
-                ...size,
-                service_id: service[0].id
-            }));
-            const { error: sizesError } = await supabase.from('product_sizes').insert(sizesToInsert);
-            if (sizesError) throw sizesError;
-        }
-
         // Reset form
         setNewService({
             title: '',
@@ -857,13 +845,11 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
             gallery: [],
             is_featured: false,
             is_best_seller: false,
-            has_multiple_sizes: false,
             has_weight_pricing: false,
             price_per_kg: null,
             sale_price_per_kg: null,
             price: 0,
             sale_price: null,
-            sizes: [{ size: '', price: 0, sale_price: null as number | null}],
         });
         setSelectedCategory('');
         setSelectedSubcategory('');
@@ -880,16 +866,6 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
   const handleEditService = async (service: Service) => {
     setEditingService(service.id);
 
-    const { data: sizes, error } = await supabase
-      .from('product_sizes')
-      .select('*')
-      .eq('service_id', service.id);
-
-    if (error) {
-      setError("خطأ في جلب مقاسات المنتج");
-      return;
-    }
-
     setNewService({
       title: service.title,
       description: service.description || '',
@@ -898,13 +874,11 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
       gallery: Array.isArray(service.gallery) ? service.gallery : [],
       is_featured: service.is_featured || false,
       is_best_seller: service.is_best_seller || false,
-      has_multiple_sizes: service.has_multiple_sizes || false,
       has_weight_pricing: service.has_weight_pricing || false,
       price_per_kg: service.price_per_kg || null,
       sale_price_per_kg: service.sale_price_per_kg || null,
       price: service.price || 0,
       sale_price: service.sale_price || null,
-      sizes: (sizes && sizes.length > 0) ? sizes : [{ size: '', price: 0, sale_price: null as number | null }],
     });
 
     setSelectedCategory(service.category_id || '');
@@ -922,7 +896,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
     }
     setIsLoading(true);
     try {
-      const { sizes, ...serviceData } = newService;
+const { ...serviceData } = newService;
       
       let serviceToUpdate: Partial<Service> = {
         ...serviceData,
@@ -930,10 +904,9 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
         subcategory_id: selectedSubcategory || null,
         is_featured: newService.is_featured || false,
         is_best_seller: newService.is_best_seller || false,
-        has_multiple_sizes: newService.has_multiple_sizes,
       };
 
-      if (!newService.has_multiple_sizes && !newService.has_weight_pricing) {
+      if (!newService.has_weight_pricing) {
           serviceToUpdate.price = newService.price;
           serviceToUpdate.sale_price = newService.sale_price;
       } else {
@@ -947,19 +920,6 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
         .eq('id', editingService);
       if (error) throw error;
 
-      // First, delete all existing sizes for this product.
-      await supabase.from('product_sizes').delete().eq('service_id', editingService);
-
-      // If multi-size is enabled, insert the new sizes.
-      if (newService.has_multiple_sizes && sizes) {
-        const sizesToInsert = sizes.map(size => ({
-            ...size,
-            service_id: editingService
-        }));
-        const { error: sizesError } = await supabase.from('product_sizes').insert(sizesToInsert);
-        if (sizesError) throw sizesError;
-      }
-
       setNewService({ 
         title: '', 
         description: '', 
@@ -968,12 +928,11 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
         gallery: [],
         is_featured: false,
         is_best_seller: false,
-        has_multiple_sizes: false,
         has_weight_pricing: false,
         price_per_kg: null,
+        sale_price_per_kg: null,
         price: 0,
         sale_price: null,
-        sizes: [{ size: '', price: 0, sale_price: null as number | null}],
       });
       setSelectedCategory('');
       setSelectedSubcategory('');
@@ -997,12 +956,11 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
       gallery: [],
       is_featured: false,
       is_best_seller: false,
-      has_multiple_sizes: false,
       has_weight_pricing: false,
       price_per_kg: null,
+      sale_price_per_kg: null,
       price: 0,
       sale_price: null,
-      sizes: [{ size: '', price: 0, sale_price: null as number | null}],
     });
     setSelectedCategory('');
     setSelectedSubcategory('');
@@ -1894,15 +1852,14 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                             <h4 className="text-lg font-bold mb-3 text-white">اختر نظام التسعير:</h4>
                             <div className="flex flex-col gap-3">
                                 {/* النظام العادي */}
-                                <label className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${!newService.has_multiple_sizes && !newService.has_weight_pricing ? 'bg-blue-600/30 border-2 border-blue-500' : 'bg-gray-700/50 border-2 border-transparent hover:border-gray-500'}`}>
+                                <label className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${!newService.has_weight_pricing ? 'bg-blue-600/30 border-2 border-blue-500' : 'bg-gray-700/50 border-2 border-transparent hover:border-gray-500'}`}>
                                     <input 
                                         type="radio" 
                                         name="pricing_type" 
-                                        checked={!newService.has_multiple_sizes && !newService.has_weight_pricing}
+                                        checked={!newService.has_weight_pricing}
                                         onChange={() => {
                                             setNewService({ 
                                                 ...newService, 
-                                                has_multiple_sizes: false, 
                                                 has_weight_pricing: false 
                                             });
                                         }}
@@ -1911,27 +1868,6 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                                     <div className="flex-1">
                                         <span className="text-white font-bold block">سعر ثابت</span>
                                         <span className="text-gray-400 text-sm">منتج بسعر واحد فقط</span>
-                                    </div>
-                                </label>
-
-                                {/* نظام المقاسات */}
-                                <label className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${newService.has_multiple_sizes ? 'bg-blue-600/30 border-2 border-blue-500' : 'bg-gray-700/50 border-2 border-transparent hover:border-gray-500'}`}>
-                                    <input 
-                                        type="radio" 
-                                        name="pricing_type" 
-                                        checked={newService.has_multiple_sizes}
-                                        onChange={() => {
-                                            setNewService({ 
-                                                ...newService, 
-                                                has_multiple_sizes: true, 
-                                                has_weight_pricing: false 
-                                            });
-                                        }}
-                                        className="h-5 w-5 accent-blue-500"
-                                    />
-                                    <div className="flex-1">
-                                        <span className="text-white font-bold block">متعدد المقاسات/المتغيرات</span>
-                                        <span className="text-gray-400 text-sm">سعر مختلف لكل مقاس أو متغير</span>
                                     </div>
                                 </label>
 
@@ -1944,7 +1880,6 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                                         onChange={() => {
                                             setNewService({ 
                                                 ...newService, 
-                                                has_multiple_sizes: false, 
                                                 has_weight_pricing: true 
                                             });
                                         }}
@@ -1978,76 +1913,12 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                             </div>
                         )}
 
-                        {newService.has_multiple_sizes ? (
-                          <div>
-                            <h4 className="text-lg font-semibold mb-2 text-white">المتغيرات والأسعار</h4>
-                            {newService.sizes && newService.sizes.map((size, index) => (
-                              <div key={index} className="flex items-center gap-2 mb-2">
-                                <input
-                                  type="text"
-                                  placeholder="المتغير (مقاس, وزن , عدد..)"
-                                  value={size.size}
-                                  onChange={(e) => {
-                                    const newSizes = [...newService.sizes];
-                                    newSizes[index].size = e.target.value;
-                                    setNewService({ ...newService, sizes: newSizes });
-                                  }}
-                                  className="w-full p-2 rounded text-white bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                  required
-                                />
-                                <input
-                                  type="number"
-                                  placeholder="السعر"
-                                  value={size.price === 0 ? '' : size.price}
-                                  onChange={(e) => {
-                                    const newSizes = [...newService.sizes];
-                                    newSizes[index].price = parseFloat(e.target.value);
-                                    setNewService({ ...newService, sizes: newSizes });
-                                  }}
-                                  className="w-full p-2 rounded text-white bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                  required
-                                />
-                                <input
-                                  type="number"
-                                  placeholder="  سعر التخفيض (اختياري)"
-                                  value={size.sale_price || ''}
-                                  onChange={(e) => {
-                                    const newSizes = [...newService.sizes];
-                                    newSizes[index].sale_price = parseFloat(e.target.value) || null;
-                                    setNewService({ ...newService, sizes: newSizes });
-                                  }}
-                                  className="w-full p-2 rounded text-white bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    const newSizes = [...newService.sizes];
-                                    newSizes.splice(index, 1);
-                                    setNewService({ ...newService, sizes: newSizes });
-                                  }}
-                                  className="bg-red-600 text-white p-2 rounded-md hover:bg-red-700"
-                                >
-                                  <Trash2 size={18} />
-                                </button>
-                              </div>
-                            ))}
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const newSizes = [...(newService.sizes || []), { size: '', price: 0, sale_price: null }];
-                                setNewService({ ...newService, sizes: newSizes });
-                              }}
-                              className="bg-blue-800 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-                            >
-                             + مقاس اضافي
-                            </button>
-                          </div>
-                        ) : !newService.has_weight_pricing ? (
+                        {!newService.has_weight_pricing && (
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <input type="number" placeholder="السعر" value={newService.price || ''} onChange={(e) => setNewService({ ...newService, price: parseFloat(e.target.value) })} className="w-full p-3 rounded text-white bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" required disabled={isLoading}/>
                             <input type="number" placeholder="سعر التخفيض (اختياري)" value={newService.sale_price || ''} onChange={(e) => setNewService({ ...newService, sale_price: parseFloat(e.target.value) || null })} className="w-full p-3 rounded text-white bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" disabled={isLoading}/>
                           </div>
-                        ) : null}
+                        )}
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                             <div className="flex items-center gap-2 p-2 bg-gray-700/50 rounded-md">
@@ -2099,20 +1970,17 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                                 <h4 className="font-bold text-white text-lg truncate">{service.title}</h4>
                                 <div className="text-xs text-gray-400 mb-1">{service.category?.name || 'قسم غير محدد'}</div>
                                 <div className="flex items-center gap-3 mt-1">
-                                  {service.has_multiple_sizes && service.sizes && service.sizes.length > 0 && service.sizes[0].sale_price ? (
-                                    <>
-                                      <span className="font-semibold text-green-400">{service.sizes[0].sale_price}</span>
-                                      <span className="text-sm text-gray-500 line-through">{service.sizes[0].price}</span>
-                                    </>
-                                  ) : service.has_multiple_sizes && service.sizes && service.sizes.length > 0 ? (
-                                    <span className="font-semibold text-green-400">{service.sizes[0].price}</span>
-                                  ) : service.sale_price ? (
+                                  {service.sale_price ? (
                                     <>
                                       <span className="font-semibold text-green-400">{service.sale_price}</span>
                                       <span className="text-sm text-gray-500 line-through">{service.price}</span>
                                     </>
-                                  ) : (
+                                  ) : service.price ? (
                                     <span className="font-semibold text-green-400">{service.price}</span>
+                                  ) : service.has_weight_pricing ? (
+                                    <span className="font-semibold text-green-400">{service.price_per_kg} ج/كيلو</span>
+                                  ) : (
+                                    <span className="text-gray-400 text-sm">بدون سعر محدد</span>
                                   )}
                                 </div>
                               </div>

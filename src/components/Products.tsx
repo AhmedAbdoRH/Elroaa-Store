@@ -252,14 +252,14 @@ export default function Products() {
         />
 
         <motion.div
-          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8"
+          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 mb-8"
           initial="hidden"
           animate="visible"
           variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.06 } } }}
         >
           <motion.button
             onClick={() => setSelectedCategory(null)}
-            className={`p-4 rounded-xl transition-all duration-300 ${
+            className={`col-span-2 md:col-span-1 px-3 py-2 md:p-4 rounded-xl transition-all duration-300 text-sm md:text-base ${
               !selectedCategory
                 ? `bg-green-500 text-black font-bold shadow-md`
                 : 'bg-black/20 text-white hover:bg-black/30 hover:shadow-md'
@@ -275,9 +275,9 @@ export default function Products() {
               <motion.button
                 key={category.id}
                 onClick={() => setSelectedCategory(category.id)}
-                className={`p-2 rounded-lg transition-all duration-300 ${
+                className={`col-span-1 px-2 py-1.5 md:p-2 rounded-lg transition-all duration-300 text-xs md:text-base font-bold ${
                   category.id === selectedCategory
-                    ? `bg-green-500 text-black font-bold shadow-md`
+                    ? `bg-green-500 text-black shadow-md`
                     : 'bg-black/20 text-white hover:bg-black/30 hover:shadow-md'
                 }`}
                 initial={{ opacity: 0, y: 20 }}
@@ -285,7 +285,7 @@ export default function Products() {
                 exit={{ opacity: 0, y: 20 }}
                 transition={{ duration: 0.23, delay: 0.06 + idx * 0.05 }}
               >
-                <h3 className="text-base font-semibold mb-1">{category.name}</h3>
+                {category.name}
               </motion.button>
             ))}
           </AnimatePresence>
