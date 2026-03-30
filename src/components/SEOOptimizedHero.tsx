@@ -31,6 +31,9 @@ export default function SEOOptimizedHero({ storeSettings }: SEOOptimizedHeroProp
           
           {/* SEO-optimized description */}
           <div className="text-lg md:text-xl mb-12 text-white/80 leading-relaxed max-w-3xl mx-auto">
+            <p className="mb-6 text-2xl md:text-3xl font-bold text-[#CA8A04]">
+              سجّل، أضف منتجاتك، وابدأ البيع فوراً برابط مخصص لمتجرك.
+            </p>
             <p className="mb-4">
               مرحباً بكم في <strong>شركة الرؤى للتجارة والتوريدات والعطارة</strong> - وجهتكم الأولى للحصول على 
               <strong> أجود أنواع الأعشاب الطبيعية والتوابل والزيوت العطرية</strong> في مصر. نقدم مجموعة واسعة من 

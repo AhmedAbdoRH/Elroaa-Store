@@ -315,7 +315,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
       if (!file.type.startsWith('image/')) throw new Error('الرجاء اختيار ملف صورة صالح');
 
       // قلل الحجم أولاً إذا لزم
-      const resized = await resizeImageIfNeeded(file, 2);
+      const resized = await resizeImageIfNeeded(file, 150);
       // أزل الخلفية
       const processed = await removeBackgroundFromFile(resized);
 
@@ -573,9 +573,9 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
     
     try {
       if (!file.type.startsWith('image/')) throw new Error('الرجاء اختيار ملف صورة صالح');
-      const maxSize = type === 'favicon' ? 0.5 * 1024 * 1024 : 2 * 1024 * 1024;
+      const maxSize = type === 'favicon' ? 150 * 1024 : 150 * 1024;
       if (file.size > maxSize) {
-        throw new Error(`حجم الصورة يجب أن لا يتجاوز ${maxSize / (1024 * 1024)} ميجابايت`);
+        throw new Error(`حجم الصورة يجب أن لا يتجاوز ${maxSize / 1024} كيلوبايت`);
       }
       const fileExt = file.name.split('.').pop();
       const fileName = type === 'logo' ? 'logo.svg' :
@@ -621,9 +621,9 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
     setKeywords(prev => prev.filter((_, index) => index !== indexToRemove));
   };
     
-  // دالة لضغط وتصغير الصورة إذا تجاوزت 2 ميجا
-  async function resizeImageIfNeeded(file: File, maxSizeMB = 2): Promise<File> {
-    if (file.size <= maxSizeMB * 1024 * 1024) return file;
+  // دالة لضغط وتصغير الصورة إذا تجاوزت 150 كيلو
+  async function resizeImageIfNeeded(file: File, maxSizeKB = 150): Promise<File> {
+    if (file.size <= maxSizeKB * 1024) return file;
     return new Promise((resolve, reject) => {
         const img = new window.Image();
         const reader = new FileReader();
@@ -641,8 +641,8 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
             canvas.toBlob(
                 (blob) => {
                 if (!blob) return reject(new Error('فشل ضغط الصورة'));
-                if (blob.size <= maxSizeMB * 1024 * 1024 || (w < 300 || h < 300)) {
-                    resolve(new File([blob], file.name, { type: file.type }));
+                if (blob.size <= maxSizeKB * 1024 || (w < 300 || h < 300)) {
+                    resolve(new File([blob], file.name.replace(/\.[^/.]+$/, '.webp'), { type: 'image/webp' }));
                 } else {
                     // قلل الأبعاد والجودة أكثر
                     w = Math.round(w * 0.85);
@@ -681,7 +681,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
       let fileToUpload: File;
 
       if (file.type.startsWith('image/')) {
-        fileToUpload = await resizeImageIfNeeded(file, 2);
+        fileToUpload = await resizeImageIfNeeded(file, 150);
       } else {
         // For video files (webm), skip resizing
         fileToUpload = file;
@@ -1225,7 +1225,7 @@ const { ...serviceData } = newService;
       const uploadedUrls: string[] = [];
       for (const file of Array.from(files)) {
         if (!file.type.startsWith('image/')) continue;
-        const processedFile = await resizeImageIfNeeded(file, 2);
+        const processedFile = await resizeImageIfNeeded(file, 150);
         const fileExt = processedFile.name.split('.').pop();
         const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
         const { error: uploadError } = await supabase.storage
@@ -1261,7 +1261,7 @@ const { ...serviceData } = newService;
     setIsLoading(true);
     try {
         if (!file.type.startsWith('image/')) throw new Error('الرجاء اختيار ملف صورة صالح');
-        const processedFile = await resizeImageIfNeeded(file, 2);
+        const processedFile = await resizeImageIfNeeded(file, 150);
         const fileExt = processedFile.name.split('.').pop();
         const fileName = `testimonial_${Date.now()}.${fileExt}`;
         
