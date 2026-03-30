@@ -44,13 +44,20 @@ export default function Header({ storeSettings }: HeaderProps) {
     }
 
     try {
+      console.log('Searching for:', query); // Debug log
+      
       const { data: services, error: servicesError } = await supabase
         .from('services')
         .select('*, category:categories(*)')
         .or(`title.ilike.%${query}%,description.ilike.%${query}%`)
         .limit(10);
 
-      if (servicesError) throw servicesError;
+      if (servicesError) {
+        console.error('Supabase search error:', servicesError);
+        throw servicesError;
+      }
+
+      console.log('Search results:', services); // Debug log
 
       const formattedServices = (services || []).map(service => ({
         ...service,
@@ -173,24 +180,30 @@ export default function Header({ storeSettings }: HeaderProps) {
               )}
             </div>
 
-            {isSearchFocused && searchResults.length > 0 && (
+            {isSearchFocused && (
               <div className="absolute mt-2 w-full bg-primary/95 backdrop-blur-md rounded-lg shadow-xl border border-secondary/10 overflow-hidden z-50">
-                {searchResults.map((product) => (
-                  <Link
-                    key={product.id}
-                    to={`/product/${product.id}`}
-                    className="flex items-center p-3 hover:bg-secondary/5 border-b border-secondary/5 last:border-0"
-                    onClick={clearSearch}
-                  >
-                    <div className="w-12 h-12 rounded bg-secondary/5 overflow-hidden">
-                      <img src={product.displayImage} alt="" className="w-full h-full object-cover" />
-                    </div>
-                    <div className="flex-1 text-right pr-2">
-                      <h4 className="text-secondary font-medium">{product.title}</h4>
-                      <p className="text-xs text-secondary/60">{product.category?.name}</p>
-                    </div>
-                  </Link>
-                ))}
+                {searchResults.length > 0 ? (
+                  searchResults.map((product) => (
+                    <Link
+                      key={product.id}
+                      to={`/product/${product.id}`}
+                      className="flex items-center p-3 hover:bg-secondary/5 border-b border-secondary/5 last:border-0"
+                      onClick={clearSearch}
+                    >
+                      <div className="w-12 h-12 rounded bg-secondary/5 overflow-hidden">
+                        <img src={product.displayImage} alt="" className="w-full h-full object-cover" />
+                      </div>
+                      <div className="flex-1 text-right pr-2">
+                        <h4 className="text-secondary font-medium">{product.title}</h4>
+                        <p className="text-xs text-secondary/60">{product.category?.name}</p>
+                      </div>
+                    </Link>
+                  ))
+                ) : searchQuery.trim().length >= 2 ? (
+                  <div className="p-4 text-center text-secondary/50">
+                    لا توجد نتائج للبحث عن "{searchQuery}"
+                  </div>
+                ) : null}
               </div>
             )}
           </div>
