@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import type { Category, Service, Banner, StoreSettings, Testimonial, Subcategory } from '../types/database'; // Added Subcategory type
-import { Trash2, Edit, Plus, Save, X, Upload, ChevronDown, ChevronUp, Facebook, Instagram, Twitter, Palette, Store, Image, List, Package } from 'lucide-react';
+import { Trash2, Edit, Plus, Save, X, Upload, ChevronDown, ChevronUp, Facebook, Instagram, Twitter, Palette, Store, Image, List, Package, Eye, EyeOff } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -51,6 +51,9 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
   const [uploadingTestimonialImage, setUploadingTestimonialImage] = useState(false);
   const [productsSubTab, setProductsSubTab] = useState<'services' | 'categories' | 'subcategories'>('services');
   const [bannersSubTab, setBannersSubTab] = useState<'text' | 'image' | 'strip'>('image');
+
+  // Search state for products
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   const [newCategory, setNewCategory] = useState({ name: '', description: '' });
   const [newSubcategory, setNewSubcategory] = useState({ category_id: '', name_ar: '', description_ar: '' });
@@ -414,12 +417,16 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
       setError(`خطأ في جلب البيانات: ${err.message}`);
       setCategories([]);
       setServices([]);
-      setSubcategories([]);
       setBanners([]);
     } finally {
       setIsLoading(false);
     }
   };
+
+  // Filter services based on search query
+  const filteredServices = services.filter((service: Service) =>
+    service.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const fetchLogoUrl = async () => {
     const { data } = supabase.storage.from('services').getPublicUrl('logo.svg');
@@ -1980,44 +1987,128 @@ const { ...serviceData } = newService;
                       </form>
 
                       <h3 className="text-lg font-semibold mb-4 text-white border-b border-gray-600 pb-2">المنتجات الحالية</h3>
-                      <div className="space-y-3">
-                        {services.map((service) => (
-                          <div key={service.id} className={`p-4 rounded-md bg-gray-900/50 border border-gray-700 transition-all ${editingService === service.id ? 'ring-2 ring-blue-500' : ''}`}>
-                            <div className="flex items-center gap-4">
-                              {service.image_url && <img src={service.image_url} alt={service.title} className="w-16 h-16 object-cover rounded-md border border-gray-600 flex-shrink-0"/>}
-                              <div className="flex-1 overflow-hidden">
-                                <h4 className="font-bold text-white text-lg truncate">{service.title}</h4>
-                                <div className="text-xs text-gray-400 mb-1">{service.category?.name || 'قسم غير محدد'}</div>
-                                <div className="flex items-center gap-3 mt-1">
+                      
+                      {/* شريط البحث */}
+                      <div className="mb-4">
+                        <div className="relative">
+                          <input
+                            type="text"
+                            placeholder="ابحث عن منتج بالاسم..."
+                            value={searchQuery || ''}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full p-3 pr-10 rounded-lg text-white bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
+                          />
+                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                          </div>
+                        </div>
+                        {searchQuery && (
+                          <div className="mt-2 text-xs text-gray-400">
+                            {filteredServices.length} منتج تم العثور عليه
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {filteredServices.map((service) => (
+                          <div key={service.id} className={`p-4 rounded-lg bg-gray-900/50 border border-gray-700 transition-all hover:bg-gray-800/50 hover:border-gray-600 ${editingService === service.id ? 'ring-2 ring-blue-500' : ''}`}>
+                            <div className="flex flex-col gap-3">
+                              {/* صورة المنتج */}
+                              {service.image_url && (
+                                <div className="relative w-full h-32 overflow-hidden rounded-md border border-gray-600">
+                                  <img 
+                                    src={service.image_url} 
+                                    alt={service.title} 
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                              )}
+                              
+                              {/* معلومات المنتج */}
+                              <div className="flex-1 min-h-0">
+                                <h4 className="font-bold text-white text-base mb-2 line-clamp-2 leading-tight">
+                                  {service.title}
+                                </h4>
+                                <div className="text-xs text-gray-400 mb-2">
+                                  {service.category?.name || 'قسم غير محدد'}
+                                </div>
+                                
+                                {/* السعر */}
+                                <div className="flex items-center gap-2 mb-3">
                                   {service.sale_price ? (
                                     <>
-                                      <span className="font-semibold text-green-400">{service.sale_price}</span>
-                                      <span className="text-sm text-gray-500 line-through">{service.price}</span>
+                                      <span className="font-semibold text-green-400 text-sm">{service.sale_price}</span>
+                                      <span className="text-xs text-gray-500 line-through">{service.price}</span>
                                     </>
                                   ) : service.price ? (
-                                    <span className="font-semibold text-green-400">{service.price}</span>
+                                    <span className="font-semibold text-green-400 text-sm">{service.price}</span>
                                   ) : service.has_weight_pricing ? (
-                                    <span className="font-semibold text-green-400">{service.price_per_kg} ج/كيلو</span>
+                                    <span className="font-semibold text-green-400 text-sm">{service.price_per_kg} ج/كيلو</span>
                                   ) : (
-                                    <span className="text-gray-400 text-sm">بدون سعر محدد</span>
+                                    <span className="text-gray-400 text-xs">بدون سعر محدد</span>
                                   )}
                                 </div>
                               </div>
-                              <div className="flex gap-2">
-                                <button
-                                  type="button"
-                                  onClick={() => handleToggleServiceAvailability(service.id, !(service.is_available ?? true))}
-                                  className={`px-3 py-2 rounded-md text-xs font-bold border transition-colors disabled:opacity-50 ${
-                                    (service.is_available ?? true)
-                                      ? 'bg-emerald-600/20 text-emerald-300 border-emerald-600/30 hover:bg-emerald-600/30'
-                                      : 'bg-amber-600/20 text-amber-300 border-amber-600/30 hover:bg-amber-600/30'
-                                  }`}
-                                  disabled={isLoading}
-                                >
-                                  {(service.is_available ?? true) ? 'متوفر' : 'غير متوفر'}
-                                </button>
-                                <button onClick={() => !isLoading && handleEditService(service)} title="تعديل" className="text-blue-400 hover:text-blue-300 p-2 disabled:opacity-50" disabled={editingService === service.id || isLoading}><Edit size={18} /></button>
-                                <button onClick={() => !isLoading && handleDeleteService(service.id)} title="حذف" className="text-red-500 hover:text-red-400 p-2 disabled:opacity-50" disabled={isLoading}><Trash2 size={18} /></button>
+                              
+                              {/* الأزرار */}
+                              <div className="flex flex-col gap-2">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-xs text-gray-400">حالة التوفر:</span>
+                                  <div className="relative">
+                                    <button
+                                      type="button"
+                                      onClick={() => handleToggleServiceAvailability(service.id, !(service.is_available ?? true))}
+                                      className={`relative w-12 h-6 rounded-full transition-all duration-400 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 ${
+                                        (service.is_available ?? true)
+                                          ? 'bg-emerald-500 focus:ring-emerald-400'
+                                          : 'bg-gray-400 focus:ring-gray-300'
+                                      }`}
+                                      disabled={isLoading}
+                                      role="switch"
+                                      aria-checked={service.is_available ?? true}
+                                      aria-label={`المنتج ${(service.is_available ?? true) ? 'متوفر' : 'غير متوفر'}`}
+                                    >
+                                      <div className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-all duration-400 shadow-md transform ${
+                                        (service.is_available ?? true)
+                                          ? 'translate-x-6'
+                                          : 'translate-x-0'
+                                      }`}>
+                                        <div className={`w-full h-full rounded-full flex items-center justify-center transition-all duration-400 ${
+                                          (service.is_available ?? true)
+                                            ? 'text-emerald-500'
+                                            : 'text-gray-400'
+                                        }`}>
+                                          {(service.is_available ?? true) ? (
+                                            <Eye size={10} />
+                                          ) : (
+                                            <EyeOff size={10} />
+                                          )}
+                                        </div>
+                                      </div>
+                                    </button>
+                                  </div>
+                                </div>
+                                
+                                <div className="flex gap-2">
+                                  <button 
+                                    onClick={() => !isLoading && handleEditService(service)} 
+                                    title="تعديل" 
+                                    className="flex-1 text-blue-400 hover:text-blue-300 p-2 rounded-lg transition-all duration-300 hover:bg-blue-600/20 hover:shadow-lg disabled:opacity-50 text-sm" 
+                                    disabled={editingService === service.id || isLoading}
+                                  >
+                                    <Edit size={16} className="mx-auto" />
+                                  </button>
+                                  <button 
+                                    onClick={() => !isLoading && handleDeleteService(service.id)} 
+                                    title="حذف" 
+                                    className="flex-1 text-red-500 hover:text-red-400 p-2 rounded-lg transition-all duration-300 hover:bg-red-600/20 hover:shadow-lg disabled:opacity-50 text-sm" 
+                                    disabled={isLoading}
+                                  >
+                                    <Trash2 size={16} className="mx-auto" />
+                                  </button>
+                                </div>
                               </div>
                             </div>
                           </div>

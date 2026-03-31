@@ -5,14 +5,14 @@ import imageCompression from 'browser-image-compression';
  * @param file The original image file
  * @param maxWidth The maximum width for resizing
  * @param maxHeight The maximum height for resizing
- * @param maxSizeKB The maximum allowed size in KB (default 150KB)
+ * @param maxSizeKB The maximum allowed size in KB (default 90KB)
  * @returns A Promise that resolves to the compressed File
  */
 export async function compressImage(
   file: File,
   maxWidth: number,
   maxHeight: number,
-  maxSizeKB = 150
+  maxSizeKB = 90
 ): Promise<File> {
   const options = {
     maxSizeKB: maxSizeKB / 1024,
