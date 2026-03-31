@@ -39,11 +39,12 @@ export default function CategoryProducts() {
         created_at: categoryData.created_at
       } as Category);
 
-      // Fetch services for this category
+      // Fetch services for this category (only available ones)
       const { data: servicesData, error: servicesError } = await supabase
         .from('services')
         .select('*')
-        .eq('category_id', categoryId);
+        .eq('category_id', categoryId)
+        .or('is_available.is.true,is_available.is.null');
 
       if (servicesError) throw servicesError;
       setServices(servicesData || []);

@@ -63,11 +63,12 @@ export default function SubcategoryProducts() {
         setCategory({ id: cat.id, name: cat.name } as Category);
       }
 
-      // Fetch services for this subcategory
+      // Fetch services for this subcategory (only available ones)
       const { data: servicesData, error: servicesError } = await supabase
         .from('services')
         .select('*')
-        .eq('subcategory_id', subcategoryId);
+        .eq('subcategory_id', subcategoryId)
+        .or('is_available.is.true,is_available.is.null');
       if (servicesError) throw servicesError;
       setServices(servicesData || []);
     } catch (err: any) {

@@ -95,6 +95,9 @@ export default function Services() {
   const filteredServices = useCallback((): Service[] => {
     let filtered = services;
 
+    // Filter by availability first - hide unavailable products
+    filtered = filtered.filter(service => service.is_available !== false);
+
     // Filter by category first
     if (selectedCategory && selectedCategory !== 'featured' && selectedCategory !== 'best_sellers') {
       filtered = filtered.filter(service => service.category_id === selectedCategory);

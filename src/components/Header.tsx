@@ -50,6 +50,7 @@ export default function Header({ storeSettings }: HeaderProps) {
         .from('services')
         .select('*, category:categories(*)')
         .or(`title.ilike.%${query}%,description.ilike.%${query}%`)
+        .or('is_available.is.true,is_available.is.null')
         .limit(10);
 
       if (servicesError) {

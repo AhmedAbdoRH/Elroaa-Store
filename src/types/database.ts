@@ -28,6 +28,7 @@ export interface Service {
   title: string;
   description: string | null;
   image_url: string | null;
+  is_available?: boolean; // متوفر/غير متوفر (إظهار/إخفاء المنتج في المتجر)
   images?: ProductImage[]; // Array of product images
   gallery?: string[]; // روابط صور متعددة
   price?: number | null;

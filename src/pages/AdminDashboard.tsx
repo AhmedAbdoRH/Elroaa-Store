@@ -966,6 +966,25 @@ const { ...serviceData } = newService;
     setSelectedSubcategory('');
   };
 
+  const handleToggleServiceAvailability = async (serviceId: number, nextIsAvailable: boolean) => {
+    if (isLoading) return;
+    setIsLoading(true);
+    try {
+      const { error } = await supabase
+        .from('services')
+        .update({ is_available: nextIsAvailable })
+        .eq('id', serviceId);
+      if (error) throw error;
+
+      setServices(prev => prev.map(s => (s.id === serviceId ? { ...s, is_available: nextIsAvailable } : s)));
+      setSuccessMsg(nextIsAvailable ? 'تم جعل المنتج متوفر' : 'تم جعل المنتج غير متوفر');
+    } catch (err: any) {
+      setError(`خطأ في تحديث حالة المنتج: ${err.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Subcategories CRUD
   const handleAddSubcategory = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -1985,6 +2004,18 @@ const { ...serviceData } = newService;
                                 </div>
                               </div>
                               <div className="flex gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => handleToggleServiceAvailability(service.id, !(service.is_available ?? true))}
+                                  className={`px-3 py-2 rounded-md text-xs font-bold border transition-colors disabled:opacity-50 ${
+                                    (service.is_available ?? true)
+                                      ? 'bg-emerald-600/20 text-emerald-300 border-emerald-600/30 hover:bg-emerald-600/30'
+                                      : 'bg-amber-600/20 text-amber-300 border-amber-600/30 hover:bg-amber-600/30'
+                                  }`}
+                                  disabled={isLoading}
+                                >
+                                  {(service.is_available ?? true) ? 'متوفر' : 'غير متوفر'}
+                                </button>
                                 <button onClick={() => !isLoading && handleEditService(service)} title="تعديل" className="text-blue-400 hover:text-blue-300 p-2 disabled:opacity-50" disabled={editingService === service.id || isLoading}><Edit size={18} /></button>
                                 <button onClick={() => !isLoading && handleDeleteService(service.id)} title="حذف" className="text-red-500 hover:text-red-400 p-2 disabled:opacity-50" disabled={isLoading}><Trash2 size={18} /></button>
                               </div>
