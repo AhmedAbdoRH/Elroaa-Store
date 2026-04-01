@@ -202,20 +202,23 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       return;
     }
 
-    // Format order details
-    const orderDetails = cartItems.map(item => 
-      `- ${item.title}${item.size ? ` (${item.size})` : ''} (${item.quantity} × ${item.price})`
-    ).join('%0A');
+    // Format order details
+    const orderDetails = cartItems.map(item => 
+      `- ${item.title}${item.size ? ` (${item.size})` : ''} (${item.quantity} × ${item.price})`
+    ).join('%0A');
 
-    // Create the message with order details and total
-    const message = `مرحباً، أود طلب المنتجات التالية:%0A%0A${orderDetails}%0A%0Aالإجمالي: ${cartTotal} ج%0A%0Aشكراً لكم!`;
-    
-    // Open WhatsApp with the order details
+    // Create the message with order details and total
+    const message = `مرحباً، أود طلب المنتجات التالية:%0A%0A${orderDetails}%0A%0Aالإجمالي: ${cartTotal} ج%0A%0Aشكراً لكم!`;
+    
+    // Open WhatsApp with the order details
     window.open(`https://wa.me/201003046674?text=${message}`, '_blank');
-    
-    // Close the cart after sending
-    toggleCart();
-  };
+    
+    // Clear the cart after sending the order
+    clearCart();
+    
+    // Close the cart after sending
+    toggleCart(false);
+  };
 
 
 

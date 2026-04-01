@@ -113,13 +113,19 @@ export default function Footer({ storeSettings }: FooterProps) {
           </div>
 
           {/* Developer Info */}
-          <div className="flex flex-col items-center gap-2">
-            <p className="text-secondary text-opacity-50 text-sm">
-              تم تطوير الموقع بواسطة
+          <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl 
+                           bg-gradient-to-r from-secondary/5 to-accent/5 
+                           border border-secondary/10 
+                           shadow-[0_2px_10px_rgba(0,0,0,0.08)]">
+            <p className="text-secondary text-opacity-60 text-xs">
+              تم التطوير بواسطة
             </p>
-            <div className="flex items-center gap-1" dir="ltr">
-              <Target className="text-green-500 h-5 w-5" />
-              <a href="https://Rhm-digital.com" className="text-secondary text-opacity-80 underline hover:no-underline text-sm">RHM Digital Solutions</a>
+            <div className="flex items-center gap-1.5" dir="ltr">
+              <Target className="text-green-500 h-4 w-4" />
+              <a href="https://Rhm-digital.com" 
+                 className="text-secondary text-opacity-90 font-semibold underline-offset-4 hover:underline text-sm transition-all duration-300 hover:text-green-500">
+                RHM Digital Solutions
+              </a>
             </div>
           </div>
 
