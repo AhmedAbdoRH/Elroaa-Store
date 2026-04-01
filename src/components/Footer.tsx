@@ -72,33 +72,55 @@ export default function Footer({ storeSettings }: FooterProps) {
 
             {/* Contact Numbers */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
+              {/* Phone Button */}
               <a
                 href="tel:01553218800"
-                className="flex items-center gap-2 bg-green-600/20 hover:bg-green-600/30 px-4 py-2 rounded-lg border border-green-500/30 transition-all duration-300"
+                className="group relative flex items-center gap-3 px-6 py-3 rounded-xl 
+                           bg-gradient-to-r from-green-600/25 to-green-500/25 
+                           hover:from-green-600/40 hover:to-green-500/40
+                           border border-green-500/30 hover:border-green-400/50
+                           shadow-[0_4px_15px_rgba(34,197,94,0.15)] hover:shadow-[0_6px_25px_rgba(34,197,94,0.3)]
+                           transform hover:-translate-y-1 hover:scale-[1.02]
+                           transition-all duration-300 ease-out"
               >
-                <Phone className="h-4 w-4 text-green-400" />
-                <span className="text-secondary text-sm font-medium">01553218800</span>
+                <span className="absolute inset-0 rounded-xl bg-green-400/10 opacity-0 
+                                 group-hover:opacity-100 transition-opacity duration-300"></span>
+                <Phone className="h-5 w-5 text-green-400 group-hover:text-green-300 
+                                  group-hover:animate-pulse transition-all duration-300 relative z-10" />
+                <span className="text-secondary text-base font-semibold relative z-10">01553218800</span>
               </a>
 
+              {/* WhatsApp Button */}
               <a
                 href="https://wa.me/201003046674"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 bg-green-600/20 hover:bg-green-600/30 px-4 py-2 rounded-lg border border-green-500/30 transition-all duration-300"
+                className="group relative flex items-center gap-3 px-6 py-3 rounded-xl 
+                           bg-gradient-to-r from-green-600/25 to-green-500/25 
+                           hover:from-green-600/40 hover:to-green-500/40
+                           border border-green-500/30 hover:border-green-400/50
+                           shadow-[0_4px_15px_rgba(34,197,94,0.15)] hover:shadow-[0_6px_25px_rgba(34,197,94,0.3)]
+                           transform hover:-translate-y-1 hover:scale-[1.02]
+                           transition-all duration-300 ease-out"
               >
-                <MessageCircle className="h-4 w-4 text-green-400" />
-                <span className="text-secondary text-sm font-medium">01003046674</span>
+                <span className="absolute inset-0 rounded-xl bg-green-400/10 opacity-0 
+                                 group-hover:opacity-100 transition-opacity duration-300"></span>
+                <MessageCircle className="h-5 w-5 text-green-400 group-hover:text-green-300 
+                                          group-hover:animate-pulse transition-all duration-300 relative z-10" />
+                <span className="text-secondary text-base font-semibold relative z-10">01003046674</span>
               </a>
             </div>
           </div>
 
           {/* Developer Info */}
-          <div className="flex flex-col items-center gap-1">
-            <p className="text-secondary text-opacity-50 flex items-center gap-2 text-sm">
+          <div className="flex flex-col items-center gap-2">
+            <p className="text-secondary text-opacity-50 text-sm">
               تم تطوير الموقع بواسطة
-              <Target className="text-red-500 h-6 w-6" />
-              <a href="https://RehlatHadaf.online" className="text-secondary text-opacity-80 underline hover:no-underline">رحلة هدف للتسويق التجاري</a>
             </p>
+            <div className="flex items-center gap-1" dir="ltr">
+              <Target className="text-green-500 h-5 w-5" />
+              <a href="https://Rhm-digital.com" className="text-secondary text-opacity-80 underline hover:no-underline text-sm">RHM Digital Solutions</a>
+            </div>
           </div>
 
           <Link

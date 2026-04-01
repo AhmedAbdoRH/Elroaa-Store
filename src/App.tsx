@@ -24,6 +24,7 @@ import StructuredData from './components/StructuredData';
 import type { StoreSettings, Banner } from './types/database';
 import { ThemeProvider } from './theme/ThemeContext';
 import FacebookButton from './components/FacebookButton';
+import ClickParticleEffect from './components/ClickParticleEffect';
 
 // PrivateRoute component with professional loading spinner
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -298,6 +299,7 @@ function App() {
   return (
     <ThemeProvider>
       <CartProvider>
+        <ClickParticleEffect />
         <Helmet>
           <title>{storeSettings?.meta_title || storeSettings?.store_name || 'شركة الرؤى للتجارة والتوريدات والعطارة | أفضل أنواع الأعشاب والتوابل في مصر'}</title>
           <meta name="description" content={storeSettings?.meta_description || storeSettings?.store_description || 'شركة الرؤى للتجارة والتوريدات والعطارة - نقدم أفضل أنواع الأعشاب الطبيعية، التوابل، والزيوت العطرية بأسعار تنافسية وجودة عالية.'} />

@@ -210,6 +210,56 @@ export default function Header({ storeSettings }: HeaderProps) {
           </div>
 
           <div className="flex items-center gap-4">
+            {isMobileSearchOpen && (
+              <div className="fixed inset-x-0 top-16 z-50 bg-primary/95 backdrop-blur-md p-3 md:hidden shadow-lg" ref={searchRef}>
+                <div className="relative">
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => handleSearch(e.target.value)}
+                    onFocus={() => setIsSearchFocused(true)}
+                    placeholder="ابحث عن منتج..."
+                    className="w-full bg-secondary/10 text-secondary placeholder-secondary/50 rounded-full py-2 pr-10 pl-4 focus:outline-none focus:ring-2 focus:ring-accent"
+                    autoFocus
+                  />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-secondary/50" />
+                  {searchQuery && (
+                    <button onClick={clearSearch} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-secondary/50">
+                      <X className="h-4 w-4" />
+                    </button>
+                  )}
+                  <button onClick={() => { setIsMobileSearchOpen(false); clearSearch(); }} className="absolute -top-10 right-2 text-secondary/70">
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+                {isSearchFocused && searchResults.length > 0 && (
+                  <div className="mt-2 max-h-60 overflow-y-auto bg-primary/90 rounded-lg border border-secondary/10">
+                    {searchResults.map((product) => (
+                      <Link
+                        key={product.id}
+                        to={`/product/${product.id}`}
+                        className="flex items-center p-3 hover:bg-secondary/5 border-b border-secondary/5 last:border-0"
+                        onClick={() => { setIsMobileSearchOpen(false); clearSearch(); }}
+                      >
+                        <div className="w-10 h-10 rounded bg-secondary/5 overflow-hidden">
+                          <img src={product.displayImage} alt="" className="w-full h-full object-cover" />
+                        </div>
+                        <div className="flex-1 text-right pr-2">
+                          <h4 className="text-secondary font-medium text-sm">{product.title}</h4>
+                          <p className="text-xs text-secondary/60">{product.category?.name}</p>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+                {isSearchFocused && searchResults.length === 0 && searchQuery.trim().length >= 2 && (
+                  <div className="mt-2 p-3 text-center text-secondary/50 bg-primary/90 rounded-lg border border-secondary/10">
+                    لا توجد نتائج
+                  </div>
+                )}
+              </div>
+            )}
             <button onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)} className="md:hidden p-2 text-secondary">
               <Search className="h-6 w-6" />
             </button>
