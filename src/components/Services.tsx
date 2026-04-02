@@ -19,6 +19,7 @@ export default function Services() {
   const [error, setError] = useState<string | null>(null);
   const [hasFeaturedProducts, setHasFeaturedProducts] = useState(false);
   const [hasBestSellerProducts, setHasBestSellerProducts] = useState(false);
+  const [visibleCount, setVisibleCount] = useState<number>(24);
 
   useEffect(() => {
     fetchCategories();
@@ -114,6 +115,10 @@ export default function Services() {
 
     return filtered;
   }, [selectedCategory, selectedSubcategory, services]);
+
+  useEffect(() => {
+    setVisibleCount(24);
+  }, [selectedCategory, selectedSubcategory]);
 
   const handleCategoryClick = (categoryId: string) => {
     setSelectedCategory(categoryId);
@@ -361,7 +366,7 @@ export default function Services() {
         >
           <AnimatePresence mode="wait">
             {filteredServices().length > 0 ? (
-              filteredServices().map((service) => (
+              filteredServices().slice(0, visibleCount).map((service) => (
                 <motion.div
                   key={service.id}
                   variants={{
@@ -400,6 +405,18 @@ export default function Services() {
             )}
           </AnimatePresence>
         </motion.div>
+
+        {filteredServices().length > visibleCount && (
+          <div className="flex justify-center mt-10">
+            <button
+              type="button"
+              onClick={() => setVisibleCount((c) => c + 24)}
+              className="px-6 py-3 rounded-xl bg-accent text-primary font-bold shadow-md hover:shadow-lg transition-all duration-200"
+            >
+              تحميل المزيد
+            </button>
+          </div>
+        )}
       </motion.div>
     </section>
   );
