@@ -114,7 +114,7 @@ export const generateOrganizationStructuredData = (storeSettings: any) => {
     "name": storeSettings?.store_name || "شركة الرؤى للتجارة والتوريدات والعطارة",
     "description": storeSettings?.store_description || "أجود أنواع الأعشاب الطبيعية والتوابل والزيوت العطرية في مصر",
     "url": "https://elroaa-store.com",
-    "logo": storeSettings?.logo_url || "/favicon.png",
+    "logo": storeSettings?.logo_url || "/logo.webp",
     "address": [
       {
         "@type": "PostalAddress",

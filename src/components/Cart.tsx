@@ -27,7 +27,7 @@ const overlayVariants = {
 
 const cartVariants = {
   hidden: { 
-    x: '100%',
+    x: '-100%',
     opacity: 0.5
   },
   visible: { 
@@ -41,7 +41,7 @@ const cartVariants = {
     }
   },
   exit: { 
-    x: '100%',
+    x: '-100%',
     opacity: 0.5,
     transition: { 
       type: 'spring',
@@ -106,7 +106,7 @@ const Cart: React.FC = () => {
           
           {/* Cart panel with slide animation */}
           <motion.div
-            className="absolute inset-y-0 right-0 w-full max-w-md bg-gradient-to-b from-gray-50 to-white shadow-2xl flex flex-col"
+            className="absolute inset-y-0 left-0 w-full max-w-md bg-gradient-to-b from-gray-50 to-white shadow-2xl flex flex-col"
             initial="hidden"
             animate="visible"
             exit="exit"

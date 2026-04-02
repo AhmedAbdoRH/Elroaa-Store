@@ -150,13 +150,13 @@ export default function Header({ storeSettings }: HeaderProps) {
 
             <Link to="/" className="flex-shrink-0">
               <img 
-                src={storeSettings?.logo_url || '/logo.png'} 
+                src={storeSettings?.logo_url || '/logo.webp'} 
                 alt={storeSettings?.store_name || 'معرض السماح للمفروشات'} 
                 className="h-12 md:h-16 w-auto object-contain"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
-                  if (target.src !== '/logo.png') {
-                    target.src = '/logo.png';
+                  if (target.src !== '/logo.webp') {
+                    target.src = '/logo.webp';
                   }
                 }}
               />

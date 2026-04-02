@@ -188,7 +188,7 @@ function App() {
           id: '00000000-0000-0000-0000-000000000001',
           store_name: 'شركة الرؤى للتجارة والتوريدات والعطارة',
           store_description: 'أفضل أنواع الأعشاب الطبيعية، التوابل، والزيوت العطرية',
-          logo_url: '/logo.png',
+          logo_url: '/logo.webp',
           meta_title: 'شركة الرؤى للتجارة والتوريدات والعطارة',
           meta_description: 'نقدم أفضل أنواع الأعشاب الطبيعية، التوابل، والزيوت العطرية بأسعار تنافسية وجودة عالية',
           theme_settings: {
@@ -229,7 +229,7 @@ function App() {
         id: '00000000-0000-0000-0000-000000000001',
         store_name: 'شركة الرؤى للتجارة والتوريدات والعطارة',
         store_description: 'أفضل أنواع الأعشاب الطبيعية، التوابل، والزيوت العطرية',
-        logo_url: '/Logo.png',
+        logo_url: '/logo.webp',
         meta_title: 'شركة الرؤى للتجارة والتوريدات والعطارة',
         meta_description: 'نقدم أفضل أنواع الأعشاب الطبيعية، التوابل، والزيوت العطرية بأسعار تنافسية وجودة عالية',
         theme_settings: {
@@ -291,7 +291,7 @@ function App() {
   if (loading) {
     return (
       <LoadingScreen
-        logoUrl={storeSettings?.logo_url || '/logo.png'} // Provide a default logo
+        logoUrl={storeSettings?.logo_url || '/logo.webp'} // Provide a default logo
       />
     );
   }

@@ -22,8 +22,8 @@ export default function StructuredData({ type, data, services, categories, bread
           "name": storeSettings?.store_name || "شركة الرؤى للتجارة والتوريدات والعطارة",
           "description": storeSettings?.store_description || "أجود أنواع الأعشاب الطبيعية والتوابل والزيوت العطرية في مصر",
           "url": baseUrl,
-          "logo": storeSettings?.logo_url ? `${baseUrl}${storeSettings.logo_url}` : `${baseUrl}/logo.png`,
-          "image": storeSettings?.og_image_url ? `${baseUrl}${storeSettings.og_image_url}` : `${baseUrl}/logo-social.png`,
+          "logo": storeSettings?.logo_url ? `${baseUrl}${storeSettings.logo_url}` : `${baseUrl}/logo.webp`,
+          "image": storeSettings?.og_image_url ? `${baseUrl}${storeSettings.og_image_url}` : `${baseUrl}/logo-social.webp`,
           "address": [
             {
               "@type": "PostalAddress",
@@ -58,8 +58,6 @@ export default function StructuredData({ type, data, services, categories, bread
             storeSettings?.facebook_url,
             storeSettings?.instagram_url,
             storeSettings?.twitter_url,
-            storeSettings?.snapchat_url,
-            storeSettings?.tiktok_url
           ].filter(Boolean),
           "hasOfferCatalog": {
             "@type": "OfferCatalog",

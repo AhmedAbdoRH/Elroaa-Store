@@ -71,11 +71,11 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setIsCartOpen(true);
     setIsAutoShowing(true);
     
-    // إخفاء السلة بعد 4 ثواني
+    // إخفاء السلة بعد 10 ثواني
     const timer = setTimeout(() => {
       setIsCartOpen(false);
       setIsAutoShowing(false);
-    }, 4000);
+    }, 10000);
     
     return () => clearTimeout(timer);
   }, []);
