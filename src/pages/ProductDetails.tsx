@@ -295,15 +295,18 @@ export default function ProductDetails() {
                                   </div>
                                 </div>
                               ) : (
-                                <button
-                                  onClick={startEditingWeight}
-                                  className="w-24 h-16 text-2xl font-bold text-secondary bg-secondary/10 hover:bg-secondary/20 border-2 border-secondary/30 rounded-lg transition-all hover:scale-105 focus:outline-none focus:border-secondary"
-                                  title="اضغط للتعديل"
-                                >
-                                  {selectedWeight}
-                                </button>
+                                <div className="flex flex-col items-center">
+                                  <span className="text-xs text-secondary/50 mb-1 animate-pulse">اضغط للتعديل</span>
+                                  <button
+                                    onClick={startEditingWeight}
+                                    className="w-24 h-16 text-2xl font-bold text-secondary bg-secondary/10 hover:bg-secondary/20 border-2 border-secondary/30 rounded-lg transition-all hover:scale-105 focus:outline-none focus:border-secondary"
+                                    title="اضغط للتعديل"
+                                  >
+                                    {selectedWeight}
+                                  </button>
+                                  <span className="text-sm text-secondary/70 font-medium mt-1">جرام</span>
+                                </div>
                               )}
-                              <span className="text-sm text-secondary/70 font-medium mt-1">جرام</span>
                             </div>
 
                             {/* Increment buttons */}
