@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
@@ -24,6 +24,8 @@ export default function ProductDetails() {
   // Weight pricing states
   const [selectedWeight, setSelectedWeight] = useState<number>(100); // Default 100g
   const [calculatedPrice, setCalculatedPrice] = useState<number>(0);
+  const [isEditingWeight, setIsEditingWeight] = useState<boolean>(false);
+  const [tempWeight, setTempWeight] = useState<string>('');
 
   // Scroll to top when product changes
   useEffect(() => {
@@ -89,6 +91,43 @@ export default function ProductDetails() {
       .limit(10);
       
     setSuggested(data || []);
+  };
+
+  // Weight management functions
+  const incrementWeight = (step: number) => {
+    const newWeight = Math.min(1000, selectedWeight + step);
+    setSelectedWeight(newWeight);
+  };
+
+  const decrementWeight = (step: number) => {
+    const newWeight = Math.max(1, selectedWeight - step);
+    setSelectedWeight(newWeight);
+  };
+
+  const startEditingWeight = () => {
+    setIsEditingWeight(true);
+    setTempWeight(selectedWeight.toString());
+  };
+
+  const saveWeight = () => {
+    const weight = parseFloat(tempWeight);
+    if (!isNaN(weight) && weight >= 1 && weight <= 1000) {
+      setSelectedWeight(weight);
+      setIsEditingWeight(false);
+    }
+  };
+
+  const cancelEditingWeight = () => {
+    setIsEditingWeight(false);
+    setTempWeight('');
+  };
+
+  const handleWeightKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      saveWeight();
+    } else if (e.key === 'Escape') {
+      cancelEditingWeight();
+    }
   };
 
   const handleContact = () => {
@@ -196,58 +235,156 @@ export default function ProductDetails() {
                       </h4>
                       
                       <div className="bg-secondary/5 backdrop-blur-sm border border-secondary/10 p-6 rounded-xl shadow-inner">
-                        <div className="relative mb-6">
-                           {/* Custom Range Slider Styles */}
-                          <style>{`
-                            input[type=range] {
-                              -webkit-appearance: none;
-                              width: 100%;
-                              background: transparent;
-                              direction: rtl; /* Set direction to RTL */
-                            }
-                            input[type=range]::-webkit-slider-thumb {
-                              -webkit-appearance: none;
-                              height: 24px;
-                              width: 24px;
-                              border-radius: 50%;
-                              background: #4f170c;
-                              cursor: pointer;
-                              margin-top: -10px;
-                              box-shadow: 0 0 15px rgba(79, 23, 12, 0.6);
-                              border: 2px solid #fff;
-                              transition: transform 0.1s;
-                            }
-                            input[type=range]::-webkit-slider-thumb:hover {
-                              transform: scale(1.1);
-                            }
-                            input[type=range]::-webkit-slider-runnable-track {
-                              width: 100%;
-                              height: 6px;
-                              cursor: pointer;
-                              /* Gradient direction reversed for RTL: starts brown from right, goes to gray on left */
-                              background: linear-gradient(to left, #4f170c ${((selectedWeight - 1) / 999) * 100}%, #d1d5db ${((selectedWeight - 1) / 999) * 100}%);
-                              border-radius: 3px;
-                            }
-                            input[type=range]:focus {
-                              outline: none;
-                            }
-                          `}</style>
+                        {/* Weight Input with Increment/Decrement Buttons */}
+                        <div className="mb-6">
+                          <div className="flex items-center justify-center gap-4 mb-4">
+                            {/* Decrement buttons */}
+                            <div className="flex flex-col gap-2">
+                              <button
+                                onClick={() => decrementWeight(1)}
+                                className="w-10 h-10 bg-secondary/20 hover:bg-secondary/30 text-secondary rounded-lg font-bold transition-colors"
+                                title="إنقاص 1 جرام"
+                              >
+                                -1
+                              </button>
+                              <button
+                                onClick={() => decrementWeight(10)}
+                                className="w-10 h-10 bg-secondary/20 hover:bg-secondary/30 text-secondary rounded-lg font-bold transition-colors"
+                                title="إنقاص 10 جرام"
+                              >
+                                -10
+                              </button>
+                              <button
+                                onClick={() => decrementWeight(100)}
+                                className="w-10 h-10 bg-secondary/20 hover:bg-secondary/30 text-secondary rounded-lg font-bold transition-colors"
+                                title="إنقاص 100 جرام"
+                              >
+                                -100
+                              </button>
+                            </div>
 
-                          <input
-                            type="range"
-                            min="1"
-                            max="1000"
-                            step="1"
-                            value={selectedWeight}
-                            onChange={(e) => setSelectedWeight(parseInt(e.target.value))}
-                            className="w-full"
-                          />
-                        </div>
+                            {/* Weight Display/Input */}
+                            <div className="flex flex-col items-center">
+                              {isEditingWeight ? (
+                                <div className="flex flex-col items-center gap-2">
+                                  <input
+                                    type="number"
+                                    value={tempWeight}
+                                    onChange={(e) => setTempWeight(e.target.value)}
+                                    onKeyDown={handleWeightKeyPress}
+                                    onBlur={saveWeight}
+                                    min="1"
+                                    max="1000"
+                                    step="1"
+                                    className="w-24 h-16 text-2xl font-bold text-center text-secondary bg-secondary/10 border-2 border-secondary/30 rounded-lg focus:outline-none focus:border-secondary"
+                                    autoFocus
+                                  />
+                                  <div className="flex gap-2">
+                                    <button
+                                      onClick={saveWeight}
+                                      className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-sm rounded transition-colors"
+                                    >
+                                      ✓
+                                    </button>
+                                    <button
+                                      onClick={cancelEditingWeight}
+                                      className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded transition-colors"
+                                    >
+                                      ✕
+                                    </button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <button
+                                  onClick={startEditingWeight}
+                                  className="w-24 h-16 text-2xl font-bold text-secondary bg-secondary/10 hover:bg-secondary/20 border-2 border-secondary/30 rounded-lg transition-all hover:scale-105 focus:outline-none focus:border-secondary"
+                                  title="اضغط للتعديل"
+                                >
+                                  {selectedWeight}
+                                </button>
+                              )}
+                              <span className="text-sm text-secondary/70 font-medium mt-1">جرام</span>
+                            </div>
 
-                        <div className="flex justify-between items-center text-xs font-bold text-secondary/70 mb-4 px-1" style={{direction: 'rtl'}}>
-                          <span>1 جم</span>
-                          <span>500 جم</span>
-                          <span>1000 جم</span>
+                            {/* Increment buttons */}
+                            <div className="flex flex-col gap-2">
+                              <button
+                                onClick={() => incrementWeight(1)}
+                                className="w-10 h-10 bg-secondary/20 hover:bg-secondary/30 text-secondary rounded-lg font-bold transition-colors"
+                                title="زيادة 1 جرام"
+                              >
+                                +1
+                              </button>
+                              <button
+                                onClick={() => incrementWeight(10)}
+                                className="w-10 h-10 bg-secondary/20 hover:bg-secondary/30 text-secondary rounded-lg font-bold transition-colors"
+                                title="زيادة 10 جرام"
+                              >
+                                +10
+                              </button>
+                              <button
+                                onClick={() => incrementWeight(100)}
+                                className="w-10 h-10 bg-secondary/20 hover:bg-secondary/30 text-secondary rounded-lg font-bold transition-colors"
+                                title="زيادة 100 جرام"
+                              >
+                                +100
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Quick select buttons */}
+                          <div className="flex flex-wrap justify-center gap-2 mb-4">
+                            <button
+                              onClick={() => setSelectedWeight(50)}
+                              className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+                                selectedWeight === 50
+                                  ? 'bg-secondary text-primary'
+                                  : 'bg-secondary/20 hover:bg-secondary/30 text-secondary'
+                              }`}
+                            >
+                              50 جم
+                            </button>
+                            <button
+                              onClick={() => setSelectedWeight(100)}
+                              className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+                                selectedWeight === 100
+                                  ? 'bg-secondary text-primary'
+                                  : 'bg-secondary/20 hover:bg-secondary/30 text-secondary'
+                              }`}
+                            >
+                              100 جم
+                            </button>
+                            <button
+                              onClick={() => setSelectedWeight(250)}
+                              className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+                                selectedWeight === 250
+                                  ? 'bg-secondary text-primary'
+                                  : 'bg-secondary/20 hover:bg-secondary/30 text-secondary'
+                              }`}
+                            >
+                              250 جم
+                            </button>
+                            <button
+                              onClick={() => setSelectedWeight(500)}
+                              className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+                                selectedWeight === 500
+                                  ? 'bg-secondary text-primary'
+                                  : 'bg-secondary/20 hover:bg-secondary/30 text-secondary'
+                              }`}
+                            >
+                              500 جم
+                            </button>
+                            <button
+                              onClick={() => setSelectedWeight(1000)}
+                              className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+                                selectedWeight === 1000
+                                  ? 'bg-secondary text-primary'
+                                  : 'bg-secondary/20 hover:bg-secondary/30 text-secondary'
+                              }`}
+                            >
+                              1 كجم
+                            </button>
+                          </div>
                         </div>
 
                         <div className="flex items-center justify-between bg-secondary/10 rounded-lg p-4 border border-secondary/20 shadow-lg">
