@@ -306,15 +306,14 @@ export default function ProductDetails() {
                                 </div>
                               ) : (
                                 <div className="flex flex-col items-center">
-                                  <span className="text-sm text-secondary/60 font-medium mb-1 animate-pulse bg-white px-3 py-1 rounded-full shadow-sm border border-secondary/20">اضغط للتعديل</span>
                                   <button
                                     onClick={startEditingWeight}
-                                    className="w-24 h-16 text-2xl font-bold text-secondary bg-white hover:bg-gray-50 border-2 border-secondary/30 rounded-lg transition-all hover:scale-105 focus:outline-none focus:border-secondary shadow-md"
+                                    className="w-24 h-16 text-2xl font-bold text-secondary bg-yellow-400 hover:bg-yellow-500 border-2 border-yellow-600 rounded-none transition-all hover:scale-105 focus:outline-none focus:border-yellow-700 shadow-md"
                                     title="اضغط للتعديل"
                                   >
                                     {selectedWeight}
                                   </button>
-                                  <span className="text-sm text-secondary/70 font-medium mt-1">جرام</span>
+                                  <span className="text-sm text-secondary/70 font-medium mt-1">اضغط على المربع لتعديل الكمية</span>
                                 </div>
                               )}
                             </div>
