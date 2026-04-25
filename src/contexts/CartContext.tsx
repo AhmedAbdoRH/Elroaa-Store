@@ -26,6 +26,7 @@ interface CartContextType {
   sendOrderViaWhatsApp: () => void;
   showToast: boolean;
   toastProductName: string;
+  hideToast: () => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -150,6 +151,10 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }, []);
 
+  const hideToast = useCallback(() => {
+    setShowToast(false);
+  }, []);
+
   const itemCount = useMemo(() => 
     cartItems.reduce((total, item) => total + item.quantity, 0),
     [cartItems]
@@ -232,7 +237,8 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         itemCount,
         sendOrderViaWhatsApp,
         showToast,
-        toastProductName
+        toastProductName,
+        hideToast
       }}
     >
       {children}

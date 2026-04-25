@@ -446,13 +446,14 @@ function MainFade({ children }: { children: React.ReactNode }) {
 }
 
 function ToastNotificationWrapper() {
-  const { showToast, toastProductName, toggleCart } = useCart();
+  const { showToast, toastProductName, toggleCart, hideToast } = useCart();
   
   return (
     <ToastNotification
       show={showToast}
       productName={toastProductName}
       onViewCart={() => toggleCart(true)}
+      onClose={hideToast}
     />
   );
 }
