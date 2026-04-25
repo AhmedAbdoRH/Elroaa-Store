@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { supabase } from './lib/supabase';
-import { CartProvider } from './contexts/CartContext';
+import { CartProvider, useCart } from './contexts/CartContext';
 import Cart from './components/Cart';
+import ToastNotification from './components/ToastNotification';
 import Header from './components/Header';
 import BannerSlider from './components/BannerSlider';
 import BannerStrip from './components/BannerStrip';
@@ -381,6 +382,8 @@ function App() {
             } />
           </Routes>
         </Router>
+        <Cart />
+        <ToastNotificationWrapper />
       </CartProvider>
     </ThemeProvider>
   );
@@ -427,6 +430,7 @@ function MainFade({ children }: { children: React.ReactNode }) {
     const t = setTimeout(() => setVisible(true), 50); // Quick fade-in for content
     return () => clearTimeout(t);
   }, []);
+
   return (
     <div
       className="main-fade-content" // Added class for specific styling if needed
@@ -438,6 +442,18 @@ function MainFade({ children }: { children: React.ReactNode }) {
     >
       {children}
     </div>
+  );
+}
+
+function ToastNotificationWrapper() {
+  const { showToast, toastProductName, toggleCart } = useCart();
+  
+  return (
+    <ToastNotification
+      show={showToast}
+      productName={toastProductName}
+      onViewCart={() => toggleCart(true)}
+    />
   );
 }
 

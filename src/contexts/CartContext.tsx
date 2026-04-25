@@ -24,6 +24,8 @@ interface CartContextType {
   itemCount: number;
   cartTotal: string;
   sendOrderViaWhatsApp: () => void;
+  showToast: boolean;
+  toastProductName: string;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -32,6 +34,8 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isAutoShowing, setIsAutoShowing] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastProductName, setToastProductName] = useState<string>('');
 
   const cleanPrice = (price: string | number): { display: string; numeric: number } => {
     // If price is already a number, use it directly
@@ -67,19 +71,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
   };
 
-  const showTemporarily = useCallback(() => {
-    setIsCartOpen(true);
-    setIsAutoShowing(true);
-    
-    // إخفاء السلة بعد 10 ثواني
-    const timer = setTimeout(() => {
-      setIsCartOpen(false);
-      setIsAutoShowing(false);
-    }, 10000);
-    
-    return () => clearTimeout(timer);
-  }, []);
-
   const addToCart = (item: Omit<CartItem, 'id' | 'quantity' | 'numericPrice'>) => {
     const { display, numeric } = cleanPrice(item.price);
     
@@ -108,10 +99,14 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }];
     });
             
-    // Show cart temporarily when adding an item
-    if (typeof showTemporarily === 'function') {
-      showTemporarily();
-    }
+    // Show toast notification instead of opening cart
+    setToastProductName(item.title);
+    setShowToast(true);
+    
+    // Hide toast after 3 seconds
+    setTimeout(() => {
+      setShowToast(false);
+    }, 3000);
   };
 
   const removeFromCart = (id: string) => {
@@ -235,7 +230,9 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         updateQuantity,
         clearCart,
         itemCount,
-        sendOrderViaWhatsApp
+        sendOrderViaWhatsApp,
+        showToast,
+        toastProductName
       }}
     >
       {children}
