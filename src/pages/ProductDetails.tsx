@@ -306,7 +306,7 @@ export default function ProductDetails() {
                                 </div>
                               ) : (
                                 <div className="flex flex-col items-center">
-                                  <span className="text-sm text-secondary/70 font-medium mb-1 bg-yellow-400 px-3 py-1 rounded">اضغط على المربع لو حابب تضيف الكمية يدويًا</span>
+                                  <span className="text-sm text-secondary/70 font-medium mb-1 bg-yellow-400 px-3 py-1 rounded">اضغط على المربع لتحديد الكمية يدويًا</span>
                                   <button
                                     onClick={startEditingWeight}
                                     className="w-24 h-16 text-2xl font-bold text-secondary bg-white hover:bg-gray-50 border-2 border-secondary/30 rounded-none transition-all hover:scale-105 focus:outline-none focus:border-secondary shadow-md relative"
