@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import type { Service, ProductSize } from '../types/database';
-import { MessageCircle, ArrowRight } from 'lucide-react';
+import { MessageCircle, ArrowRight, Share2, Copy } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { toast } from 'react-toastify';
 import ProductImageSlider from '../components/ProductImageSlider';
@@ -146,6 +146,31 @@ export default function ProductDetails() {
       // Fallback to home page
       navigate('/');
     }
+  };
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: service?.title || 'منتج',
+          text: service?.description || '',
+          url: window.location.href
+        });
+      } catch (err) {
+        console.error('Error sharing:', err);
+      }
+    } else {
+      // Fallback: copy to clipboard
+      handleCopyLink();
+    }
+  };
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      toast.success('تم نسخ رابط المنتج');
+    }).catch(() => {
+      toast.error('فشل نسخ الرابط');
+    });
   };
 
   // Get all images for the main product carousel
@@ -482,6 +507,20 @@ export default function ProductDetails() {
                       title="تواصل معنا للطلب"
                     >
                       <MessageCircle className="h-6 w-6" />
+                    </button>
+                    <button
+                      onClick={handleShare}
+                      className="w-14 h-14 bg-blue-600 text-white rounded-lg font-bold hover:bg-opacity-90 flex items-center justify-center"
+                      title="مشاركة المنتج"
+                    >
+                      <Share2 className="h-6 w-6" />
+                    </button>
+                    <button
+                      onClick={handleCopyLink}
+                      className="w-14 h-14 bg-gray-600 text-white rounded-lg font-bold hover:bg-opacity-90 flex items-center justify-center"
+                      title="نسخ رابط المنتج"
+                    >
+                      <Copy className="h-6 w-6" />
                     </button>
                     <button
                       onClick={(e) => {
