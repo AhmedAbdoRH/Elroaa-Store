@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import type { Service, ProductSize } from '../types/database';
-import { MessageCircle, ArrowRight, Share2, Copy } from 'lucide-react';
+import { MessageCircle, ArrowRight, Share2, Copy, Edit } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { toast } from 'react-toastify';
 import ProductImageSlider from '../components/ProductImageSlider';
@@ -306,14 +306,15 @@ export default function ProductDetails() {
                                 </div>
                               ) : (
                                 <div className="flex flex-col items-center">
+                                  <span className="text-sm text-secondary/70 font-medium mb-1 bg-yellow-400 px-3 py-1 rounded">اضغط على المربع لتعديل الكمية</span>
                                   <button
                                     onClick={startEditingWeight}
-                                    className="w-24 h-16 text-2xl font-bold text-secondary bg-white hover:bg-gray-50 border-2 border-secondary/30 rounded-none transition-all hover:scale-105 focus:outline-none focus:border-secondary shadow-md"
+                                    className="w-24 h-16 text-2xl font-bold text-secondary bg-white hover:bg-gray-50 border-2 border-secondary/30 rounded-none transition-all hover:scale-105 focus:outline-none focus:border-secondary shadow-md relative"
                                     title="اضغط للتعديل"
                                   >
                                     {selectedWeight}
+                                    <Edit className="absolute top-1 right-1 w-4 h-4 text-secondary/40" />
                                   </button>
-                                  <span className="text-sm text-secondary/70 font-medium mt-1 bg-yellow-400 px-3 py-1 rounded">اضغط على المربع لتعديل الكمية</span>
                                 </div>
                               )}
                             </div>
