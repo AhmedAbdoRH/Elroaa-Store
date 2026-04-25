@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import ServiceCard from '../components/ServiceCard';
+import { ArrowRight } from 'lucide-react';
 import type { Service } from '../types/database';
 
 interface Subcategory {
@@ -19,11 +20,20 @@ interface Category {
 
 export default function SubcategoryProducts() {
   const { subcategoryId } = useParams<{ subcategoryId: string }>();
+  const navigate = useNavigate();
   const [services, setServices] = useState<Service[]>([]);
   const [subcategory, setSubcategory] = useState<Subcategory | null>(null);
   const [category, setCategory] = useState<Category | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const handleBack = () => {
+    if (category) {
+      navigate(`/category/${category.id}`);
+    } else {
+      navigate('/');
+    }
+  };
 
   useEffect(() => {
     if (subcategoryId) {
@@ -127,6 +137,15 @@ export default function SubcategoryProducts() {
       }}
     >
       <div className="container mx-auto px-4 py-8">
+        {/* Back Button */}
+        <button
+          onClick={handleBack}
+          className="mb-4 flex items-center gap-2 text-secondary hover:text-secondary/80 transition-colors font-medium"
+        >
+          <ArrowRight className="w-5 h-5" />
+          <span>رجوع للقسم</span>
+        </button>
+
         {/* Breadcrumbs */}
         <div className="mb-8 text-secondary">
           <Link to="/" className="hover:text-accent transition-colors">الرئيسية</Link>

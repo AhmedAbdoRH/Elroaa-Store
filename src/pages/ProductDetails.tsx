@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import type { Service, ProductSize } from '../types/database';
-import { MessageCircle } from 'lucide-react';
+import { MessageCircle, ArrowRight } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { toast } from 'react-toastify';
 import ProductImageSlider from '../components/ProductImageSlider';
@@ -12,6 +12,7 @@ import ProductImageSlider from '../components/ProductImageSlider';
 export default function ProductDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const [service, setService] = useState<Service | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -137,6 +138,16 @@ export default function ProductDetails() {
     window.open(`https://wa.me/201003046674?text=${encodeURIComponent(message)}`, '_blank');
   };
 
+  const handleBack = () => {
+    // Try to navigate back to the category page
+    if (service?.category_id) {
+      navigate(`/category/${service.category_id}`);
+    } else {
+      // Fallback to home page
+      navigate('/');
+    }
+  };
+
   // Get all images for the main product carousel
   const images: string[] = [
     service?.image_url || '',
@@ -211,6 +222,15 @@ export default function ProductDetails() {
       )}
       <div className="flex items-center justify-center flex-grow py-8">
         <div className="container mx-auto px-4 max-w-4xl lg:max-w-5xl">
+          {/* Back Button */}
+          <button
+            onClick={handleBack}
+            className="mb-4 flex items-center gap-2 text-secondary hover:text-secondary/80 transition-colors font-medium"
+          >
+            <ArrowRight className="w-5 h-5" />
+            <span>رجوع للقسم</span>
+          </button>
+          
           <div className="rounded-lg shadow-lg overflow-hidden glass">
             <div className="md:flex">
               <div className="md:w-1/2">
@@ -296,10 +316,10 @@ export default function ProductDetails() {
                                 </div>
                               ) : (
                                 <div className="flex flex-col items-center">
-                                  <span className="text-xs text-secondary/50 mb-1 animate-pulse">اضغط للتعديل</span>
+                                  <span className="text-sm text-secondary/60 font-medium mb-1 animate-pulse bg-white px-3 py-1 rounded-full shadow-sm border border-secondary/20">اضغط للتعديل</span>
                                   <button
                                     onClick={startEditingWeight}
-                                    className="w-24 h-16 text-2xl font-bold text-secondary bg-secondary/10 hover:bg-secondary/20 border-2 border-secondary/30 rounded-lg transition-all hover:scale-105 focus:outline-none focus:border-secondary"
+                                    className="w-24 h-16 text-2xl font-bold text-secondary bg-white hover:bg-gray-50 border-2 border-secondary/30 rounded-lg transition-all hover:scale-105 focus:outline-none focus:border-secondary shadow-md"
                                     title="اضغط للتعديل"
                                   >
                                     {selectedWeight}
