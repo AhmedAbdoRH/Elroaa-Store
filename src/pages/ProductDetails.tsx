@@ -311,7 +311,7 @@ export default function ProductDetails() {
                                     className="w-24 h-16 text-2xl font-bold text-secondary bg-yellow-400 hover:bg-yellow-500 border-2 border-yellow-600 rounded-none transition-all hover:scale-105 focus:outline-none focus:border-yellow-700 shadow-md"
                                     title="اضغط للتعديل"
                                   >
-                                    {selectedWeight}
+                                    <span className="bg-white px-2 py-1 rounded shadow-sm">{selectedWeight}</span>
                                   </button>
                                   <span className="text-sm text-secondary/70 font-medium mt-1">اضغط على المربع لتعديل الكمية</span>
                                 </div>
