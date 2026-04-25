@@ -509,20 +509,6 @@ export default function ProductDetails() {
                       <MessageCircle className="h-6 w-6" />
                     </button>
                     <button
-                      onClick={handleShare}
-                      className="w-14 h-14 bg-blue-600 text-white rounded-lg font-bold hover:bg-opacity-90 flex items-center justify-center"
-                      title="مشاركة المنتج"
-                    >
-                      <Share2 className="h-6 w-6" />
-                    </button>
-                    <button
-                      onClick={handleCopyLink}
-                      className="w-14 h-14 bg-gray-600 text-white rounded-lg font-bold hover:bg-opacity-90 flex items-center justify-center"
-                      title="نسخ رابط المنتج"
-                    >
-                      <Copy className="h-6 w-6" />
-                    </button>
-                    <button
                       onClick={(e) => {
                         e.preventDefault();
                         if (service.has_weight_pricing) {
@@ -567,6 +553,25 @@ export default function ProductDetails() {
                         <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
                       </svg>
                       <span className="mr-2">أضف للسلة للطلب</span>
+                    </button>
+                  </div>
+                  {/* Share and Copy Link Buttons - Smaller, below main buttons */}
+                  <div className="flex gap-2 items-center mt-3">
+                    <button
+                      onClick={handleShare}
+                      className="flex-1 h-10 bg-[#4f170c] text-white rounded-lg font-medium hover:bg-opacity-90 flex items-center justify-center gap-2 text-sm"
+                      title="مشاركة المنتج"
+                    >
+                      <Share2 className="h-4 w-4" />
+                      <span>مشاركة</span>
+                    </button>
+                    <button
+                      onClick={handleCopyLink}
+                      className="flex-1 h-10 bg-[#4f170c] text-white rounded-lg font-medium hover:bg-opacity-90 flex items-center justify-center gap-2 text-sm"
+                      title="نسخ رابط المنتج"
+                    >
+                      <Copy className="h-4 w-4" />
+                      <span>نسخ الرابط</span>
                     </button>
                   </div>
                 </div>
