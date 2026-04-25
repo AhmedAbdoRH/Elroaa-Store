@@ -95,16 +95,6 @@ export default function ProductDetails() {
   };
 
   // Weight management functions
-  const incrementWeight = (step: number) => {
-    const newWeight = Math.min(1000, selectedWeight + step);
-    setSelectedWeight(newWeight);
-  };
-
-  const decrementWeight = (step: number) => {
-    const newWeight = Math.max(1, selectedWeight - step);
-    setSelectedWeight(newWeight);
-  };
-
   const startEditingWeight = () => {
     setIsEditingWeight(true);
     setTempWeight(selectedWeight.toString());
@@ -280,34 +270,9 @@ export default function ProductDetails() {
                       </h4>
                       
                       <div className="bg-secondary/5 backdrop-blur-sm border border-secondary/10 p-6 rounded-xl shadow-inner">
-                        {/* Weight Input with Increment/Decrement Buttons */}
+                        {/* Weight Input */}
                         <div className="mb-6">
-                          <div className="flex items-center justify-center gap-4 mb-4">
-                            {/* Decrement buttons */}
-                            <div className="flex flex-col gap-2">
-                              <button
-                                onClick={() => decrementWeight(1)}
-                                className="w-10 h-10 bg-secondary/20 hover:bg-secondary/30 text-secondary rounded-lg font-bold transition-colors"
-                                title="إنقاص 1 جرام"
-                              >
-                                -1
-                              </button>
-                              <button
-                                onClick={() => decrementWeight(10)}
-                                className="w-10 h-10 bg-secondary/20 hover:bg-secondary/30 text-secondary rounded-lg font-bold transition-colors"
-                                title="إنقاص 10 جرام"
-                              >
-                                -10
-                              </button>
-                              <button
-                                onClick={() => decrementWeight(100)}
-                                className="w-10 h-10 bg-secondary/20 hover:bg-secondary/30 text-secondary rounded-lg font-bold transition-colors"
-                                title="إنقاص 100 جرام"
-                              >
-                                -100
-                              </button>
-                            </div>
-
+                          <div className="flex items-center justify-center mb-4">
                             {/* Weight Display/Input */}
                             <div className="flex flex-col items-center">
                               {isEditingWeight ? (
@@ -352,31 +317,6 @@ export default function ProductDetails() {
                                   <span className="text-sm text-secondary/70 font-medium mt-1">جرام</span>
                                 </div>
                               )}
-                            </div>
-
-                            {/* Increment buttons */}
-                            <div className="flex flex-col gap-2">
-                              <button
-                                onClick={() => incrementWeight(1)}
-                                className="w-10 h-10 bg-secondary/20 hover:bg-secondary/30 text-secondary rounded-lg font-bold transition-colors"
-                                title="زيادة 1 جرام"
-                              >
-                                +1
-                              </button>
-                              <button
-                                onClick={() => incrementWeight(10)}
-                                className="w-10 h-10 bg-secondary/20 hover:bg-secondary/30 text-secondary rounded-lg font-bold transition-colors"
-                                title="زيادة 10 جرام"
-                              >
-                                +10
-                              </button>
-                              <button
-                                onClick={() => incrementWeight(100)}
-                                className="w-10 h-10 bg-secondary/20 hover:bg-secondary/30 text-secondary rounded-lg font-bold transition-colors"
-                                title="زيادة 100 جرام"
-                              >
-                                +100
-                              </button>
                             </div>
                           </div>
 
