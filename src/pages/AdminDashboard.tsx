@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import type { Category, Service, Banner, StoreSettings, Testimonial, Subcategory } from '../types/database'; // Added Subcategory type
-import { Trash2, Edit, Plus, Save, X, Upload, ChevronDown, ChevronUp, Facebook, Instagram, Twitter, Palette, Store, Image, List, Package, Eye, EyeOff, Home } from 'lucide-react';
+import { Trash2, Edit, Plus, Save, X, Upload, ChevronDown, ChevronUp, Facebook, Instagram, Twitter, Palette, Store, Image, List, Package, Eye, EyeOff, Home, ArrowUp } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -1370,7 +1370,7 @@ const { ...serviceData } = newService;
         className="fixed right-6 bottom-6 z-50 bg-black hover:bg-gray-900 text-white p-2 rounded-full shadow-lg transition-all duration-300 hover:scale-110"
         title="الصعود لأعلى"
       >
-        <Home size={16} className="rotate-180" />
+        <ArrowUp size={16} />
       </button>
 
       {deleteModal && (
