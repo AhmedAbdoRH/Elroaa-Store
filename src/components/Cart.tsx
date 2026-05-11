@@ -212,6 +212,11 @@ const Cart: React.FC = () => {
                   <span className="text-gray-700 font-bold text-lg">المجموع</span>
                   <span className="text-blue-600 font-bold text-2xl">{cartTotal} ج</span>
                 </div>
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-center">
+                  <p className="text-amber-800 text-sm font-medium">
+                    ⚠️ سعر الشحن يختلف حسب المنطقة
+                  </p>
+                </div>
                 <button
                   onClick={sendOrderViaWhatsApp}
                   className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-3 rounded-lg hover:from-green-600 hover:to-green-700 transition-all font-bold shadow-md hover:shadow-lg"
