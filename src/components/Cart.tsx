@@ -214,7 +214,7 @@ const Cart: React.FC = () => {
                 </div>
                 <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-center">
                   <p className="text-amber-800 text-sm font-medium">
-                    💰 يتم تقدير تكلفة الشحن حسب المنطقة
+                    يتم تقدير تكلفة الشحن حسب المنطقة
                   </p>
                 </div>
                 <button

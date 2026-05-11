@@ -1355,22 +1355,22 @@ const { ...serviceData } = newService;
         }}
       />
 
-      {/* Fixed Home Button - Bottom Right */}
+      {/* Fixed Home Button - Bottom Left */}
       <button
         onClick={() => navigate('/')}
-        className="fixed right-6 bottom-6 z-50 bg-white/20 backdrop-blur-md hover:bg-white/30 text-white p-4 rounded-full shadow-lg transition-all duration-300 hover:scale-110 border border-white/30"
+        className="fixed left-6 bottom-6 z-50 bg-white/20 backdrop-blur-md hover:bg-white/30 text-white p-4 rounded-full shadow-lg transition-all duration-300 hover:scale-110 border border-white/30"
         title="العودة للصفحة الرئيسية"
       >
         <Home size={24} />
       </button>
 
-      {/* Scroll to Top Button - Bottom Left */}
+      {/* Scroll to Top Button - Bottom Right */}
       <button
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        className="fixed left-6 bottom-6 z-50 bg-white/20 backdrop-blur-md hover:bg-white/30 text-white p-4 rounded-full shadow-lg transition-all duration-300 hover:scale-110 border border-white/30"
+        className="fixed right-6 bottom-6 z-50 bg-black hover:bg-gray-900 text-white p-2 rounded-full shadow-lg transition-all duration-300 hover:scale-110"
         title="الصعود لأعلى"
       >
-        <Home size={24} className="rotate-180" />
+        <Home size={16} className="rotate-180" />
       </button>
 
       {deleteModal && (
