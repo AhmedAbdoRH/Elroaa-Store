@@ -201,7 +201,8 @@ export default function ProductDetails() {
     <>
       {/* وسوم Open Graph لعرض صورة المنتج عند مشاركة الرابط (واتساب وغيره) */}
       <Helmet>
-        <meta property="og:title" content={service?.title || ''} />
+        <title>{`${service.title} | شركة الرؤى للتجارة والتوريدات والعطارة`}</title>
+        <meta property="og:title" content={`${service.title} | شركة الرؤى للتجارة والتوريدات والعطارة`} />
         <meta property="og:description" content={service?.description || ''} />
         <meta property="og:image" content={ogImage} />
         <meta property="og:image:width" content="1200" />
@@ -210,7 +211,7 @@ export default function ProductDetails() {
         <meta property="og:type" content="product" />
         {/* دعم تويتر أيضاً */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={service?.title || ''} />
+        <meta name="twitter:title" content={`${service.title} | شركة الرؤى للتجارة والتوريدات والعطارة`} />
         <meta name="twitter:description" content={service?.description || ''} />
         <meta name="twitter:image" content={ogImage} />
       </Helmet>

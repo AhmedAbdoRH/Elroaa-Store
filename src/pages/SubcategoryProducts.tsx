@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { supabase } from '../lib/supabase';
 import ServiceCard from '../components/ServiceCard';
 import { ArrowRight } from 'lucide-react';
@@ -136,6 +137,9 @@ export default function SubcategoryProducts() {
         backgroundAttachment: 'fixed',
       }}
     >
+      <Helmet>
+        <title>{`${subcategory.name} | شركة الرؤى للتجارة والتوريدات والعطارة`}</title>
+      </Helmet>
       <div className="container mx-auto px-4 py-8">
         {/* Back Button */}
         <button
