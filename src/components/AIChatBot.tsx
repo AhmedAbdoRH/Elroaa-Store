@@ -3,6 +3,7 @@ import { MessageCircle, Send, X, Bot, User, MessageSquare, ExternalLink } from '
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import type { Service, Category, StoreSettings } from '../types/database';
+import { sanitizeStoreSettings } from '../utils/storeBranding';
 
 interface Message {
     id: string;
@@ -102,7 +103,11 @@ export default function AIChatBot() {
             const { data: storeSettings, error: storeError } = await supabase.from('store_settings').select('*').single();
             if (storeError && storeError.code !== 'PGRST116') console.error('Error fetching store settings:', storeError);
 
-            setStoreData({ products: products || [], categories: categories || [], storeSettings: storeSettings || null });
+            setStoreData({
+                products: products || [],
+                categories: categories || [],
+                storeSettings: storeSettings ? sanitizeStoreSettings(storeSettings as StoreSettings) : null,
+            });
         } catch (error) {
             console.error('Error fetching store data:', error);
         }

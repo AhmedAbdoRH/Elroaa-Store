@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import type { Category, Service, Banner, StoreSettings, Testimonial, Subcategory } from '../types/database'; // Added Subcategory type
+import { sanitizeStoreSettings } from '../utils/storeBranding';
 import { Trash2, Edit, Plus, Save, X, Upload, ChevronDown, ChevronUp, Facebook, Instagram, Twitter, Palette, Store, Image, List, Package, Eye, EyeOff, Home, ArrowUp } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -460,7 +461,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
       }
 
       if (allRows && allRows.length > 0) {
-        setStoreSettings(allRows[0]);
+        setStoreSettings(sanitizeStoreSettings(allRows[0] as StoreSettings));
       } else {
         // Initialize with default values if no settings are found
         setStoreSettings({

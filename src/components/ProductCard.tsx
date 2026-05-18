@@ -74,7 +74,7 @@ export default function Services() {
     return (
       <div className="py-16" style={{backgroundColor: '#2a2a2a'}}>
         <div className="container mx-auto px-4 text-center text-red-600">
-          حدث خطأ أثناء تحميل المفروشات
+          حدث خطأ أثناء تحميل المنتجات
         </div>
       </div>
     );
@@ -90,7 +90,7 @@ export default function Services() {
                    border border-white/10
                    shadow-2xl shadow-black/40">
         <h2 className={`text-3xl font-bold text-center mb-12 text-[${lightGold}]`}>
-          مفروشاتنا
+          منتجاتنا
         </h2>
         <div className="w-full h-1 bg-[${lightGold}] mb-8"></div>
 
@@ -104,7 +104,7 @@ export default function Services() {
                 : 'bg-black/20 text-white hover:bg-black/30 hover:shadow-md'
             }`}
           >
-            جميع المفروشات
+            جميع المنتجات
           </button>
           {categories.map((category) => (
             <button

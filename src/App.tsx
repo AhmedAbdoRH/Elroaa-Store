@@ -23,6 +23,7 @@ import ContactUs from './pages/ContactUs';
 import LoadingScreen from './components/LoadingScreen';
 import StructuredData from './components/StructuredData';
 import type { StoreSettings, Banner } from './types/database';
+import { sanitizeStoreSettings } from './utils/storeBranding';
 import { ThemeProvider } from './theme/ThemeContext';
 import FacebookButton from './components/FacebookButton';
 import ClickParticleEffect from './components/ClickParticleEffect';
@@ -204,7 +205,7 @@ function App() {
       }
 
       if (data) {
-        setStoreSettings(data);
+        setStoreSettings(sanitizeStoreSettings(data as StoreSettings));
       } else {
         // No data found, set default settings
         setStoreSettings({
