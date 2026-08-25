@@ -31,6 +31,42 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
   const [removingBackground, setRemovingBackground] = useState(false);
   const [uploadingBannerImage, setUploadingBannerImage] = useState(false);
   const [editingService, setEditingService] = useState<number | null>(null);
+  const [highlightedServiceId, setHighlightedServiceId] = useState<number | null>(null);
+  const [editServiceData, setEditServiceData] = useState<{
+    title: string;
+    description: string;
+    image_url: string;
+    category_id: string;
+    subcategory_id: string;
+    gallery: string[];
+    is_featured: boolean;
+    is_best_seller: boolean;
+    has_weight_pricing: boolean;
+    price_per_kg: number | null;
+    sale_price_per_kg: number | null;
+    price: number | null;
+    sale_price: number | null;
+  }>({
+    title: '',
+    description: '',
+    image_url: '',
+    category_id: '',
+    subcategory_id: '',
+    gallery: [],
+    is_featured: false,
+    is_best_seller: false,
+    has_weight_pricing: false,
+    price_per_kg: null,
+    sale_price_per_kg: null,
+    price: 0,
+    sale_price: null,
+  });
+  const [editRemoveBgSwitch, setEditRemoveBgSwitch] = useState(false);
+  const [editOriginalImageUrl, setEditOriginalImageUrl] = useState<string | null>(null);
+  const [editUploadingImage, setEditUploadingImage] = useState(false);
+  const [editRemovingBg, setEditRemovingBg] = useState(false);
+  const [editUploadingGallery, setEditUploadingGallery] = useState(false);
+  const [isAddProductFormOpen, setIsAddProductFormOpen] = useState(true);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [editingCategory, setEditingCategory] = useState<string | null>(null);
@@ -871,14 +907,21 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
   };
 
 
-  const handleEditService = async (service: Service) => {
-    setEditingService(service.id);
+  const handleEditService = (service: Service) => {
+    const isAlreadyEditing = editingService === service.id;
+    if (isAlreadyEditing) {
+      setEditingService(null);
+      return;
+    }
 
-    setNewService({
-      title: service.title,
+    setEditingService(service.id);
+    setEditServiceData({
+      title: service.title || '',
       description: service.description || '',
       image_url: service.image_url || '',
       category_id: service.category_id || '',
+      // @ts-ignore
+      subcategory_id: (service as any).subcategory_id || '',
       gallery: Array.isArray(service.gallery) ? service.gallery : [],
       is_featured: service.is_featured || false,
       is_best_seller: service.is_best_seller || false,
@@ -888,65 +931,165 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
       price: service.price || 0,
       sale_price: service.sale_price || null,
     });
+    setEditRemoveBgSwitch(false);
+    setEditOriginalImageUrl(service.image_url || null);
 
-    setSelectedCategory(service.category_id || '');
-    // @ts-ignore - subcategory_id may exist in DB even if not in Service type
-    setSelectedSubcategory((service as any).subcategory_id || '');
-    const formElement = document.getElementById('service-form');
-    formElement?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Scroll smoothly to this product card in the list
+    setTimeout(() => {
+      const cardEl = document.getElementById(`service-card-${service.id}`);
+      if (cardEl) {
+        cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
+  };
+
+  const handleEditServiceImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setEditUploadingImage(true);
+    try {
+      if (!file.type.startsWith('image/')) {
+        throw new Error('الرجاء اختيار ملف صورة صالح');
+      }
+      const fileToUpload = await resizeImageIfNeeded(file, 150);
+      const fileExt = fileToUpload.name.split('.').pop();
+      const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage.from('services').upload(filePath, fileToUpload);
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage.from('services').getPublicUrl(filePath);
+      setEditServiceData(prev => ({ ...prev, image_url: publicUrl }));
+      setEditRemoveBgSwitch(false);
+      setEditOriginalImageUrl(publicUrl);
+      setSuccessMsg("تم رفع الصورة بنجاح!");
+    } catch (err: any) {
+      setError(`خطأ في رفع الصورة: ${err.message}`);
+    } finally {
+      setEditUploadingImage(false);
+      event.target.value = '';
+    }
+  };
+
+  const handleEditToggleRemoveBgSwitch = async (checked: boolean) => {
+    if (!editServiceData.image_url) return;
+    if (checked) {
+      setEditRemovingBg(true);
+      try {
+        if (!editOriginalImageUrl) setEditOriginalImageUrl(editServiceData.image_url);
+        const processed = await removeBackgroundFromImageUrl(editServiceData.image_url);
+        const fileExt = processed.name.split('.').pop();
+        const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
+        const { error: uploadError } = await supabase.storage
+          .from('services')
+          .upload(fileName, processed, { upsert: true });
+        if (uploadError) throw uploadError;
+        const { data: { publicUrl } } = supabase.storage.from('services').getPublicUrl(fileName);
+        setEditServiceData(prev => ({ ...prev, image_url: publicUrl }));
+        setEditRemoveBgSwitch(true);
+        setSuccessMsg('تم تحويل الصورة إلى خلفية شفافة');
+      } catch (err: any) {
+        setEditRemoveBgSwitch(false);
+        setError(`تعذر إزالة الخلفية: ${err.message}`);
+      } finally {
+        setEditRemovingBg(false);
+      }
+    } else {
+      if (editOriginalImageUrl) {
+        setEditServiceData(prev => ({ ...prev, image_url: editOriginalImageUrl }));
+      }
+      setEditRemoveBgSwitch(false);
+    }
+  };
+
+  const handleEditGalleryUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+    setEditUploadingGallery(true);
+    try {
+      const uploadedUrls: string[] = [];
+      for (const file of Array.from(files)) {
+        if (!file.type.startsWith('image/')) continue;
+        const processedFile = await resizeImageIfNeeded(file, 150);
+        const fileExt = processedFile.name.split('.').pop();
+        const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
+        const { error: uploadError } = await supabase.storage
+          .from('services')
+          .upload(fileName, processedFile, { upsert: true });
+        if (uploadError) continue;
+        const { data: { publicUrl } } = supabase.storage.from('services').getPublicUrl(fileName);
+        uploadedUrls.push(publicUrl);
+      }
+      setEditServiceData(prev => {
+        const gallery = [...(prev.gallery || []), ...uploadedUrls].filter(Boolean);
+        const filteredGallery = Array.from(new Set(gallery)).filter(img => img !== prev.image_url);
+        return { ...prev, gallery: filteredGallery };
+      });
+      if (uploadedUrls.length > 0) setSuccessMsg(`تم رفع ${uploadedUrls.length} صورة بنجاح!`);
+    } catch (err: any) {
+      setError(`خطأ في رفع الصور: ${err.message}`);
+    } finally {
+      setEditUploadingGallery(false);
+    }
   };
 
   const handleUpdateService = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editingService || !selectedCategory || !newService.title.trim()) {
+    if (!editingService || !editServiceData.category_id || !editServiceData.title.trim()) {
       setError("يجب اختيار قسم وتحديد عنوان للمنتج.");
       return;
     }
     setIsLoading(true);
+    const updatedId = editingService;
     try {
-const { ...serviceData } = newService;
-      
       let serviceToUpdate: Partial<Service> = {
-        ...serviceData,
-        category_id: selectedCategory,
-        subcategory_id: selectedSubcategory || null,
-        is_featured: newService.is_featured || false,
-        is_best_seller: newService.is_best_seller || false,
+        title: editServiceData.title,
+        description: editServiceData.description,
+        image_url: editServiceData.image_url,
+        category_id: editServiceData.category_id,
+        // @ts-ignore
+        subcategory_id: editServiceData.subcategory_id || null,
+        gallery: editServiceData.gallery,
+        is_featured: editServiceData.is_featured || false,
+        is_best_seller: editServiceData.is_best_seller || false,
+        has_weight_pricing: editServiceData.has_weight_pricing || false,
       };
 
-      if (!newService.has_weight_pricing) {
-          serviceToUpdate.price = newService.price;
-          serviceToUpdate.sale_price = newService.sale_price;
+      if (!editServiceData.has_weight_pricing) {
+        serviceToUpdate.price = editServiceData.price;
+        serviceToUpdate.sale_price = editServiceData.sale_price;
+        serviceToUpdate.price_per_kg = null;
+        serviceToUpdate.sale_price_per_kg = null;
       } else {
-          serviceToUpdate.price = null;
-          serviceToUpdate.sale_price = null;
+        serviceToUpdate.price = null;
+        serviceToUpdate.sale_price = null;
+        serviceToUpdate.price_per_kg = editServiceData.price_per_kg;
+        serviceToUpdate.sale_price_per_kg = editServiceData.sale_price_per_kg;
       }
 
       const { error } = await supabase
         .from('services')
         .update(serviceToUpdate)
-        .eq('id', editingService);
+        .eq('id', updatedId);
       if (error) throw error;
 
-      setNewService({ 
-        title: '', 
-        description: '', 
-        image_url: '', 
-        category_id: '', 
-        gallery: [],
-        is_featured: false,
-        is_best_seller: false,
-        has_weight_pricing: false,
-        price_per_kg: null,
-        sale_price_per_kg: null,
-        price: 0,
-        sale_price: null,
-      });
-      setSelectedCategory('');
-      setSelectedSubcategory('');
       setEditingService(null);
       await fetchData();
       setSuccessMsg("تم تحديث المنتج بنجاح!");
+
+      // Highlight the updated product and ensure viewport is aligned with it
+      setHighlightedServiceId(updatedId);
+      setTimeout(() => {
+        const cardEl = document.getElementById(`service-card-${updatedId}`);
+        if (cardEl) {
+          cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 150);
+      setTimeout(() => {
+        setHighlightedServiceId(null);
+      }, 3500);
     } catch (err: any) {
       setError(`خطأ في تحديث المنتج: ${err.message}`);
     } finally {
@@ -954,24 +1097,17 @@ const { ...serviceData } = newService;
     }
   };
 
-  const handleCancelEdit = () => {
+  const handleCancelEdit = (serviceId?: number) => {
+    const targetId = serviceId || editingService;
     setEditingService(null);
-    setNewService({ 
-      title: '', 
-      description: '', 
-      image_url: '', 
-      category_id: '', 
-      gallery: [],
-      is_featured: false,
-      is_best_seller: false,
-      has_weight_pricing: false,
-      price_per_kg: null,
-      sale_price_per_kg: null,
-      price: 0,
-      sale_price: null,
-    });
-    setSelectedCategory('');
-    setSelectedSubcategory('');
+    if (targetId) {
+      setTimeout(() => {
+        const cardEl = document.getElementById(`service-card-${targetId}`);
+        if (cardEl) {
+          cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+    }
   };
 
   const handleToggleServiceAvailability = async (serviceId: number, nextIsAvailable: boolean) => {
@@ -1837,186 +1973,229 @@ const { ...serviceData } = newService;
 
                   {productsSubTab === 'services' && (
                     <>
-                      <form onSubmit={editingService ? handleUpdateService : handleAddService} className="mb-8 space-y-4" id="service-form">
-                        <input type="text" placeholder="عنوان المنتج" value={newService.title} onChange={(e) => setNewService({ ...newService, title: e.target.value })} className="w-full p-3 rounded text-white bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" required disabled={isLoading}/>
-                        <textarea placeholder="وصف المنتج (اختياري)" value={newService.description} onChange={(e) => setNewService({ ...newService, description: e.target.value })} rows={3} className="w-full p-3 rounded text-white bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" disabled={isLoading}/>
-                        
-                        <div>
-                            <label htmlFor="image-upload" className={`w-full flex flex-col items-center justify-center p-4 rounded-md border-2 border-dashed border-gray-600 cursor-pointer hover:bg-gray-700/50 hover:border-blue-500 transition-colors ${uploadingImage || isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                                <Upload className={`w-8 h-8 mb-2 text-blue-400 ${uploadingImage ? 'animate-pulse' : ''}`} />
-                                <span className="text-white font-semibold">{uploadingImage ? 'جاري رفع الصورة...' : (newService.image_url ? 'تغيير الصورة الرئيسية' : 'اختر صورة المنتج الرئيسية')}</span>
-                                <span className="text-xs text-gray-400 mt-1">المقاس الموصى به: أبعاد أفقية (5:4)</span>
-                            </label>
-                            <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" id="image-upload" disabled={uploadingImage || isLoading}/>
-                        </div>
-
-                        {/* مفتاح تحويل الصورة إلى خلفية شفافة أسفل المعاينة */}
-
-                        {newService.image_url && !uploadingImage && (
-                          <>
-                            <div className="mt-3 flex items-center justify-center gap-4 bg-gray-900/50 p-2 rounded border border-gray-700">
-                              <img src={newService.image_url} alt="معاينة" className="w-16 h-16 object-cover rounded border border-gray-600" />
-                              <span className="text-gray-400 text-xs">الصورة الحالية/الجديدة</span>
-                              <button type="button" onClick={() => { setNewService({...newService, image_url: ''}); setRemoveBgSwitch(false); setOriginalServiceImageUrl(null); }} className="text-red-500 hover:text-red-400 p-1" title="إزالة الصورة"><X size={16}/></button>
+                      {/* نموذج إضافة منتج جديد بأعلى الصفحة */}
+                      <div className="mb-8 bg-gray-900/60 border border-gray-700/80 rounded-xl overflow-hidden shadow-lg">
+                        <button
+                          type="button"
+                          onClick={() => setIsAddProductFormOpen(!isAddProductFormOpen)}
+                          className="w-full p-4 flex items-center justify-between bg-gradient-to-r from-gray-800 to-gray-850 hover:bg-gray-750 transition-colors text-right"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30">
+                              <Plus className="w-5 h-5" />
                             </div>
-                            <div className="mt-2 flex items-center justify-center">
-                              <label className="flex items-center gap-2 text-xs text-gray-300 select-none">
-                                {/* صندوق تحديد بسيط على يمين النص مع RTL */}
-                                <input
-                                  type="checkbox"
-                                  className="h-4 w-4 accent-emerald-500 rounded border border-gray-500 bg-gray-700 focus:ring-0"
-                                  checked={removeBgSwitch}
-                                  onChange={(e) => handleToggleRemoveBgSwitch(e.target.checked)}
-                                  disabled={removingBackground || isLoading}
-                                />
-                                <span className="leading-none">بدون خلفية</span>
-                                {removingBackground && <span className="text-[10px] text-gray-400">جاري المعالجة...</span>}
-                              </label>
+                            <div>
+                              <h3 className="text-lg font-bold text-white">إضافة منتج جديد</h3>
+                              <p className="text-xs text-gray-400">انقر هنا {isAddProductFormOpen ? 'لإخفاء' : 'لإظهار'} نموذج إضافة منتج جديد</p>
                             </div>
-                          </>
-                        )}
-                        
-                        <select value={selectedCategory} onChange={(e) => { setSelectedCategory(e.target.value); setSelectedSubcategory(''); }} className="w-full p-3 rounded text-white bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none" required disabled={isLoading || categories.length === 0}>
-                          <option value="" disabled className="text-gray-400">-- اختر القسم --</option>
-                          {categories.map((category) => (<option key={category.id} value={category.id} className="bg-gray-800 text-white">{category.name}</option>))}
-                          {categories.length === 0 && <option disabled>لا توجد أقسام، يرجى إضافة قسم أولاً.</option>}
-                        </select>
-                        <select value={selectedSubcategory} onChange={(e) => setSelectedSubcategory(e.target.value)} className="w-full p-3 rounded text-white bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none" disabled={isLoading || !selectedCategory}>
-                          <option value="" className="text-gray-400">-- اختر التصنيف الفرعي (اختياري) --</option>
-                          {subcategories
-                            .filter(sc => sc.category_id === selectedCategory)
-                            .map((sc) => (
-                              <option key={sc.id} value={sc.id} className="bg-gray-800 text-white">{(sc as any).name_ar || (sc as any).name}</option>
-                            ))}
-                          {selectedCategory && subcategories.filter(sc => sc.category_id === selectedCategory).length === 0 && (
-                            <option disabled>لا توجد تصنيفات فرعية لهذا القسم</option>
-                          )}
-                        </select>
-                        
-                        {/* نظام التسعير */}
-                        <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-600">
-                            <h4 className="text-lg font-bold mb-3 text-white">اختر نظام التسعير:</h4>
-                            <div className="flex flex-col gap-3">
-                                {/* النظام العادي */}
-                                <label className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${!newService.has_weight_pricing ? 'bg-blue-600/30 border-2 border-blue-500' : 'bg-gray-700/50 border-2 border-transparent hover:border-gray-500'}`}>
-                                    <input 
-                                        type="radio" 
-                                        name="pricing_type" 
-                                        checked={!newService.has_weight_pricing}
-                                        onChange={() => {
-                                            setNewService({ 
-                                                ...newService, 
-                                                has_weight_pricing: false 
-                                            });
-                                        }}
-                                        className="h-5 w-5 accent-blue-500"
-                                    />
-                                    <div className="flex-1">
-                                        <span className="text-white font-bold block">سعر ثابت</span>
-                                        <span className="text-gray-400 text-sm">منتج بسعر واحد فقط</span>
-                                    </div>
-                                </label>
-
-                                {/* نظام الوزن */}
-                                <label className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${newService.has_weight_pricing ? 'bg-blue-600/30 border-2 border-blue-500' : 'bg-gray-700/50 border-2 border-transparent hover:border-gray-500'}`}>
-                                    <input 
-                                        type="radio" 
-                                        name="pricing_type" 
-                                        checked={newService.has_weight_pricing}
-                                        onChange={() => {
-                                            setNewService({ 
-                                                ...newService, 
-                                                has_weight_pricing: true 
-                                            });
-                                        }}
-                                        className="h-5 w-5 accent-blue-500"
-                                    />
-                                    <div className="flex-1">
-                                        <span className="text-white font-bold block">تسعير بالوزن</span>
-                                        <span className="text-gray-400 text-sm">سعر الكيلو (اختيار العميل للوزن)</span>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
-
-                        {newService.has_weight_pricing && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <input 
-                                    type="number" 
-                                    placeholder="سعر الكيلو" 
-                                    value={newService.price_per_kg || ''} 
-                                    onChange={(e) => setNewService({ ...newService, price_per_kg: parseFloat(e.target.value) || null })} 
-                                    className="w-full p-3 rounded text-white bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    required
-                                />
-                                <input 
-                                    type="number" 
-                                    placeholder="سعر الكيلو بعد التخفيض (اختياري)" 
-                                    value={newService.sale_price_per_kg || ''} 
-                                    onChange={(e) => setNewService({ ...newService, sale_price_per_kg: parseFloat(e.target.value) || null })} 
-                                    className="w-full p-3 rounded text-white bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-                        )}
-
-                        {!newService.has_weight_pricing && (
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <input type="number" placeholder="السعر" value={newService.price || ''} onChange={(e) => setNewService({ ...newService, price: parseFloat(e.target.value) })} className="w-full p-3 rounded text-white bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" required disabled={isLoading}/>
-                            <input type="number" placeholder="سعر التخفيض (اختياري)" value={newService.sale_price || ''} onChange={(e) => setNewService({ ...newService, sale_price: parseFloat(e.target.value) || null })} className="w-full p-3 rounded text-white bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" disabled={isLoading}/>
                           </div>
-                        )}
+                          {isAddProductFormOpen ? <ChevronUp className="w-5 h-5 text-gray-400" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}
+                        </button>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                            <div className="flex items-center gap-2 p-2 bg-gray-700/50 rounded-md">
-                                <input type="checkbox" id="is_featured" checked={newService.is_featured || false} onChange={(e) => setNewService({ ...newService, is_featured: e.target.checked })} className="h-4 w-4 accent-blue-500"/>
-                                <label htmlFor="is_featured" className="text-white">أحدث العروض</label>
+                        {isAddProductFormOpen && (
+                          <form onSubmit={handleAddService} className="p-5 space-y-4 border-t border-gray-700/60" id="service-form">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-300 mb-1">عنوان المنتج <span className="text-red-400">*</span></label>
+                              <input type="text" placeholder="مثال: عسل سدر طبيعي 500 جرام" value={newService.title} onChange={(e) => setNewService({ ...newService, title: e.target.value })} className="w-full p-3 rounded-lg text-white bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" required disabled={isLoading}/>
                             </div>
-                            <div className="flex items-center gap-2 p-2 bg-gray-700/50 rounded-md">
-                                <input type="checkbox" id="is_best_seller" checked={newService.is_best_seller || false} onChange={(e) => setNewService({ ...newService, is_best_seller: e.target.checked })} className="h-4 w-4 accent-blue-500"/>
-                                <label htmlFor="is_best_seller" className="text-white">الأكثر مبيعًا</label>
-                            </div>
-                        </div>
 
-                        <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-1">صور إضافية للمنتج <span className="text-gray-400">(اختياري)</span></label>
-                          <input type="file" accept="image/*" multiple onChange={handleGalleryUpload} className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" disabled={uploadingImage || isLoading}/>
-                          <div className="flex flex-wrap gap-2 mt-2">
-                            {newService.gallery && newService.gallery.map((img, idx) => (
-                              <div key={img} className="relative group">
-                                <img src={img} alt={`صورة إضافية ${idx + 1}`} className="w-16 h-16 object-cover rounded border-2 border-gray-600"/>
-                                <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button type="button" className="text-white" onClick={() => setNewService(prev => ({ ...prev, gallery: prev.gallery.filter((g) => g !== img) }))} title="حذف الصورة">
-                                        <Trash2 size={20} />
-                                    </button>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-300 mb-1">وصف المنتج (اختياري)</label>
+                              <textarea placeholder="وصف تفصيلي لمميزات المنتج ومكوناته..." value={newService.description} onChange={(e) => setNewService({ ...newService, description: e.target.value })} rows={3} className="w-full p-3 rounded-lg text-white bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" disabled={isLoading}/>
+                            </div>
+                            
+                            <div>
+                              <label className="block text-sm font-medium text-gray-300 mb-1">صورة المنتج الرئيسية</label>
+                              <label htmlFor="image-upload" className={`w-full flex flex-col items-center justify-center p-4 rounded-lg border-2 border-dashed border-gray-600 cursor-pointer hover:bg-gray-800/80 hover:border-blue-500 transition-colors ${uploadingImage || isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                                  <Upload className={`w-8 h-8 mb-2 text-blue-400 ${uploadingImage ? 'animate-pulse' : ''}`} />
+                                  <span className="text-white font-semibold">{uploadingImage ? 'جاري رفع الصورة...' : (newService.image_url ? 'تغيير الصورة الرئيسية' : 'اختر صورة المنتج الرئيسية')}</span>
+                                  <span className="text-xs text-gray-400 mt-1">المقاس الموصى به: أبعاد مربعة أو أفقية</span>
+                              </label>
+                              <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" id="image-upload" disabled={uploadingImage || isLoading}/>
+                            </div>
+
+                            {newService.image_url && !uploadingImage && (
+                              <div className="bg-gray-800/80 p-3 rounded-lg border border-gray-700 flex flex-wrap items-center justify-between gap-3">
+                                <div className="flex items-center gap-3">
+                                  <img src={newService.image_url} alt="معاينة" className="w-16 h-16 object-cover rounded-lg border border-gray-600 bg-gray-900" />
+                                  <span className="text-gray-300 text-xs font-medium">تم اختيار الصورة بنجاح</span>
+                                </div>
+                                <div className="flex items-center gap-4">
+                                  <label className="flex items-center gap-2 text-xs text-gray-300 select-none cursor-pointer bg-gray-750 px-3 py-1.5 rounded-md border border-gray-600">
+                                    <input
+                                      type="checkbox"
+                                      className="h-4 w-4 accent-emerald-500 rounded border border-gray-500 bg-gray-700 focus:ring-0 cursor-pointer"
+                                      checked={removeBgSwitch}
+                                      onChange={(e) => handleToggleRemoveBgSwitch(e.target.checked)}
+                                      disabled={removingBackground || isLoading}
+                                    />
+                                    <span className="leading-none">بدون خلفية</span>
+                                    {removingBackground && <span className="text-[10px] text-yellow-400">جاري المعالجة...</span>}
+                                  </label>
+                                  <button type="button" onClick={() => { setNewService({...newService, image_url: ''}); setRemoveBgSwitch(false); setOriginalServiceImageUrl(null); }} className="text-red-400 hover:text-red-300 p-1.5 rounded bg-red-950/40 border border-red-800/50" title="إزالة الصورة">
+                                    <Trash2 size={16}/>
+                                  </button>
                                 </div>
                               </div>
-                            ))}
+                            )}
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-1">القسم <span className="text-red-400">*</span></label>
+                                <select value={selectedCategory} onChange={(e) => { setSelectedCategory(e.target.value); setSelectedSubcategory(''); }} className="w-full p-3 rounded-lg text-white bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none" required disabled={isLoading || categories.length === 0}>
+                                  <option value="" disabled className="text-gray-400">-- اختر القسم --</option>
+                                  {categories.map((category) => (<option key={category.id} value={category.id} className="bg-gray-800 text-white">{category.name}</option>))}
+                                  {categories.length === 0 && <option disabled>لا توجد أقسام، يرجى إضافة قسم أولاً.</option>}
+                                </select>
+                              </div>
+
+                              <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-1">التصنيف الفرعي (اختياري)</label>
+                                <select value={selectedSubcategory} onChange={(e) => setSelectedSubcategory(e.target.value)} className="w-full p-3 rounded-lg text-white bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none" disabled={isLoading || !selectedCategory}>
+                                  <option value="" className="text-gray-400">-- بدون تصنيف فرعي --</option>
+                                  {subcategories
+                                    .filter(sc => sc.category_id === selectedCategory)
+                                    .map((sc) => (
+                                      <option key={sc.id} value={sc.id} className="bg-gray-800 text-white">{(sc as any).name_ar || (sc as any).name}</option>
+                                    ))}
+                                </select>
+                              </div>
+                            </div>
+                            
+                            {/* نظام التسعير */}
+                            <div className="bg-gray-800/70 p-4 rounded-xl border border-gray-700">
+                                <h4 className="text-sm font-bold mb-3 text-white">نظام التسعير:</h4>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                                    <label className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${!newService.has_weight_pricing ? 'bg-blue-600/20 border-2 border-blue-500 text-white' : 'bg-gray-800 border border-gray-700 text-gray-300'}`}>
+                                        <input 
+                                            type="radio" 
+                                            name="new_pricing_type" 
+                                            checked={!newService.has_weight_pricing}
+                                            onChange={() => setNewService({ ...newService, has_weight_pricing: false })}
+                                            className="h-4 w-4 accent-blue-500"
+                                        />
+                                        <div>
+                                            <span className="font-bold block text-sm">سعر ثابت</span>
+                                            <span className="text-gray-400 text-xs">منتج بسعر واحد</span>
+                                        </div>
+                                    </label>
+
+                                    <label className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${newService.has_weight_pricing ? 'bg-blue-600/20 border-2 border-blue-500 text-white' : 'bg-gray-800 border border-gray-700 text-gray-300'}`}>
+                                        <input 
+                                            type="radio" 
+                                            name="new_pricing_type" 
+                                            checked={newService.has_weight_pricing}
+                                            onChange={() => setNewService({ ...newService, has_weight_pricing: true })}
+                                            className="h-4 w-4 accent-blue-500"
+                                        />
+                                        <div>
+                                            <span className="font-bold block text-sm">تسعير بالوزن</span>
+                                            <span className="text-gray-400 text-xs">سعر الكيلو</span>
+                                        </div>
+                                    </label>
+                                </div>
+
+                                {newService.has_weight_pricing ? (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                          <label className="block text-xs text-gray-300 mb-1">سعر الكيلو <span className="text-red-400">*</span></label>
+                                          <input 
+                                              type="number" 
+                                              placeholder="مثال: 120" 
+                                              value={newService.price_per_kg || ''} 
+                                              onChange={(e) => setNewService({ ...newService, price_per_kg: parseFloat(e.target.value) || null })} 
+                                              className="w-full p-3 rounded-lg text-white bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                              required
+                                          />
+                                        </div>
+                                        <div>
+                                          <label className="block text-xs text-gray-300 mb-1">سعر الكيلو بعد التخفيض (اختياري)</label>
+                                          <input 
+                                              type="number" 
+                                              placeholder="مثال: 99" 
+                                              value={newService.sale_price_per_kg || ''} 
+                                              onChange={(e) => setNewService({ ...newService, sale_price_per_kg: parseFloat(e.target.value) || null })} 
+                                              className="w-full p-3 rounded-lg text-white bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                          />
+                                        </div>
+                                    </div>
+                                ) : (
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                      <label className="block text-xs text-gray-300 mb-1">السعر <span className="text-red-400">*</span></label>
+                                      <input type="number" placeholder="مثال: 150" value={newService.price || ''} onChange={(e) => setNewService({ ...newService, price: parseFloat(e.target.value) })} className="w-full p-3 rounded-lg text-white bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" required disabled={isLoading}/>
+                                    </div>
+                                    <div>
+                                      <label className="block text-xs text-gray-300 mb-1">سعر التخفيض (اختياري)</label>
+                                      <input type="number" placeholder="مثال: 120" value={newService.sale_price || ''} onChange={(e) => setNewService({ ...newService, sale_price: parseFloat(e.target.value) || null })} className="w-full p-3 rounded-lg text-white bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" disabled={isLoading}/>
+                                    </div>
+                                  </div>
+                                )}
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                <label className="flex items-center gap-2 p-3 bg-gray-800/80 border border-gray-700 rounded-lg cursor-pointer hover:bg-gray-800">
+                                    <input type="checkbox" id="is_featured" checked={newService.is_featured || false} onChange={(e) => setNewService({ ...newService, is_featured: e.target.checked })} className="h-4 w-4 accent-blue-500"/>
+                                    <span className="text-white font-medium">أحدث العروض (يظهر في قسم العروض المميزة)</span>
+                                </label>
+                                <label className="flex items-center gap-2 p-3 bg-gray-800/80 border border-gray-700 rounded-lg cursor-pointer hover:bg-gray-800">
+                                    <input type="checkbox" id="is_best_seller" checked={newService.is_best_seller || false} onChange={(e) => setNewService({ ...newService, is_best_seller: e.target.checked })} className="h-4 w-4 accent-blue-500"/>
+                                    <span className="text-white font-medium">الأكثر مبيعًا (شارة الأكثر طلباً)</span>
+                                </label>
+                            </div>
+
+                            <div>
+                              <label className="block text-sm font-medium text-gray-300 mb-1">صور إضافية للمنتج <span className="text-gray-400">(اختياري)</span></label>
+                              <input type="file" accept="image/*" multiple onChange={handleGalleryUpload} className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600/20 file:text-blue-300 hover:file:bg-blue-600/30" disabled={uploadingImage || isLoading}/>
+                              <div className="flex flex-wrap gap-2 mt-2">
+                                {newService.gallery && newService.gallery.map((img, idx) => (
+                                  <div key={img} className="relative group">
+                                    <img src={img} alt={`صورة إضافية ${idx + 1}`} className="w-16 h-16 object-cover rounded-lg border border-gray-600"/>
+                                    <div className="absolute inset-0 bg-black/60 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button type="button" className="text-red-400 hover:text-red-300" onClick={() => setNewService(prev => ({ ...prev, gallery: prev.gallery.filter((g) => g !== img) }))} title="حذف الصورة">
+                                            <Trash2 size={18} />
+                                        </button>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+
+                            <div className="pt-2">
+                              <button type="submit" className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-bold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 shadow-md" disabled={isLoading || !selectedCategory}>
+                                <Plus size={20} /> إضافة المنتج
+                              </button>
+                            </div>
+                          </form>
+                        )}
+                      </div>
+
+                      {/* قسم قائمة المنتجات الحالية */}
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4 border-b border-gray-700 pb-3">
+                        <div className="flex items-center gap-2">
+                          <Package className="w-5 h-5 text-blue-400" />
+                          <h3 className="text-lg font-bold text-white">المنتجات الحالية</h3>
+                          <span className="bg-blue-600/20 border border-blue-500/30 text-blue-300 text-xs px-2.5 py-0.5 rounded-full font-semibold">
+                            {filteredServices.length} منتج
+                          </span>
+                        </div>
+                        {editingService && (
+                          <div className="bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs px-3 py-1.5 rounded-lg flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                            <span>أنت الآن في وضع تعديل المنتج مباشرة في القائمة أدناه</span>
                           </div>
-                        </div>
-
-                        <div className="flex gap-3 pt-2">
-                          <button type="submit" className="flex-grow bg-blue-600 text-white py-2.5 px-4 rounded-md font-bold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50" disabled={isLoading || (editingService ? false : !selectedCategory)}>
-                            {editingService ? <><Save size={20} /> حفظ التعديلات</> : <><Plus size={20} /> إضافة المنتج</>}
-                          </button>
-                          {editingService && (
-                            <button type="button" onClick={handleCancelEdit} className="bg-gray-600 text-white px-4 py-2.5 rounded-md hover:bg-gray-700 flex items-center justify-center gap-2 font-bold" disabled={isLoading}>
-                              <X size={20} /> إلغاء
-                            </button>
-                          )}
-                        </div>
-                      </form>
-
-                      <h3 className="text-lg font-semibold mb-4 text-white border-b border-gray-600 pb-2">المنتجات الحالية</h3>
+                        )}
+                      </div>
                       
                       {/* شريط البحث */}
-                      <div className="mb-4">
+                      <div className="mb-6">
                         <div className="relative">
                           <input
                             type="text"
-                            placeholder="ابحث عن منتج بالاسم..."
+                            placeholder="ابحث عن منتج بالاسم أو القسم..."
                             value={searchQuery || ''}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full p-3 pr-10 rounded-lg text-white bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
+                            className="w-full p-3 pr-10 rounded-lg text-white bg-gray-900/60 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400 text-sm"
                           />
                           <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2024,56 +2203,416 @@ const { ...serviceData } = newService;
                             </svg>
                           </div>
                         </div>
-                        {searchQuery && (
-                          <div className="mt-2 text-xs text-gray-400">
-                            {filteredServices.length} منتج تم العثور عليه
-                          </div>
-                        )}
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {filteredServices.map((service) => (
-                          <div key={service.id} className={`p-4 rounded-lg bg-gray-900/50 border border-gray-700 transition-all hover:bg-gray-800/50 hover:border-gray-600 ${editingService === service.id ? 'ring-2 ring-blue-500' : ''}`}>
-                            <div className="flex flex-col gap-3">
-                              {/* صورة المنتج */}
-                              {service.image_url && (
-                                <div className="relative w-full h-32 overflow-hidden rounded-md border border-gray-600">
-                                  <img 
-                                    src={service.image_url} 
-                                    alt={service.title} 
-                                    className="w-full h-full object-cover"
-                                  />
+                      {/* شبكة عرض المنتجات والتعديل المباشر */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                        {filteredServices.length === 0 && (
+                          <div className="col-span-full text-center py-12 text-gray-400 bg-gray-900/30 border border-gray-800 rounded-xl">
+                            <Package className="w-12 h-12 mx-auto text-gray-600 mb-2" />
+                            <p className="font-semibold">لم يتم العثور على أي منتجات مطابقة</p>
+                          </div>
+                        )}
+
+                        {filteredServices.map((service) => {
+                          const isEditingThis = editingService === service.id;
+                          const isHighlighted = highlightedServiceId === service.id;
+
+                          if (isEditingThis) {
+                            // خانات التعديل المباشرة أسفل/في مكان المنتج
+                            return (
+                              <div
+                                key={`edit-${service.id}`}
+                                id={`service-card-${service.id}`}
+                                className="col-span-full bg-gradient-to-b from-gray-850 to-gray-900 border-2 border-blue-500 rounded-2xl p-6 shadow-2xl transition-all duration-300 ring-4 ring-blue-500/20"
+                              >
+                                <div className="flex items-center justify-between pb-4 mb-5 border-b border-gray-700">
+                                  <div className="flex items-center gap-3">
+                                    <div className="p-2.5 rounded-xl bg-blue-600 text-white shadow-md">
+                                      <Edit className="w-5 h-5" />
+                                    </div>
+                                    <div>
+                                      <div className="flex items-center gap-2">
+                                        <h4 className="text-lg font-bold text-white">تعديل المنتج</h4>
+                                        <span className="text-xs bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded font-mono">#{service.id}</span>
+                                      </div>
+                                      <p className="text-xs text-gray-400 truncate max-w-md">{service.title}</p>
+                                    </div>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleCancelEdit(service.id)}
+                                    className="text-gray-400 hover:text-white p-2 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors"
+                                    title="إلغاء التعديل"
+                                  >
+                                    <X size={20} />
+                                  </button>
                                 </div>
-                              )}
-                              
-                              {/* معلومات المنتج */}
-                              <div className="flex-1 min-h-0">
-                                <h4 className="font-bold text-white text-base mb-2 line-clamp-2 leading-tight">
-                                  {service.title}
-                                </h4>
-                                <div className="text-xs text-gray-400 mb-2">
-                                  {service.category?.name || 'قسم غير محدد'}
+
+                                <form onSubmit={handleUpdateService} className="space-y-5">
+                                  {/* الحقول الأساسية */}
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                      <label className="block text-sm font-medium text-gray-300 mb-1">عنوان المنتج <span className="text-red-400">*</span></label>
+                                      <input
+                                        type="text"
+                                        value={editServiceData.title}
+                                        onChange={(e) => setEditServiceData({ ...editServiceData, title: e.target.value })}
+                                        className="w-full p-3 rounded-lg text-white bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        required
+                                        disabled={isLoading}
+                                        placeholder="عنوان المنتج"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="block text-sm font-medium text-gray-300 mb-1">القسم <span className="text-red-400">*</span></label>
+                                      <select
+                                        value={editServiceData.category_id}
+                                        onChange={(e) => setEditServiceData({ ...editServiceData, category_id: e.target.value, subcategory_id: '' })}
+                                        className="w-full p-3 rounded-lg text-white bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        required
+                                        disabled={isLoading}
+                                      >
+                                        <option value="" disabled>-- اختر القسم --</option>
+                                        {categories.map((c) => (
+                                          <option key={c.id} value={c.id}>{c.name}</option>
+                                        ))}
+                                      </select>
+                                    </div>
+                                  </div>
+
+                                  <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">التصنيف الفرعي (اختياري)</label>
+                                    <select
+                                      value={editServiceData.subcategory_id}
+                                      onChange={(e) => setEditServiceData({ ...editServiceData, subcategory_id: e.target.value })}
+                                      className="w-full p-3 rounded-lg text-white bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                      disabled={isLoading || !editServiceData.category_id}
+                                    >
+                                      <option value="">-- بدون تصنيف فرعي --</option>
+                                      {subcategories
+                                        .filter(sc => sc.category_id === editServiceData.category_id)
+                                        .map((sc) => (
+                                          <option key={sc.id} value={sc.id}>{(sc as any).name_ar || (sc as any).name}</option>
+                                        ))}
+                                    </select>
+                                  </div>
+
+                                  <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">وصف المنتج</label>
+                                    <textarea
+                                      value={editServiceData.description}
+                                      onChange={(e) => setEditServiceData({ ...editServiceData, description: e.target.value })}
+                                      rows={3}
+                                      className="w-full p-3 rounded-lg text-white bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                      placeholder="وصف تفصيلي للمنتج..."
+                                      disabled={isLoading}
+                                    />
+                                  </div>
+
+                                  {/* صورة المنتج وإزالة الخلفية */}
+                                  <div className="bg-gray-800/60 p-4 rounded-xl border border-gray-700">
+                                    <label className="block text-sm font-medium text-gray-300 mb-2">صورة المنتج الرئيسية</label>
+                                    <div className="flex flex-col sm:flex-row items-center gap-4">
+                                      {editServiceData.image_url ? (
+                                        <div className="relative w-28 h-28 rounded-xl overflow-hidden border-2 border-gray-600 bg-gray-900 flex-shrink-0">
+                                          <img
+                                            src={editServiceData.image_url}
+                                            alt="معاينة"
+                                            className="w-full h-full object-cover"
+                                          />
+                                        </div>
+                                      ) : (
+                                        <div className="w-28 h-28 rounded-xl border-2 border-dashed border-gray-600 flex items-center justify-center text-gray-500 text-xs flex-shrink-0">
+                                          بدون صورة
+                                        </div>
+                                      )}
+
+                                      <div className="flex-1 w-full space-y-2">
+                                        <label
+                                          htmlFor={`edit-image-${service.id}`}
+                                          className={`w-full flex items-center justify-center gap-2 p-3 rounded-lg border border-dashed border-gray-600 cursor-pointer bg-gray-800 hover:bg-gray-750 hover:border-blue-500 transition-colors ${editUploadingImage || isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        >
+                                          <Upload className={`w-5 h-5 text-blue-400 ${editUploadingImage ? 'animate-pulse' : ''}`} />
+                                          <span className="text-white text-sm font-semibold">
+                                            {editUploadingImage ? 'جاري رفع الصورة...' : (editServiceData.image_url ? 'تغيير الصورة' : 'رفع صورة للمنتج')}
+                                          </span>
+                                        </label>
+                                        <input
+                                          type="file"
+                                          accept="image/*"
+                                          onChange={handleEditServiceImageUpload}
+                                          className="hidden"
+                                          id={`edit-image-${service.id}`}
+                                          disabled={editUploadingImage || isLoading}
+                                        />
+
+                                        {editServiceData.image_url && (
+                                          <div className="flex items-center justify-between pt-1">
+                                            <label className="flex items-center gap-2 text-xs text-gray-300 select-none cursor-pointer bg-gray-750 px-3 py-1.5 rounded-lg border border-gray-600">
+                                              <input
+                                                type="checkbox"
+                                                className="h-4 w-4 accent-emerald-500 rounded border border-gray-500 bg-gray-700 focus:ring-0 cursor-pointer"
+                                                checked={editRemoveBgSwitch}
+                                                onChange={(e) => handleEditToggleRemoveBgSwitch(e.target.checked)}
+                                                disabled={editRemovingBg || isLoading}
+                                              />
+                                              <span>بدون خلفية</span>
+                                              {editRemovingBg && <span className="text-[10px] text-yellow-400">جاري المعالجة...</span>}
+                                            </label>
+
+                                            <button
+                                              type="button"
+                                              onClick={() => {
+                                                setEditServiceData({ ...editServiceData, image_url: '' });
+                                                setEditRemoveBgSwitch(false);
+                                                setEditOriginalImageUrl(null);
+                                              }}
+                                              className="text-red-400 hover:text-red-300 text-xs flex items-center gap-1 p-1.5 rounded bg-red-950/40 border border-red-800/40"
+                                            >
+                                              <Trash2 size={14} /> حذف الصورة
+                                            </button>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  {/* نظام التسعير */}
+                                  <div className="bg-gray-800/60 p-4 rounded-xl border border-gray-700">
+                                    <h4 className="text-sm font-bold mb-3 text-white">نظام التسعير:</h4>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                                      <label className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${!editServiceData.has_weight_pricing ? 'bg-blue-600/20 border-2 border-blue-500 text-white' : 'bg-gray-800 border border-gray-700 text-gray-300'}`}>
+                                        <input
+                                          type="radio"
+                                          name={`pricing_type_${service.id}`}
+                                          checked={!editServiceData.has_weight_pricing}
+                                          onChange={() => setEditServiceData({ ...editServiceData, has_weight_pricing: false })}
+                                          className="h-4 w-4 accent-blue-500"
+                                        />
+                                        <div>
+                                          <span className="font-bold block text-sm">سعر ثابت</span>
+                                          <span className="text-gray-400 text-xs">منتج بسعر واحد</span>
+                                        </div>
+                                      </label>
+
+                                      <label className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${editServiceData.has_weight_pricing ? 'bg-blue-600/20 border-2 border-blue-500 text-white' : 'bg-gray-800 border border-gray-700 text-gray-300'}`}>
+                                        <input
+                                          type="radio"
+                                          name={`pricing_type_${service.id}`}
+                                          checked={editServiceData.has_weight_pricing}
+                                          onChange={() => setEditServiceData({ ...editServiceData, has_weight_pricing: true })}
+                                          className="h-4 w-4 accent-blue-500"
+                                        />
+                                        <div>
+                                          <span className="font-bold block text-sm">تسعير بالوزن</span>
+                                          <span className="text-gray-400 text-xs">سعر الكيلو</span>
+                                        </div>
+                                      </label>
+                                    </div>
+
+                                    {editServiceData.has_weight_pricing ? (
+                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                          <label className="block text-xs text-gray-300 mb-1">سعر الكيلو <span className="text-red-400">*</span></label>
+                                          <input
+                                            type="number"
+                                            value={editServiceData.price_per_kg || ''}
+                                            onChange={(e) => setEditServiceData({ ...editServiceData, price_per_kg: parseFloat(e.target.value) || null })}
+                                            className="w-full p-3 rounded-lg text-white bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            required
+                                            placeholder="سعر الكيلو"
+                                          />
+                                        </div>
+                                        <div>
+                                          <label className="block text-xs text-gray-300 mb-1">سعر الكيلو بعد التخفيض (اختياري)</label>
+                                          <input
+                                            type="number"
+                                            value={editServiceData.sale_price_per_kg || ''}
+                                            onChange={(e) => setEditServiceData({ ...editServiceData, sale_price_per_kg: parseFloat(e.target.value) || null })}
+                                            className="w-full p-3 rounded-lg text-white bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            placeholder="سعر التخفيض"
+                                          />
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                          <label className="block text-xs text-gray-300 mb-1">السعر <span className="text-red-400">*</span></label>
+                                          <input
+                                            type="number"
+                                            value={editServiceData.price || ''}
+                                            onChange={(e) => setEditServiceData({ ...editServiceData, price: parseFloat(e.target.value) })}
+                                            className="w-full p-3 rounded-lg text-white bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            required
+                                            disabled={isLoading}
+                                            placeholder="السعر"
+                                          />
+                                        </div>
+                                        <div>
+                                          <label className="block text-xs text-gray-300 mb-1">سعر التخفيض (اختياري)</label>
+                                          <input
+                                            type="number"
+                                            value={editServiceData.sale_price || ''}
+                                            onChange={(e) => setEditServiceData({ ...editServiceData, sale_price: parseFloat(e.target.value) || null })}
+                                            className="w-full p-3 rounded-lg text-white bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            disabled={isLoading}
+                                            placeholder="سعر التخفيض"
+                                          />
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  {/* خيارات العرض */}
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                    <label className="flex items-center gap-2 p-3 bg-gray-800/60 border border-gray-700 rounded-lg cursor-pointer hover:bg-gray-800">
+                                      <input
+                                        type="checkbox"
+                                        checked={editServiceData.is_featured}
+                                        onChange={(e) => setEditServiceData({ ...editServiceData, is_featured: e.target.checked })}
+                                        className="h-4 w-4 accent-blue-500"
+                                      />
+                                      <span className="text-white">أحدث العروض (مميز)</span>
+                                    </label>
+                                    <label className="flex items-center gap-2 p-3 bg-gray-800/60 border border-gray-700 rounded-lg cursor-pointer hover:bg-gray-800">
+                                      <input
+                                        type="checkbox"
+                                        checked={editServiceData.is_best_seller}
+                                        onChange={(e) => setEditServiceData({ ...editServiceData, is_best_seller: e.target.checked })}
+                                        className="h-4 w-4 accent-blue-500"
+                                      />
+                                      <span className="text-white">الأكثر مبيعًا</span>
+                                    </label>
+                                  </div>
+
+                                  {/* معرض الصور الإضافية */}
+                                  <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">صور إضافية للمنتج</label>
+                                    <input
+                                      type="file"
+                                      accept="image/*"
+                                      multiple
+                                      onChange={handleEditGalleryUpload}
+                                      className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600/20 file:text-blue-300 hover:file:bg-blue-600/30"
+                                      disabled={editUploadingGallery || isLoading}
+                                    />
+                                    <div className="flex flex-wrap gap-2 mt-2">
+                                      {editServiceData.gallery && editServiceData.gallery.map((img, idx) => (
+                                        <div key={img} className="relative group">
+                                          <img src={img} alt={`صورة ${idx + 1}`} className="w-16 h-16 object-cover rounded-lg border border-gray-600" />
+                                          <div className="absolute inset-0 bg-black/60 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button
+                                              type="button"
+                                              className="text-red-400 hover:text-red-300"
+                                              onClick={() => setEditServiceData(prev => ({ ...prev, gallery: prev.gallery.filter(g => g !== img) }))}
+                                              title="حذف الصورة"
+                                            >
+                                              <Trash2 size={18} />
+                                            </button>
+                                          </div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+
+                                  {/* أزرار الحفظ والإلغاء المباشرة */}
+                                  <div className="flex flex-col sm:flex-row gap-3 pt-3 border-t border-gray-700">
+                                    <button
+                                      type="submit"
+                                      className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white py-3 px-6 rounded-xl font-bold transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
+                                      disabled={isLoading || !editServiceData.category_id || !editServiceData.title.trim()}
+                                    >
+                                      <Save size={20} />
+                                      {isLoading ? 'جاري الحفظ...' : 'حفظ التعديلات على المنتج'}
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleCancelEdit(service.id)}
+                                      className="bg-gray-700 hover:bg-gray-600 text-white py-3 px-6 rounded-xl font-bold transition-colors flex items-center justify-center gap-2"
+                                      disabled={isLoading}
+                                    >
+                                      <X size={20} /> إلغاء التعديل
+                                    </button>
+                                  </div>
+                                </form>
+                              </div>
+                            );
+                          }
+
+                          // كارت المنتج الافتراضي مع زر التعديل
+                          return (
+                            <div
+                              key={service.id}
+                              id={`service-card-${service.id}`}
+                              className={`p-4 rounded-xl bg-gray-900/60 border transition-all duration-500 flex flex-col justify-between ${
+                                isHighlighted
+                                  ? 'border-emerald-500 ring-4 ring-emerald-500/40 bg-emerald-950/20 shadow-2xl scale-[1.02]'
+                                  : 'border-gray-700 hover:border-gray-600 hover:bg-gray-800/60'
+                              }`}
+                            >
+                              <div className="flex flex-col gap-3">
+                                {/* صورة المنتج */}
+                                <div className="relative w-full h-36 overflow-hidden rounded-lg border border-gray-700 bg-gray-950 flex items-center justify-center">
+                                  {service.image_url ? (
+                                    <img 
+                                      src={service.image_url} 
+                                      alt={service.title} 
+                                      className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                                    />
+                                  ) : (
+                                    <Package className="w-12 h-12 text-gray-600" />
+                                  )}
+                                  {service.is_featured && (
+                                    <span className="absolute top-2 right-2 bg-amber-500 text-black text-[10px] font-bold px-2 py-0.5 rounded-full shadow">
+                                      عرض مميز
+                                    </span>
+                                  )}
+                                  {service.is_best_seller && (
+                                    <span className="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow">
+                                      الأكثر مبيعاً
+                                    </span>
+                                  )}
                                 </div>
                                 
-                                {/* السعر */}
-                                <div className="flex items-center gap-2 mb-3">
-                                  {service.sale_price ? (
-                                    <>
-                                      <span className="font-semibold text-green-400 text-sm">{service.sale_price}</span>
-                                      <span className="text-xs text-gray-500 line-through">{service.price}</span>
-                                    </>
-                                  ) : service.price ? (
-                                    <span className="font-semibold text-green-400 text-sm">{service.price}</span>
-                                  ) : service.has_weight_pricing ? (
-                                    <span className="font-semibold text-green-400 text-sm">{service.price_per_kg} ج/كيلو</span>
-                                  ) : (
-                                    <span className="text-gray-400 text-xs">بدون سعر محدد</span>
-                                  )}
+                                {/* معلومات المنتج */}
+                                <div className="flex-1 min-h-0">
+                                  <h4 className="font-bold text-white text-base mb-1 line-clamp-2 leading-snug">
+                                    {service.title}
+                                  </h4>
+                                  <div className="flex items-center gap-2 text-xs text-gray-400 mb-2">
+                                    <span className="bg-gray-800 px-2 py-0.5 rounded border border-gray-700">
+                                      {service.category?.name || 'قسم غير محدد'}
+                                    </span>
+                                  </div>
+                                  
+                                  {/* السعر */}
+                                  <div className="flex items-center gap-2 mb-2">
+                                    {service.sale_price ? (
+                                      <>
+                                        <span className="font-bold text-emerald-400 text-base">{service.sale_price} ج.م</span>
+                                        <span className="text-xs text-gray-500 line-through">{service.price} ج.م</span>
+                                      </>
+                                    ) : service.price ? (
+                                      <span className="font-bold text-emerald-400 text-base">{service.price} ج.م</span>
+                                    ) : service.has_weight_pricing ? (
+                                      service.sale_price_per_kg ? (
+                                        <>
+                                          <span className="font-bold text-emerald-400 text-base">{service.sale_price_per_kg} ج/كيلو</span>
+                                          <span className="text-xs text-gray-500 line-through">{service.price_per_kg}</span>
+                                        </>
+                                      ) : (
+                                        <span className="font-bold text-emerald-400 text-base">{service.price_per_kg} ج/كيلو</span>
+                                      )
+                                    ) : (
+                                      <span className="text-gray-400 text-xs">بدون سعر محدد</span>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
                               
-                              {/* الأزرار */}
-                              <div className="flex flex-col gap-2">
+                              {/* الأزرار وحالة التوفر */}
+                              <div className="flex flex-col gap-2 pt-3 border-t border-gray-800 mt-2">
                                 <div className="flex items-center justify-between">
                                   <span className="text-xs text-gray-400">حالة التوفر:</span>
                                   <div className="relative">
@@ -2083,7 +2622,7 @@ const { ...serviceData } = newService;
                                       className={`relative w-12 h-6 rounded-full transition-all duration-400 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 ${
                                         (service.is_available ?? true)
                                           ? 'bg-emerald-500 focus:ring-emerald-400'
-                                          : 'bg-gray-400 focus:ring-gray-300'
+                                          : 'bg-gray-600 focus:ring-gray-300'
                                       }`}
                                       disabled={isLoading}
                                       role="switch"
@@ -2111,28 +2650,29 @@ const { ...serviceData } = newService;
                                   </div>
                                 </div>
                                 
-                                <div className="flex gap-2">
+                                <div className="flex gap-2 mt-1">
                                   <button 
                                     onClick={() => !isLoading && handleEditService(service)} 
-                                    title="تعديل" 
-                                    className="flex-1 text-blue-400 hover:text-blue-300 p-2 rounded-lg transition-all duration-300 hover:bg-blue-600/20 hover:shadow-lg disabled:opacity-50 text-sm" 
-                                    disabled={editingService === service.id || isLoading}
+                                    title="تعديل هذا المنتج مباشرة" 
+                                    className="flex-1 bg-blue-600/20 hover:bg-blue-600 border border-blue-500/30 hover:border-blue-500 text-blue-300 hover:text-white p-2.5 rounded-lg transition-all flex items-center justify-center gap-1.5 text-xs font-bold disabled:opacity-50" 
+                                    disabled={isLoading}
                                   >
-                                    <Edit size={16} className="mx-auto" />
+                                    <Edit size={15} />
+                                    <span>تعديل</span>
                                   </button>
                                   <button 
                                     onClick={() => !isLoading && handleDeleteService(service.id)} 
-                                    title="حذف" 
-                                    className="flex-1 text-red-500 hover:text-red-400 p-2 rounded-lg transition-all duration-300 hover:bg-red-600/20 hover:shadow-lg disabled:opacity-50 text-sm" 
+                                    title="حذف المنتج" 
+                                    className="bg-red-600/20 hover:bg-red-600 border border-red-500/30 hover:border-red-500 text-red-300 hover:text-white p-2.5 rounded-lg transition-all flex items-center justify-center text-xs disabled:opacity-50" 
                                     disabled={isLoading}
                                   >
-                                    <Trash2 size={16} className="mx-auto" />
+                                    <Trash2 size={15} />
                                   </button>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </>
                   )}

@@ -1,12 +1,12 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Read from Vite env (define in .env.local)
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+// Read from Vite env
+const supabaseUrl = (import.meta.env.VITE_SUPABASE_URL || '').trim();
+const supabaseAnonKey = (import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY || import.meta.env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
 
 // Add validation to ensure the environment variables are loaded
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('Supabase environment variables are missing. Please check your .env file or Netlify environment variables.');
+  console.error('Supabase environment variables are missing. Please check your .env file or environment variables.');
 }
 
 export const supabase = createClient(
