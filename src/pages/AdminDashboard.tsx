@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import type { Category, Service, Banner, StoreSettings, Testimonial, Subcategory } from '../types/database'; // Added Subcategory type
 import { sanitizeStoreSettings } from '../utils/storeBranding';
-import { Trash2, Edit, Plus, Save, X, Upload, ChevronDown, ChevronUp, Facebook, Instagram, Twitter, Palette, Store, Image, List, Package, Eye, EyeOff, Home, ArrowUp } from 'lucide-react';
+import { Trash2, Edit, Plus, Save, X, Upload, ChevronDown, ChevronUp, Facebook, Instagram, Twitter, Palette, Store, Image, List, Package, Eye, EyeOff, Home, ArrowUp, Sparkles, Flame, Filter, Layers } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -91,6 +91,10 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
 
   // Search state for products
   const [searchQuery, setSearchQuery] = useState<string>('');
+
+  // Category and Subcategory filters for products list
+  const [productCategoryFilter, setProductCategoryFilter] = useState<string>('all');
+  const [productSubcategoryFilter, setProductSubcategoryFilter] = useState<string | null>(null);
 
   const [newCategory, setNewCategory] = useState({ name: '', description: '' });
   const [newSubcategory, setNewSubcategory] = useState({ category_id: '', name_ar: '', description_ar: '' });
@@ -459,11 +463,6 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
       setIsLoading(false);
     }
   };
-
-  // Filter services based on search query
-  const filteredServices = services.filter((service: Service) =>
-    service.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   const fetchLogoUrl = async () => {
     const { data } = supabase.storage.from('services').getPublicUrl('logo.svg');
@@ -1452,6 +1451,42 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
     }
   }
 
+  // Filtered services based on category, subcategory, and search query
+  const hasFeaturedProducts = services.some(s => s.is_featured);
+  const hasBestSellerProducts = services.some(s => s.is_best_seller);
+
+  const filteredServices = services.filter((service) => {
+    // 1. Filter by category or special tabs (featured / best_sellers)
+    if (productCategoryFilter === 'featured') {
+      if (!service.is_featured) return false;
+    } else if (productCategoryFilter === 'best_sellers') {
+      if (!service.is_best_seller) return false;
+    } else if (productCategoryFilter !== 'all') {
+      if (service.category_id !== productCategoryFilter) return false;
+      // 2. Filter by subcategory if one is selected
+      if (productSubcategoryFilter && service.subcategory_id !== productSubcategoryFilter) {
+        return false;
+      }
+    }
+
+    // 3. Filter by search query
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      const matchTitle = service.title ? service.title.toLowerCase().includes(q) : false;
+      const matchDesc = service.description ? service.description.toLowerCase().includes(q) : false;
+      const categoryName = categories.find(c => c.id === service.category_id)?.name || '';
+      const matchCat = categoryName.toLowerCase().includes(q);
+      const subcatName = subcategories.find(sc => sc.id === service.subcategory_id)?.name || (service as any).subcategory?.name_ar || '';
+      const matchSubcat = subcatName ? subcatName.toLowerCase().includes(q) : false;
+
+      if (!matchTitle && !matchDesc && !matchCat && !matchSubcat) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+
   if (isLoading && categories.length === 0 && services.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white p-4 md:p-8 flex items-center justify-center">
@@ -2186,23 +2221,246 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                           </div>
                         )}
                       </div>
+
+                      {/* أزرار الأقسام والأقسام الفرعية مثل الصفحة الرئيسية */}
+                      <div className="mb-6 space-y-4">
+                        {/* الأزرار العلوية: جميع المنتجات + أحدث العروض + الأكثر مبيعاً */}
+                        <div className="flex flex-wrap gap-2.5 items-center">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setProductCategoryFilter('all');
+                              setProductSubcategoryFilter(null);
+                            }}
+                            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all duration-200 shadow-sm ${
+                              productCategoryFilter === 'all'
+                                ? 'bg-blue-600 text-white shadow-blue-500/20 border border-blue-400'
+                                : 'bg-gray-800/90 text-gray-300 hover:bg-gray-750 hover:text-white border border-gray-700'
+                            }`}
+                          >
+                            <Layers className="w-4 h-4" />
+                            <span>جميع المنتجات</span>
+                            <span className={`text-xs px-2 py-0.5 rounded-full font-mono ${
+                              productCategoryFilter === 'all' ? 'bg-blue-700 text-white' : 'bg-gray-700 text-gray-300'
+                            }`}>
+                              {services.length}
+                            </span>
+                          </button>
+
+                          {hasFeaturedProducts && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setProductCategoryFilter('featured');
+                                setProductSubcategoryFilter(null);
+                              }}
+                              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all duration-200 shadow-sm ${
+                                productCategoryFilter === 'featured'
+                                  ? 'bg-amber-600 text-white shadow-amber-500/20 border border-amber-400'
+                                  : 'bg-amber-950/30 text-amber-300 hover:bg-amber-900/40 border border-amber-800/40'
+                              }`}
+                            >
+                              <Sparkles className="w-4 h-4 text-yellow-300" />
+                              <span>أحدث العروض</span>
+                              <span className={`text-xs px-2 py-0.5 rounded-full font-mono ${
+                                productCategoryFilter === 'featured' ? 'bg-amber-700 text-white' : 'bg-amber-900/60 text-amber-200'
+                              }`}>
+                                {services.filter(s => s.is_featured).length}
+                              </span>
+                            </button>
+                          )}
+
+                          {hasBestSellerProducts && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setProductCategoryFilter('best_sellers');
+                                setProductSubcategoryFilter(null);
+                              }}
+                              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all duration-200 shadow-sm ${
+                                productCategoryFilter === 'best_sellers'
+                                  ? 'bg-red-600 text-white shadow-red-500/20 border border-red-400'
+                                  : 'bg-red-950/30 text-red-300 hover:bg-red-900/40 border border-red-800/40'
+                              }`}
+                            >
+                              <Flame className="w-4 h-4 text-red-400" />
+                              <span>الأكثر مبيعاً</span>
+                              <span className={`text-xs px-2 py-0.5 rounded-full font-mono ${
+                                productCategoryFilter === 'best_sellers' ? 'bg-red-700 text-white' : 'bg-red-900/60 text-red-200'
+                              }`}>
+                                {services.filter(s => s.is_best_seller).length}
+                              </span>
+                            </button>
+                          )}
+                        </div>
+
+                        {/* أزرار الأقسام الرئيسية */}
+                        {categories.length > 0 && (
+                          <div className="bg-gray-900/50 p-3.5 rounded-2xl border border-gray-700/80">
+                            <div className="text-xs font-semibold text-gray-400 mb-2.5 flex items-center gap-1.5">
+                              <Filter className="w-3.5 h-3.5 text-blue-400" />
+                              <span>تصفية حسب القسم:</span>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                              {categories.map((category) => {
+                                const isSelected = productCategoryFilter === category.id;
+                                const categoryCount = services.filter(s => s.category_id === category.id).length;
+                                return (
+                                  <button
+                                    key={category.id}
+                                    type="button"
+                                    onClick={() => {
+                                      if (isSelected) {
+                                        setProductCategoryFilter('all');
+                                        setProductSubcategoryFilter(null);
+                                      } else {
+                                        setProductCategoryFilter(category.id);
+                                        setProductSubcategoryFilter(null);
+                                      }
+                                    }}
+                                    className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-bold transition-all duration-200 ${
+                                      isSelected
+                                        ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30 border border-blue-400'
+                                        : 'bg-gray-800 text-gray-300 hover:bg-gray-750 hover:text-white border border-gray-700/70'
+                                    }`}
+                                  >
+                                    <span>{category.name}</span>
+                                    <span className={`text-xs px-1.5 py-0.5 rounded-md font-mono ${
+                                      isSelected ? 'bg-blue-700 text-white' : 'bg-gray-700 text-gray-400'
+                                    }`}>
+                                      {categoryCount}
+                                    </span>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* شريط الأقسام الفرعية التابعة للقسم المختار */}
+                        {productCategoryFilter !== 'all' && productCategoryFilter !== 'featured' && productCategoryFilter !== 'best_sellers' && (
+                          <div className="bg-gradient-to-r from-blue-950/30 via-gray-900/50 to-blue-950/30 p-3.5 rounded-2xl border border-blue-800/40 animate-fadeIn">
+                            <div className="flex items-center justify-between gap-2 mb-2.5">
+                              <div className="text-xs font-semibold text-blue-300 flex items-center gap-1.5">
+                                <span className="w-2 h-2 rounded-full bg-blue-400"></span>
+                                <span>الأقسام الفرعية لقسم ({categories.find(c => c.id === productCategoryFilter)?.name}):</span>
+                              </div>
+                              {productSubcategoryFilter && (
+                                <button
+                                  type="button"
+                                  onClick={() => setProductSubcategoryFilter(null)}
+                                  className="text-[11px] text-gray-400 hover:text-white underline"
+                                >
+                                  عرض كل التصنيفات الفرعية
+                                </button>
+                              )}
+                            </div>
+
+                            <div className="flex flex-wrap gap-2">
+                              {/* زر الكل داخل هذا القسم */}
+                              <button
+                                type="button"
+                                onClick={() => setProductSubcategoryFilter(null)}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 ${
+                                  productSubcategoryFilter === null
+                                    ? 'bg-blue-500 text-white shadow-sm'
+                                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white border border-gray-700'
+                                }`}
+                              >
+                                الكل ({services.filter(s => s.category_id === productCategoryFilter).length})
+                              </button>
+
+                              {/* قائمة الأقسام الفرعية */}
+                              {subcategories
+                                .filter(sc => sc.category_id === productCategoryFilter)
+                                .map((sc) => {
+                                  const isSubSelected = productSubcategoryFilter === sc.id;
+                                  const subCount = services.filter(s => s.category_id === productCategoryFilter && s.subcategory_id === sc.id).length;
+                                  const subName = (sc as any).name_ar || (sc as any).name;
+                                  return (
+                                    <button
+                                      key={sc.id}
+                                      type="button"
+                                      onClick={() => setProductSubcategoryFilter(isSubSelected ? null : sc.id)}
+                                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 ${
+                                        isSubSelected
+                                          ? 'bg-emerald-600 text-white shadow-sm border border-emerald-400'
+                                          : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white border border-gray-700'
+                                      }`}
+                                    >
+                                      <span>{subName}</span>
+                                      <span className={`text-[10px] px-1.5 py-0.5 rounded ${
+                                        isSubSelected ? 'bg-emerald-700 text-white' : 'bg-gray-700 text-gray-400'
+                                      }`}>
+                                        {subCount}
+                                      </span>
+                                    </button>
+                                  );
+                                })}
+
+                              {subcategories.filter(sc => sc.category_id === productCategoryFilter).length === 0 && (
+                                <span className="text-xs text-gray-400 italic py-1">
+                                  لا توجد أقسام فرعية لهذا القسم حالياً
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
                       
                       {/* شريط البحث */}
                       <div className="mb-6">
                         <div className="relative">
                           <input
                             type="text"
-                            placeholder="ابحث عن منتج بالاسم أو القسم..."
+                            placeholder="ابحث عن منتج بالاسم أو الوصف أو القسم..."
                             value={searchQuery || ''}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full p-3 pr-10 rounded-lg text-white bg-gray-900/60 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400 text-sm"
+                            className="w-full p-3 pr-10 pl-10 rounded-lg text-white bg-gray-900/60 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400 text-sm"
                           />
                           <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                           </div>
+                          {searchQuery && (
+                            <button
+                              type="button"
+                              onClick={() => setSearchQuery('')}
+                              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white p-1 rounded"
+                              title="مسح البحث"
+                            >
+                              <X size={16} />
+                            </button>
+                          )}
                         </div>
+                        {(searchQuery || productCategoryFilter !== 'all' || productSubcategoryFilter) && (
+                          <div className="mt-2.5 flex items-center justify-between text-xs text-gray-400 bg-gray-900/40 px-3 py-1.5 rounded-lg border border-gray-800">
+                            <span>
+                              تم العثور على <strong className="text-blue-400">{filteredServices.length}</strong> منتج
+                              {productCategoryFilter === 'featured' && ' في أحدث العروض'}
+                              {productCategoryFilter === 'best_sellers' && ' في الأكثر مبيعاً'}
+                              {productCategoryFilter !== 'all' && productCategoryFilter !== 'featured' && productCategoryFilter !== 'best_sellers' && (
+                                <> في قسم (<strong className="text-gray-200">{categories.find(c => c.id === productCategoryFilter)?.name}</strong>)</>
+                              )}
+                              {productSubcategoryFilter && (
+                                <> - تصنيف (<strong className="text-emerald-400">{(subcategories.find(sc => sc.id === productSubcategoryFilter) as any)?.name_ar || subcategories.find(sc => sc.id === productSubcategoryFilter)?.name}</strong>)</>
+                              )}
+                              {searchQuery && <> لكلمة البحث: "<strong className="text-white">{searchQuery}</strong>"</>}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setProductCategoryFilter('all');
+                                setProductSubcategoryFilter(null);
+                                setSearchQuery('');
+                              }}
+                              className="text-blue-400 hover:text-blue-300 font-medium underline"
+                            >
+                              إعادة ضبط الفلاتر
+                            </button>
+                          </div>
+                        )}
                       </div>
 
                       {/* شبكة عرض المنتجات والتعديل المباشر */}
