@@ -1,7 +1,8 @@
-import { createContext, useContext, useState, useMemo, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useState, useMemo, useCallback, ReactNode, useEffect } from 'react';
 import { toast } from 'react-toastify';
+import { deductStockForOrder, syncInventoryFromDB } from '../utils/inventoryManager';
 
-interface CartItem {
+export interface CartItem {
   id: string;
   title: string;
   price: string;
@@ -10,23 +11,27 @@ interface CartItem {
   imageUrl?: string;
   productId?: string;
   size?: string;
+  track_stock?: boolean;
+  stock_quantity?: number | null;
 }
 
 interface CartContextType {
-  cartItems: CartItem[];
-  addToCart: (item: Omit<CartItem, 'id' | 'quantity' | 'numericPrice'>) => void;
-  removeFromCart: (id: string) => void;
-  updateQuantity: (id: string, quantity: number) => void;
-  clearCart: () => void;
-  isCartOpen: boolean;
-  isAutoShowing: boolean;
-  toggleCart: (open?: boolean) => void;
-  itemCount: number;
-  cartTotal: string;
-  sendOrderViaWhatsApp: () => void;
-  showToast: boolean;
-  toastProductName: string;
-  hideToast: () => void;
+  cartItems: CartItem[];
+  addToCart: (item: Omit<CartItem, 'id' | 'quantity' | 'numericPrice'>) => void;
+  removeFromCart: (id: string) => void;
+  updateQuantity: (id: string, quantity: number) => void;
+  clearCart: () => void;
+  isCartOpen: boolean;
+  isAutoShowing: boolean;
+  toggleCart: (open?: boolean) => void;
+  itemCount: number;
+  cartTotal: string;
+  sendOrderViaWhatsApp: () => Promise<void>;
+  showToast: boolean;
+  toastProductName: string;
+  hideToast: () => void;
+  isSubmittingOrder: boolean;
+  hasZeroStockItemsInCart: boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -37,6 +42,12 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [isAutoShowing, setIsAutoShowing] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastProductName, setToastProductName] = useState<string>('');
+  const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
+
+  // Sync inventory data on mount
+  useEffect(() => {
+    syncInventoryFromDB();
+  }, []);
 
   const cleanPrice = (price: string | number): { display: string; numeric: number } => {
     // If price is already a number, use it directly
@@ -63,7 +74,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         .replace(/\.(?=.*\.)/g, ''); // Remove all but last decimal point
       
       numericValue = parseFloat(cleanNumber) || 0;
-      console.log('Parsed price:', { original: price, western: westernPrice, cleanNumber, numericValue });
     }
     
     return {
@@ -76,7 +86,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const { display, numeric } = cleanPrice(item.price);
     
     setCartItems(prevItems => {
-      // Check if item already exists in cart by title (since we might not have productId)
+      // Check if item already exists in cart by title and size
       const existingItem = prevItems.find(
         cartItem => cartItem.title === item.title && cartItem.size === item.size
       );
@@ -84,8 +94,8 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (existingItem) {
         // If item exists, increase quantity
         return prevItems.map(cartItem =>
-          cartItem.title === item.title
-            ? { ...cartItem, quantity: cartItem.quantity + 1 }
+          cartItem.title === item.title && cartItem.size === item.size
+            ? { ...cartItem, quantity: cartItem.quantity + 1, track_stock: item.track_stock ?? cartItem.track_stock, stock_quantity: item.stock_quantity ?? cartItem.stock_quantity }
             : cartItem
         );
       }
@@ -93,10 +103,12 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       // If item doesn't exist, add it to cart
       return [...prevItems, { 
         ...item, 
-        id: Date.now().toString(),
+        id: Date.now().toString() + '_' + Math.random().toString(36).substring(2, 6),
         price: display,
         numericPrice: numeric,
-        quantity: 1 
+        quantity: 1,
+        track_stock: item.track_stock ?? false,
+        stock_quantity: item.stock_quantity ?? null
       }];
     });
             
@@ -160,90 +172,116 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     [cartItems]
   );
 
+  const hasZeroStockItemsInCart = useMemo(() => {
+    return cartItems.some(item => item.track_stock && (item.stock_quantity ?? 0) <= 0);
+  }, [cartItems]);
+
   const cartTotal = useMemo(() => {
     let total = 0;
     
-    console.log('Calculating cart total for items:', cartItems);
-    
     cartItems.forEach(item => {
-      // Ensure we have a valid numeric price and quantity
       const price = typeof item.numericPrice === 'number' ? item.numericPrice : 0;
       const quantity = typeof item.quantity === 'number' ? item.quantity : 0;
       const itemTotal = price * quantity;
-      console.log(`Item: ${item.title}, Price: ${price}, Qty: ${quantity}, Subtotal: ${itemTotal}`);
       total += itemTotal;
     });
     
-    console.log('Raw total before formatting:', total);
-    
-    // Ensure we have a valid number
     if (isNaN(total) || !isFinite(total)) {
-      console.error('Invalid total calculated, defaulting to 0');
       total = 0;
     }
     
-    // Format to 2 decimal places
-    const formattedTotal = total.toFixed(2);
-    console.log('Formatted total:', formattedTotal);
-    
-    // Debug: Log the final value that will be returned
-    console.log('Returning cart total:', { 
-      formattedTotal, 
-      asNumber: parseFloat(formattedTotal),
-      isNaN: isNaN(parseFloat(formattedTotal))
-    });
-    
-    return formattedTotal;
+    return total.toFixed(2);
   }, [cartItems]);
 
-  const sendOrderViaWhatsApp = () => {
+  const sendOrderViaWhatsApp = async () => {
     if (cartItems.length === 0) {
       toast.warning('السلة فارغة، أضف منتجات أولاً');
       return;
     }
 
-    // Format order details
-    const orderDetails = cartItems.map(item => 
-      `- ${item.title}${item.size ? ` (${item.size})` : ''} (${item.quantity} × ${item.price})`
-    ).join('%0A');
+    setIsSubmittingOrder(true);
+    try {
+      // 1. Deduct stock automatically and check for zero stock items
+      const { hasZeroStock, zeroStockItemTitles, orderRecord } = await deductStockForOrder(
+        cartItems.map(item => ({
+          productId: item.productId,
+          title: item.title,
+          quantity: item.quantity,
+          price: item.price,
+          size: item.size
+        })),
+        cartTotal
+      );
 
-    // Create the message with order details and total
-    const message = `مرحباً، أود طلب المنتجات التالية:%0A%0A${orderDetails}%0A%0Aالإجمالي: ${cartTotal} ج%0A%0Aشكراً لكم!`;
-    
-    // Open WhatsApp with the order details
-    window.open(`https://wa.me/201003046674?text=${message}`, '_blank');
-    
-    // Clear the cart after sending the order
-    clearCart();
-    
-    // Close the cart after sending
-    toggleCart(false);
+      // 2. Format order details for WhatsApp
+      const orderDetails = cartItems.map(item => {
+        const isItemZeroStock = item.track_stock && (item.stock_quantity ?? 0) <= 0;
+        const zeroStockTag = isItemZeroStock ? ' *(مخزون صفري: 0 - تحت الطلب)*' : '';
+        return `- ${item.title}${item.size ? ` (${item.size})` : ''} (${item.quantity} × ${item.price} ج)${zeroStockTag}`;
+      }).join('%0A');
+
+      // 3. Build WhatsApp message with merchant warning if zero stock occurred
+      let message = `*طلب جديد من المتجر الإلكتروني*%0A`;
+      message += `رقم الطلب: ${orderRecord.id}%0A`;
+      message += `------------------------%0A`;
+      message += `${orderDetails}%0A`;
+      message += `------------------------%0A`;
+      message += `*الإجمالي: ${cartTotal} ج*%0A`;
+
+      if (hasZeroStock) {
+        message += `%0A⚠️ *تنبيه للتاجر*: يتضمن هذا الطلب منتجات تم شراؤها بمخزون صفري (0 متبقي):%0A`;
+        zeroStockItemTitles.forEach(title => {
+          message += `• ${title}%0A`;
+        });
+        message += `*(يرجى مراجعة المخزن وتوفير وتجهيز الكمية المطلوبة للعميل)*%0A`;
+      }
+
+      message += `%0Aشكراً لكم!`;
+
+      // 4. Open WhatsApp
+      window.open(`https://wa.me/201003046674?text=${message}`, '_blank');
+
+      if (hasZeroStock) {
+        toast.info('تم تأكيد طلبك بنجاح! سيتم تجهيز وتوريد المنتجات المطلوبة لك فوراً.', { autoClose: 5000 });
+      } else {
+        toast.success('تم إرسال الطلب بنجاح وتحديث المخزون!');
+      }
+
+      // 5. Clear cart and close
+      clearCart();
+      toggleCart(false);
+    } catch (err: any) {
+      console.error('Error completing order:', err);
+      toast.error('حدث خطأ أثناء معالجة الطلب، يرجى المحاولة ثانية');
+    } finally {
+      setIsSubmittingOrder(false);
+    }
   };
 
-
-
-  return (
-    <CartContext.Provider
-      value={{
-        cartItems,
-        cartTotal,
-        isCartOpen,
-        isAutoShowing,
-        toggleCart,
-        addToCart,
-        removeFromCart,
-        updateQuantity,
-        clearCart,
-        itemCount,
-        sendOrderViaWhatsApp,
-        showToast,
-        toastProductName,
-        hideToast
-      }}
-    >
-      {children}
-    </CartContext.Provider>
-  );
+  return (
+    <CartContext.Provider
+      value={{
+        cartItems,
+        cartTotal,
+        isCartOpen,
+        isAutoShowing,
+        toggleCart,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        clearCart,
+        itemCount,
+        sendOrderViaWhatsApp,
+        showToast,
+        toastProductName,
+        hideToast,
+        isSubmittingOrder,
+        hasZeroStockItemsInCart
+      }}
+    >
+      {children}
+    </CartContext.Provider>
+  );
 };
 
 export const useCart = () => {

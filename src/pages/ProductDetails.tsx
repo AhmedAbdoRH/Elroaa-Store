@@ -1,22 +1,34 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import type { Service, ProductSize } from '../types/database';
-import { MessageCircle, ArrowRight, Share2, Copy, Edit } from 'lucide-react';
+import { MessageCircle, ArrowRight, Share2, Copy, Edit, CheckCircle2 } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { toast } from 'react-toastify';
 import ProductImageSlider from '../components/ProductImageSlider';
+import { getProductInventory, subscribeToInventory } from '../utils/inventoryManager';
 
 
 export default function ProductDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const location = useLocation();
   const [service, setService] = useState<Service | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [suggested, setSuggested] = useState<Service[]>([]);
+
+  // Inventory state
+  const [inventory, setInventory] = useState(() => id ? getProductInventory(id) : { track_stock: false, stock_quantity: 0 });
+
+  useEffect(() => {
+    if (id) {
+      setInventory(getProductInventory(id));
+      return subscribeToInventory(() => {
+        setInventory(getProductInventory(id));
+      });
+    }
+  }, [id]);
 
   // Image slider states - removed as we're using ProductImageSlider component
   const { addToCart } = useCart();
@@ -440,10 +452,52 @@ export default function ProductDetails() {
                       )
                     )}
                   </div>
+                  {/* بطاقة عرض حالة المخزون للعميل */}
+                  {inventory.track_stock && (
+                    <div className="mb-6 p-4 rounded-xl border transition-all text-right shadow-sm bg-black/20 border-white/10 backdrop-blur-sm">
+                      <div className="flex items-center justify-between gap-3 mb-2">
+                        <span className="text-xs font-semibold text-secondary/70">حالة توفر المخزون</span>
+                        {inventory.stock_quantity === 0 ? (
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                            <span>(0) مخزون متبقي</span>
+                          </span>
+                        ) : inventory.stock_quantity <= 5 ? (
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                            <span>كمية محدودة!</span>
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                            <span>متوفر بالمخزن</span>
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <span className="text-base font-bold text-secondary">
+                          {inventory.stock_quantity === 0
+                            ? 'المخزون المتبقي: 0 قطعة'
+                            : `الرصيد المتبقي: ${inventory.stock_quantity} قطعة متوفرة`}
+                        </span>
+                        {inventory.stock_quantity > 0 && (
+                          <span className="text-xs text-secondary/60">جاهز للتجهيز والشحن</span>
+                        )}
+                      </div>
+
+                      {/* رسالة توضيحية عند وصول المخزون إلى 0 مع إبقاء زر الطلب نشطاً */}
+                      {inventory.stock_quantity === 0 && (
+                        <div className="mt-2.5 pt-2.5 border-t border-white/10 text-xs text-amber-300/90 leading-relaxed">
+                          💡 <strong>ملاحظة هامة:</strong> زر إتمام الطلب متاح ونشط بالكامل. يمكنك متابعة طلبك بشكل طبيعي وسيقوم فريق المتجر بتوفير وتجهيز الكمية المطلوبة لك فوراً.
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   <div className="flex gap-4 items-center">
                     <button
                       onClick={handleContact}
-                      className="w-14 h-14 bg-[#CA8A04] text-white rounded-lg font-bold hover:bg-opacity-90 flex items-center justify-center"
+                      className="w-14 h-14 bg-[#CA8A04] text-white rounded-lg font-bold hover:bg-opacity-90 flex items-center justify-center transition-all cursor-pointer shadow-md"
                       title="تواصل معنا للطلب"
                     >
                       <MessageCircle className="h-6 w-6" />
@@ -459,6 +513,8 @@ export default function ProductDetails() {
                             price: String(calculatedPrice),
                             imageUrl: service.image_url || '',
                             size: weightText,
+                            track_stock: inventory.track_stock,
+                            stock_quantity: inventory.stock_quantity,
                           });
                           toast.success('تمت إضافة المنتج إلى السلة');
                         } else if (service.has_multiple_sizes) {
@@ -469,6 +525,8 @@ export default function ProductDetails() {
                               price: String(selectedSize.sale_price || selectedSize.price),
                               imageUrl: service.image_url || '',
                               size: selectedSize.size,
+                              track_stock: inventory.track_stock,
+                              stock_quantity: inventory.stock_quantity,
                             });
                             toast.success('تمت إضافة المنتج إلى السلة');
                           } else {
@@ -480,11 +538,13 @@ export default function ProductDetails() {
                             title: service.title,
                             price: String(service.sale_price || service.price || 0),
                             imageUrl: service.image_url || '',
+                            track_stock: inventory.track_stock,
+                            stock_quantity: inventory.stock_quantity,
                           });
                           toast.success('تمت إضافة المنتج إلى السلة');
                         }
                       }}
-                      className="flex-1 h-14 bg-[#25D366] hover:bg-opacity-90 text-white p-3 rounded-lg font-bold flex items-center justify-center"
+                      className="flex-1 h-14 bg-[#25D366] hover:bg-opacity-90 text-white p-3 rounded-lg font-bold flex items-center justify-center transition-all cursor-pointer shadow-md active:scale-[0.99]"
                       title="أضف إلى السلة"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

@@ -1,11 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import type { Category, Service, Banner, StoreSettings, Testimonial, Subcategory } from '../types/database'; // Added Subcategory type
+import type { Category, Service, Banner, StoreSettings, Testimonial, Subcategory, OrderRecord } from '../types/database'; // Added Subcategory type
 import { sanitizeStoreSettings } from '../utils/storeBranding';
-import { Trash2, Edit, Plus, Save, X, Upload, ChevronDown, ChevronUp, Facebook, Instagram, Twitter, Palette, Store, Image, List, Package, Eye, EyeOff, Home, ArrowUp, Sparkles, Flame, Filter, Layers } from 'lucide-react';
+import { Trash2, Edit, Plus, Save, X, Upload, ChevronDown, ChevronUp, Facebook, Instagram, Twitter, Palette, Store, Image, List, Package, Eye, EyeOff, Home, ArrowUp, Sparkles, Flame, Filter, Layers, Boxes, Warehouse, AlertTriangle, ShoppingCart, RefreshCw, CheckCircle2 } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import {
+  enrichServicesWithInventory,
+  getProductInventory,
+  updateProductInventory,
+  getLocalOrdersLog,
+  clearOrdersLog,
+  syncInventoryFromDB,
+  subscribeToInventory
+} from '../utils/inventoryManager';
 
 const brownDark = '#3d2c1d';
 const successGreen = '#228B22'; // Natural green color
@@ -46,6 +55,8 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
     sale_price_per_kg: number | null;
     price: number | null;
     sale_price: number | null;
+    track_stock: boolean;
+    stock_quantity: number | null;
   }>({
     title: '',
     description: '',
@@ -60,6 +71,8 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
     sale_price_per_kg: null,
     price: 0,
     sale_price: null,
+    track_stock: false,
+    stock_quantity: null,
   });
   const [editRemoveBgSwitch, setEditRemoveBgSwitch] = useState(false);
   const [editOriginalImageUrl, setEditOriginalImageUrl] = useState<string | null>(null);
@@ -72,7 +85,10 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
   const [editingCategory, setEditingCategory] = useState<string | null>(null);
   const [editingBanner, setEditingBanner] = useState<string | null>(null);
   const [deleteModal, setDeleteModal] = useState<{ id: string | number; type: 'category' | 'service' | 'banner' | 'subcategory' } | null>(null);
-  const [activeTab, setActiveTab] = useState<'products' | 'banners' | 'testimonials' | 'store'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'banners' | 'testimonials' | 'store' | 'inventory_orders'>('products');
+  const [ordersLog, setOrdersLog] = useState<OrderRecord[]>([]);
+  const [ordersFilter, setOrdersFilter] = useState<'all' | 'zero_stock'>('all');
+  const [quickStockInput, setQuickStockInput] = useState<Record<number, number>>({});
 
   // Remove BG switch state and original image backup (session only)
   const [removeBgSwitch, setRemoveBgSwitch] = useState(false);
@@ -111,6 +127,8 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
     sale_price_per_kg: null as number | null,
     price: 0,
     sale_price: null as number | null,
+    track_stock: false,
+    stock_quantity: null as number | null,
   });
   const [editingSubcategory, setEditingSubcategory] = useState<string | null>(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>('');
@@ -399,6 +417,15 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
     };
 
     initialize();
+
+    const unsubscribe = subscribeToInventory(() => {
+      setOrdersLog(getLocalOrdersLog());
+      setServices(prev => enrichServicesWithInventory(prev));
+    });
+
+    return () => {
+      unsubscribe();
+    };
   }, []);
   
   // UseEffect for showing toasts
@@ -439,7 +466,12 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
         .select(`*, category:categories(*), sizes:product_sizes(*)`)
         .order('created_at', { ascending: false });
       if (servicesError) throw servicesError;
-      setServices(servicesData || []);
+
+      // مزامنة المخزون وسجل الطلبات من قاعدة البيانات
+      await syncInventoryFromDB();
+      const enrichedServices = enrichServicesWithInventory(servicesData || []);
+      setServices(enrichedServices);
+      setOrdersLog(getLocalOrdersLog());
 
       const { data: subcatsData, error: subcatsError } = await supabase
         .from('subcategories')
@@ -857,7 +889,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
     }
     setIsLoading(true);
     try {
-        const { ...serviceData } = newService;
+        const { track_stock, stock_quantity, ...serviceData } = newService;
         
         let serviceToAdd: Partial<Service> = {
             ...serviceData,
@@ -879,6 +911,11 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
 
         if (error) throw error;
 
+        // حفظ كمية المخزون وتفعيل التتبع إذا تم اختياره
+        if (newService.track_stock && service && service[0]?.id) {
+          await updateProductInventory(service[0].id, true, newService.stock_quantity || 0);
+        }
+
         // Reset form
         setNewService({
             title: '',
@@ -893,6 +930,8 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
             sale_price_per_kg: null,
             price: 0,
             sale_price: null,
+            track_stock: false,
+            stock_quantity: null,
         });
         setSelectedCategory('');
         setSelectedSubcategory('');
@@ -913,6 +952,10 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
       return;
     }
 
+    const currentInv = getProductInventory(service.id);
+    const trackStock = service.track_stock ?? currentInv.track_stock ?? false;
+    const stockQty = trackStock ? (service.stock_quantity ?? currentInv.stock_quantity ?? 0) : null;
+
     setEditingService(service.id);
     setEditServiceData({
       title: service.title || '',
@@ -929,6 +972,8 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
       sale_price_per_kg: service.sale_price_per_kg || null,
       price: service.price || 0,
       sale_price: service.sale_price || null,
+      track_stock: trackStock,
+      stock_quantity: stockQty,
     });
     setEditRemoveBgSwitch(false);
     setEditOriginalImageUrl(service.image_url || null);
@@ -1074,9 +1119,16 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
         .eq('id', updatedId);
       if (error) throw error;
 
+      // تحديث إعدادات المخزون للمنتج
+      await updateProductInventory(
+        updatedId,
+        editServiceData.track_stock,
+        editServiceData.track_stock ? (editServiceData.stock_quantity || 0) : 0
+      );
+
       setEditingService(null);
       await fetchData();
-      setSuccessMsg("تم تحديث المنتج بنجاح!");
+      setSuccessMsg("تم تحديث المنتج والمخزون بنجاح!");
 
       // Highlight the updated product and ensure viewport is aligned with it
       setHighlightedServiceId(updatedId);
@@ -1093,6 +1145,34 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
       setError(`خطأ في تحديث المنتج: ${err.message}`);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleQuickStockUpdate = async (serviceId: number, newQty: number, trackStock = true) => {
+    setIsLoading(true);
+    try {
+      await updateProductInventory(serviceId, trackStock, Math.max(0, newQty));
+      await fetchData();
+      toast.success('تم تحديث المخزون بنجاح!');
+    } catch (err: any) {
+      toast.error('فشل تحديث المخزون: ' + err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleClearOrders = async () => {
+    if (window.confirm('هل أنت متأكد من رغبتك في مسح سجل الطلبات؟')) {
+      setIsLoading(true);
+      try {
+        await clearOrdersLog();
+        setOrdersLog([]);
+        toast.success('تم مسح سجل الطلبات بنجاح');
+      } catch (err: any) {
+        toast.error('فشل مسح السجل: ' + err.message);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -1605,6 +1685,28 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
             </button>
 
             <button
+              onClick={() => setActiveTab('inventory_orders')}
+              className={`w-full flex items-center justify-between px-4 py-3 rounded-lg font-bold transition-all duration-300 transform
+                ${activeTab === 'inventory_orders'
+                  ? 'bg-blue-500 text-white shadow-lg -translate-y-1'
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white'}`}
+            >
+              <div className="flex items-center gap-3">
+                <Warehouse className="h-5 w-5" />
+                <span>المخزون والطلبات</span>
+              </div>
+              {ordersLog.some(o => o.has_zero_stock) ? (
+                <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full animate-pulse" title="يوجد طلب بمخزون صفري">
+                  تنبيه
+                </span>
+              ) : ordersLog.length > 0 ? (
+                <span className="bg-blue-900/80 text-blue-200 text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                  {ordersLog.length}
+                </span>
+              ) : null}
+            </button>
+
+            <button
               onClick={() => setActiveTab('banners')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-bold transition-all duration-300 transform
                 ${activeTab === 'banners'
@@ -1638,27 +1740,37 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
 
           {/* Main Content */}
           <div className="md:col-span-3">
-            {/* Header for Products, Banners, Testimonials, Store */}
+            {/* Header for Products, Inventory, Banners, Testimonials, Store */}
             <div className="mb-8 p-6 bg-gray-800/50 border border-gray-700 rounded-lg shadow-lg">
                 <div className="flex items-center justify-between">
                     <div>
                         <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                             {activeTab === 'products' && <><Package className="w-7 h-7 text-blue-400" /> إدارة المنتجات</>}
+                            {activeTab === 'inventory_orders' && <><Warehouse className="w-7 h-7 text-blue-400" /> إدارة المخزون وتنبيهات الطلبات</>}
                             {activeTab === 'banners' && <><Image className="w-7 h-7 text-blue-400" /> إدارة البانرات</>}
                             {activeTab === 'testimonials' && <><List className="w-7 h-7 text-blue-400" /> إدارة آراء العملاء</>}
                             {activeTab === 'store' && <><Store className="w-7 h-7 text-blue-400" /> إعدادات المتجر</>}
                         </h2>
                         <p className="text-gray-400 mt-1 text-sm">
-                            {activeTab === 'products' && 'إدارة المنتجات والأقسام المرتبطة بها.'}
+                            {activeTab === 'products' && 'إدارة المنتجات والأقسام المرتبطة بها وتتبع مخزونها.'}
+                            {activeTab === 'inventory_orders' && 'متابعة حركة المخزون، سجل طلبات العملاء، وتنبيهات الطلبات المكتملة بمخزون صفري.'}
                             {activeTab === 'banners' && 'يمكنك إضافة بانر نصي أو صور أو شريطي.'}
                             {activeTab === 'testimonials' && 'إدارة وتعديل آراء وتقييمات العملاء.'}
                             {activeTab === 'store' && 'تعديل إعدادات المتجر والمعلومات العامة.'}
                         </p>
                     </div>
-                     <div className="flex items-center gap-2 text-xs font-bold">
+                     <div className="flex items-center gap-2 text-xs font-bold flex-wrap">
                         {activeTab === 'products' && <>
                             <span className="bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full">{services.length} منتج</span>
                             <span className="bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full">{categories.length} قسم</span>
+                        </>}
+                        {activeTab === 'inventory_orders' && <>
+                            <span className="bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full">{ordersLog.length} طلب مسجل</span>
+                            {ordersLog.filter(o => o.has_zero_stock).length > 0 && (
+                              <span className="bg-red-500/20 text-red-300 border border-red-500/40 px-3 py-1 rounded-full animate-pulse">
+                                ⚠️ {ordersLog.filter(o => o.has_zero_stock).length} طلب بمخزون صفري
+                              </span>
+                            )}
                         </>}
                         {activeTab === 'banners' && <span className="bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full">{banners.length} بانر</span>}
                         {activeTab === 'testimonials' && <span className="bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full">{testimonials.length} رأي</span>}
@@ -1997,6 +2109,270 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
               </div>
             )}
             
+            {activeTab === 'inventory_orders' && (
+              <div className="space-y-6">
+                {/* الإحصائيات السريعة للمخزون والطلبات */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="bg-gray-800/80 border border-gray-700 rounded-xl p-5 shadow-lg">
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-400 text-xs font-semibold">إجمالي الطلبات</span>
+                      <ShoppingCart className="w-5 h-5 text-blue-400" />
+                    </div>
+                    <p className="text-3xl font-extrabold text-white mt-2 font-mono">{ordersLog.length}</p>
+                    <span className="text-xs text-gray-400 mt-1 block">عملية شراء مسجلة</span>
+                  </div>
+
+                  <div className={`rounded-xl p-5 shadow-lg border transition-all ${
+                    ordersLog.some(o => o.has_zero_stock)
+                      ? 'bg-red-950/40 border-red-500/60 ring-1 ring-red-500/30'
+                      : 'bg-gray-800/80 border-gray-700'
+                  }`}>
+                    <div className="flex items-center justify-between">
+                      <span className="text-red-400 text-xs font-semibold">طلبات بمخزون صفري</span>
+                      <AlertTriangle className={`w-5 h-5 ${ordersLog.some(o => o.has_zero_stock) ? 'text-red-400 animate-bounce' : 'text-gray-500'}`} />
+                    </div>
+                    <p className="text-3xl font-extrabold text-red-300 mt-2 font-mono">
+                      {ordersLog.filter(o => o.has_zero_stock).length}
+                    </p>
+                    <span className="text-xs text-red-400/80 mt-1 block">طلبات تحتاج تجهيز وتوريد</span>
+                  </div>
+
+                  <div className="bg-gray-800/80 border border-gray-700 rounded-xl p-5 shadow-lg">
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-400 text-xs font-semibold">منتجات بتتبع مفعّل</span>
+                      <Boxes className="w-5 h-5 text-emerald-400" />
+                    </div>
+                    <p className="text-3xl font-extrabold text-emerald-400 mt-2 font-mono">
+                      {services.filter(s => s.track_stock).length}
+                    </p>
+                    <span className="text-xs text-gray-400 mt-1 block">من إجمالي {services.length} منتج</span>
+                  </div>
+
+                  <div className="bg-gray-800/80 border border-gray-700 rounded-xl p-5 shadow-lg">
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-400 text-xs font-semibold">منتجات بمخزون صفري</span>
+                      <Warehouse className="w-5 h-5 text-amber-400" />
+                    </div>
+                    <p className="text-3xl font-extrabold text-amber-400 mt-2 font-mono">
+                      {services.filter(s => s.track_stock && (s.stock_quantity ?? 0) <= 0).length}
+                    </p>
+                    <span className="text-xs text-amber-400/80 mt-1 block">تحتاج إعادة شحن للمخزن</span>
+                  </div>
+                </div>
+
+                {/* قسم المنتجات التي تحتاج زيادة مخزون */}
+                <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-6 shadow-lg">
+                  <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-700">
+                    <div className="flex items-center gap-2">
+                      <Warehouse className="w-5 h-5 text-amber-400" />
+                      <h3 className="text-lg font-bold text-white">المنتجات ذات المخزون المنخفض أو الصفري</h3>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => fetchData()}
+                      disabled={isLoading}
+                      className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1.5 transition-colors disabled:opacity-50"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+                      <span>تحديث</span>
+                    </button>
+                  </div>
+
+                  {services.filter(s => s.track_stock && (s.stock_quantity ?? 0) <= 5).length === 0 ? (
+                    <div className="text-center py-6 text-gray-400 text-sm">
+                      ✨ رائع! جميع المنتجات المتبعة لديها رصيد مخزون كافٍ ومريح.
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {services
+                        .filter(s => s.track_stock && (s.stock_quantity ?? 0) <= 5)
+                        .map(service => (
+                          <div
+                            key={service.id}
+                            className="p-4 rounded-xl bg-gray-900/70 border border-gray-700/80 flex flex-col justify-between gap-3 shadow-md hover:border-gray-600 transition-all"
+                          >
+                            <div className="flex items-start gap-3">
+                              {service.image_url ? (
+                                <img
+                                  src={service.image_url}
+                                  alt={service.title}
+                                  className="w-14 h-14 rounded-lg object-cover border border-gray-700 flex-shrink-0"
+                                />
+                              ) : (
+                                <div className="w-14 h-14 rounded-lg bg-gray-800 border border-gray-700 flex items-center justify-center flex-shrink-0 text-gray-500">
+                                  <Package className="w-6 h-6" />
+                                </div>
+                              )}
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-bold text-white text-sm truncate">{service.title}</h4>
+                                <div className="mt-1">
+                                  {(service.stock_quantity ?? 0) <= 0 ? (
+                                    <span className="inline-flex items-center gap-1 text-xs font-bold text-red-400 bg-red-950/60 border border-red-800/60 px-2 py-0.5 rounded-md">
+                                      <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse"></span>
+                                      <span>(0) نفد المخزون</span>
+                                    </span>
+                                  ) : (
+                                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-300 bg-amber-950/60 border border-amber-800/60 px-2 py-0.5 rounded-md">
+                                      <span>متبقي {service.stock_quantity} فقط</span>
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* أزرار زيادة المخزون السريعة */}
+                            <div className="pt-2 border-t border-gray-800">
+                              <span className="text-[11px] text-gray-400 block mb-1.5">إعادة شحن المخزون فوراً:</span>
+                              <div className="flex items-center gap-1.5">
+                                <button
+                                  type="button"
+                                  onClick={() => handleQuickStockUpdate(service.id, (service.stock_quantity ?? 0) + 5)}
+                                  className="flex-1 bg-gray-800 hover:bg-gray-700 text-gray-200 hover:text-white text-xs py-1.5 rounded-lg border border-gray-700 font-mono transition-colors"
+                                  disabled={isLoading}
+                                >
+                                  +5
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleQuickStockUpdate(service.id, (service.stock_quantity ?? 0) + 10)}
+                                  className="flex-1 bg-gray-800 hover:bg-gray-700 text-gray-200 hover:text-white text-xs py-1.5 rounded-lg border border-gray-700 font-mono transition-colors"
+                                  disabled={isLoading}
+                                >
+                                  +10
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleQuickStockUpdate(service.id, (service.stock_quantity ?? 0) + 25)}
+                                  className="flex-1 bg-gray-800 hover:bg-gray-700 text-gray-200 hover:text-white text-xs py-1.5 rounded-lg border border-gray-700 font-mono transition-colors"
+                                  disabled={isLoading}
+                                >
+                                  +25
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleQuickStockUpdate(service.id, (service.stock_quantity ?? 0) + 50)}
+                                  className="flex-1 bg-emerald-700 hover:bg-emerald-600 text-white text-xs py-1.5 rounded-lg font-mono transition-colors"
+                                  disabled={isLoading}
+                                >
+                                  +50
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* سجل الطلبات وتنبيهات التاجر */}
+                <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-6 shadow-lg">
+                  <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-700">
+                    <div className="flex items-center gap-2">
+                      <ShoppingCart className="w-5 h-5 text-blue-400" />
+                      <h3 className="text-lg font-bold text-white">سجل الطلبات الأخير وتنبيهات المخزون</h3>
+                    </div>
+                    {ordersLog.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={handleClearOrders}
+                        disabled={isLoading}
+                        className="text-xs text-red-400 hover:text-red-300 flex items-center gap-1 transition-colors disabled:opacity-50"
+                        title="مسح سجل الطلبات"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>مسح السجل</span>
+                      </button>
+                    )}
+                  </div>
+
+                  {ordersLog.length === 0 ? (
+                    <div className="text-center py-12 text-gray-400">
+                      <ShoppingCart className="w-12 h-12 mx-auto text-gray-600 mb-3" />
+                      <p className="text-base font-semibold text-gray-300">لا توجد طلبات مسجلة بعد</p>
+                      <p className="text-xs text-gray-500 mt-1 max-w-md mx-auto leading-relaxed">
+                        عندما يقوم العميل بإتمام طلب شراء عبر واتساب، سيتم إنقاص المخزون تلقائياً، وتسجيل الطلب هنا، مع تنبيهك فوراً بأي منتجات تم شراؤها بمخزون صفري.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {ordersLog.map((order) => (
+                        <div
+                          key={order.id}
+                          className={`rounded-xl p-5 border transition-all ${
+                            order.has_zero_stock
+                              ? 'bg-red-950/30 border-red-600/60 shadow-red-950/20 shadow-md ring-1 ring-red-500/20'
+                              : 'bg-gray-900/60 border-gray-700 shadow-md'
+                          }`}
+                        >
+                          {/* شريط رأس الطلب */}
+                          <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-gray-700/60 mb-3">
+                            <div className="flex items-center gap-2">
+                              <span className="font-mono font-bold text-sm text-blue-400">#{order.id}</span>
+                              <span className="text-xs text-gray-400">
+                                {new Date(order.created_at).toLocaleString('ar-EG', {
+                                  year: 'numeric',
+                                  month: 'short',
+                                  day: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
+                              </span>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-gray-400">الإجمالي:</span>
+                              <span className="font-bold text-emerald-400 text-base">{order.total} ج</span>
+                            </div>
+                          </div>
+
+                          {/* تنبيه التاجر للمخزون الصفري */}
+                          {order.has_zero_stock && (
+                            <div className="mb-3 p-3 rounded-lg bg-red-900/40 border border-red-500/50 flex items-start gap-2.5 text-xs text-red-200">
+                              <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+                              <div className="leading-relaxed">
+                                <strong className="font-bold text-red-300 block mb-0.5">
+                                  ⚠️ تنبيه للتاجر: تم شراء منتجات في هذا الطلب بمخزون صفري (0 متبقي)!
+                                </strong>
+                                <span>
+                                  العميل أكمل طلبه بنجاح، يرجى تجهيز وتوريد الكميات المطلوبة للعميل فوراً.
+                                </span>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* تفاصيل عناصر الطلب */}
+                          <div className="space-y-1.5">
+                            {order.items.map((item, idx) => (
+                              <div
+                                key={idx}
+                                className="flex items-center justify-between p-2 rounded-lg bg-gray-800/40 border border-gray-700/40 text-xs"
+                              >
+                                <div className="flex items-center gap-2 flex-1 min-w-0">
+                                  <span className="font-semibold text-gray-200 truncate">{item.title}</span>
+                                  {item.size && (
+                                    <span className="text-gray-400 font-mono text-[11px]">({item.size})</span>
+                                  )}
+                                  {item.is_zero_stock && (
+                                    <span className="bg-red-500/20 text-red-300 border border-red-500/40 text-[10px] px-1.5 py-0.2 rounded font-bold">
+                                      مخزون صفري
+                                    </span>
+                                  )}
+                                </div>
+
+                                <div className="flex items-center gap-3 text-gray-300 font-mono">
+                                  <span>{item.quantity} × {item.price} ج</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            
             {activeTab === 'products' && (
               <div className="bg-gray-800/50 border border-gray-700 rounded-lg">
                 <div className="p-6">
@@ -2194,6 +2570,70 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                                   </div>
                                 ))}
                               </div>
+                            </div>
+
+                            {/* نظام إدارة المخزون (اختياري) */}
+                            <div className="bg-gray-800/70 p-4 rounded-xl border border-gray-700">
+                              <div className="flex items-center justify-between gap-3">
+                                <div className="flex items-center gap-2.5">
+                                  <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                    <Warehouse className="w-5 h-5" />
+                                  </div>
+                                  <div>
+                                    <h4 className="text-sm font-bold text-white">إدارة وتتبع المخزون (اختياري)</h4>
+                                    <p className="text-xs text-gray-400">تتبع كمية المخزون المتاحة وإنقاصها تلقائياً مع كل عملية شراء</p>
+                                  </div>
+                                </div>
+                                
+                                {/* زر التبديل التفاعلي Toggle */}
+                                <label className="relative inline-flex items-center cursor-pointer select-none">
+                                  <input
+                                    type="checkbox"
+                                    checked={newService.track_stock}
+                                    onChange={(e) => {
+                                      const checked = e.target.checked;
+                                      setNewService({
+                                        ...newService,
+                                        track_stock: checked,
+                                        stock_quantity: checked ? (newService.stock_quantity ?? 10) : null
+                                      });
+                                    }}
+                                    className="sr-only peer"
+                                    disabled={isLoading}
+                                  />
+                                  <div className="w-12 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-600"></div>
+                                </label>
+                              </div>
+
+                              {newService.track_stock && (
+                                <div className="mt-4 pt-4 border-t border-gray-700/80 space-y-3">
+                                  <div>
+                                    <label className="block text-xs font-semibold text-gray-200 mb-1.5">
+                                      كمية المخزون المتاحة فعلياً <span className="text-red-400">*</span>
+                                    </label>
+                                    <div className="relative">
+                                      <input
+                                        type="number"
+                                        min="0"
+                                        step="1"
+                                        placeholder="مثال: 50"
+                                        value={newService.stock_quantity !== null && newService.stock_quantity !== undefined ? newService.stock_quantity : ''}
+                                        onChange={(e) => {
+                                          const val = e.target.value === '' ? null : Math.max(0, parseInt(e.target.value, 10) || 0);
+                                          setNewService({ ...newService, stock_quantity: val });
+                                        }}
+                                        className="w-full p-3 pl-12 rounded-lg text-white bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-500 font-mono text-base"
+                                        required={newService.track_stock}
+                                        disabled={isLoading}
+                                      />
+                                      <span className="absolute left-3 top-3.5 text-xs text-gray-400 font-semibold">قطعة</span>
+                                    </div>
+                                  </div>
+                                  <div className="bg-amber-950/20 border border-amber-800/30 rounded-lg p-3 text-xs text-amber-300/90 leading-relaxed">
+                                    💡 <strong>سلوك النظام التلقائي:</strong> هذه الكمية تنقص تلقائياً فور إتمام أي طلب شراء. عند وصولها إلى الصفر (0)، سيعرض المتجر للعميل «(0) مخزون متبقي» مع إبقاء زر الطلب نشطاً ومتاحاً، وسيصلك تنبيه فوري بأن هذا الطلب تم بمخزون صفري.
+                                  </div>
+                                </div>
+                              )}
                             </div>
 
                             <div className="pt-2">
@@ -2774,6 +3214,85 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                                     </div>
                                   </div>
 
+                                  {/* نظام إدارة المخزون (اختياري) */}
+                                  <div className="bg-gray-800/70 p-4 rounded-xl border border-gray-700">
+                                    <div className="flex items-center justify-between gap-3">
+                                      <div className="flex items-center gap-2.5">
+                                        <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                          <Warehouse className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                          <h4 className="text-sm font-bold text-white">إدارة وتتبع المخزون (اختياري)</h4>
+                                          <p className="text-xs text-gray-400">تتبع كمية المخزون المتاحة وإنقاصها تلقائياً مع كل عملية شراء</p>
+                                        </div>
+                                      </div>
+                                      
+                                      {/* زر التبديل التفاعلي Toggle */}
+                                      <label className="relative inline-flex items-center cursor-pointer select-none">
+                                        <input
+                                          type="checkbox"
+                                          checked={editServiceData.track_stock}
+                                          onChange={(e) => {
+                                            const checked = e.target.checked;
+                                            setEditServiceData({
+                                              ...editServiceData,
+                                              track_stock: checked,
+                                              stock_quantity: checked ? (editServiceData.stock_quantity ?? 0) : null
+                                            });
+                                          }}
+                                          className="sr-only peer"
+                                          disabled={isLoading}
+                                        />
+                                        <div className="w-12 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-600"></div>
+                                      </label>
+                                    </div>
+
+                                    {editServiceData.track_stock && (
+                                      <div className="mt-4 pt-4 border-t border-gray-700/80 space-y-3">
+                                        <div>
+                                          <label className="block text-xs font-semibold text-gray-200 mb-1.5">
+                                            كمية المخزون المتاحة فعلياً <span className="text-red-400">*</span>
+                                          </label>
+                                          <div className="relative">
+                                            <input
+                                              type="number"
+                                              min="0"
+                                              step="1"
+                                              placeholder="مثال: 50"
+                                              value={editServiceData.stock_quantity !== null && editServiceData.stock_quantity !== undefined ? editServiceData.stock_quantity : ''}
+                                              onChange={(e) => {
+                                                const val = e.target.value === '' ? null : Math.max(0, parseInt(e.target.value, 10) || 0);
+                                                setEditServiceData({ ...editServiceData, stock_quantity: val });
+                                              }}
+                                              className="w-full p-3 pl-12 rounded-lg text-white bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-500 font-mono text-base"
+                                              required={editServiceData.track_stock}
+                                              disabled={isLoading}
+                                            />
+                                            <span className="absolute left-3 top-3.5 text-xs text-gray-400 font-semibold">قطعة</span>
+                                          </div>
+                                        </div>
+
+                                        <div className="flex items-center justify-between bg-gray-900/60 p-3 rounded-lg border border-gray-700/80 text-xs">
+                                          <span className="text-gray-300">حالة المخزون الراهنة:</span>
+                                          {(editServiceData.stock_quantity ?? 0) === 0 ? (
+                                            <span className="text-amber-400 font-bold flex items-center gap-1.5">
+                                              <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                                              <span>(0) مخزون متبقي (متاح للطلب مع تنبيه التاجر)</span>
+                                            </span>
+                                          ) : (
+                                            <span className="text-emerald-400 font-bold">
+                                              متوفر بالمخزن: {editServiceData.stock_quantity} قطعة
+                                            </span>
+                                          )}
+                                        </div>
+
+                                        <div className="bg-amber-950/20 border border-amber-800/30 rounded-lg p-3 text-xs text-amber-300/90 leading-relaxed">
+                                          💡 <strong>تنبيه:</strong> تنقص هذه الكمية تلقائياً مع كل طلب شراء جديد. إذا وصلت الكمية إلى 0، يستمر العميل في القدرة على إتمام الطلب، وسيتم تنبيهك في سجل الطلبات بأن الطلب تم بمخزون صفري.
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+
                                   {/* أزرار الحفظ والإلغاء المباشرة */}
                                   <div className="flex flex-col sm:flex-row gap-3 pt-3 border-t border-gray-700">
                                     <button
@@ -2869,8 +3388,66 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                                 </div>
                               </div>
                               
-                              {/* الأزرار وحالة التوفر */}
+                              {/* الأزرار وحالة التوفر والمخزون */}
                               <div className="flex flex-col gap-2 pt-3 border-t border-gray-800 mt-2">
+                                {/* مؤشر المخزون للمنتج */}
+                                <div className="flex flex-col gap-1.5 p-2 rounded-lg bg-gray-800/80 border border-gray-700/60 text-xs">
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-gray-400 font-medium">المخزون:</span>
+                                    {service.track_stock ? (
+                                      (service.stock_quantity ?? 0) === 0 ? (
+                                        <span className="inline-flex items-center gap-1 font-bold text-amber-400 bg-amber-950/70 border border-amber-800/80 px-2 py-0.5 rounded-full">
+                                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                                          <span>(0) مخزون صفري</span>
+                                        </span>
+                                      ) : (service.stock_quantity ?? 0) <= 5 ? (
+                                        <span className="inline-flex items-center gap-1 font-semibold text-yellow-300 bg-yellow-950/50 border border-yellow-800/60 px-2 py-0.5 rounded-full">
+                                          <span>مخزون منخفض ({service.stock_quantity})</span>
+                                        </span>
+                                      ) : (
+                                        <span className="inline-flex items-center gap-1 font-semibold text-emerald-400 bg-emerald-950/50 border border-emerald-800/60 px-2 py-0.5 rounded-full">
+                                          <span>{service.stock_quantity} قطعة</span>
+                                        </span>
+                                      )
+                                    ) : (
+                                      <span className="text-gray-400 text-[11px] bg-gray-900/60 px-2 py-0.5 rounded">غير مفعّل</span>
+                                    )}
+                                  </div>
+
+                                  {/* أزرار زيادة المخزون السريعة */}
+                                  {service.track_stock && (
+                                    <div className="flex items-center gap-1 pt-1 border-t border-gray-700/40">
+                                      <button
+                                        type="button"
+                                        onClick={() => handleQuickStockUpdate(service.id, (service.stock_quantity ?? 0) + 5)}
+                                        className="flex-1 bg-gray-700 hover:bg-gray-600 text-gray-200 hover:text-white text-[10px] py-1 rounded transition-colors font-mono"
+                                        title="إضافة 5 قطع للمخزون"
+                                        disabled={isLoading}
+                                      >
+                                        +5 قطع
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleQuickStockUpdate(service.id, (service.stock_quantity ?? 0) + 10)}
+                                        className="flex-1 bg-gray-700 hover:bg-gray-600 text-gray-200 hover:text-white text-[10px] py-1 rounded transition-colors font-mono"
+                                        title="إضافة 10 قطع للمخزون"
+                                        disabled={isLoading}
+                                      >
+                                        +10 قطع
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleQuickStockUpdate(service.id, (service.stock_quantity ?? 0) + 50)}
+                                        className="flex-1 bg-gray-700 hover:bg-gray-600 text-gray-200 hover:text-white text-[10px] py-1 rounded transition-colors font-mono"
+                                        title="إضافة 50 قطعة للمخزون"
+                                        disabled={isLoading}
+                                      >
+                                        +50
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+
                                 <div className="flex items-center justify-between">
                                   <span className="text-xs text-gray-400">حالة التوفر:</span>
                                   <div className="relative">

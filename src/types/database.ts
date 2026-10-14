@@ -37,14 +37,41 @@ export interface Service {
   has_weight_pricing?: boolean; // نظام التسعير بالوزن
   price_per_kg?: number | null; // سعر الكيلو
   sale_price_per_kg?: number | null; // سعر الكيلو بعد التخفيض
-  sizes?: ProductSize[]; // Array of product sizes
   is_featured?: boolean; // أحدث العروض
   is_best_seller?: boolean; // الأكثر مبيعاً
+  track_stock?: boolean; // تفعيل تتبع المخزون
+  stock_quantity?: number | null; // كمية المخزون المتاحة فعلياً
   created_at: string;
   category?: Category;
   subcategory?: Subcategory; // إضافة علاقة الفئة الفرعية
   // For search results display
   displayImage?: string;
+}
+
+export interface InventoryItem {
+  track_stock: boolean;
+  stock_quantity: number;
+  updated_at?: string;
+}
+
+export interface OrderItemRecord {
+  productId?: string | number;
+  title: string;
+  quantity: number;
+  price: string;
+  size?: string;
+  track_stock?: boolean;
+  stock_before?: number;
+  is_zero_stock?: boolean;
+}
+
+export interface OrderRecord {
+  id: string;
+  created_at: string;
+  total: string;
+  items: OrderItemRecord[];
+  has_zero_stock: boolean;
+  status?: 'pending' | 'completed' | 'cancelled';
 }
 
 export interface Banner {

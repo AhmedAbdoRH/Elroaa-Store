@@ -135,72 +135,91 @@ const Cart: React.FC = () => {
                 </div>
               ) : (
                 <motion.ul className="space-y-3">
-                  {cartItems.map((item, index) => (
-                    <motion.li
-                      key={item.id}
-                      className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg bg-white hover:shadow-md hover:border-blue-200 transition-all"
-                      variants={itemVariants}
-                      custom={index}
-                      initial="hidden"
-                      animate="visible"
-                      exit="exit"
-                      layout
-                    >
-                      {item.imageUrl && (
-                        <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden border border-gray-200 shadow-sm">
-                          <img
-                            src={item.imageUrl}
-                            alt={item.title}
-                            className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
-                          />
-                        </div>
-                      )}
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-gray-800 text-sm">
-                          {item.title}
-                          {item.size && <span className="text-xs font-normal text-gray-500 ml-1">({item.size})</span>}
-                        </h3>
-                        <p className="text-blue-600 font-bold text-sm mt-1">{item.price} ج</p>
-                        <div className="flex items-center mt-2">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (item.quantity > 1) {
-                                updateQuantity(item.id, item.quantity - 1);
-                              } else {
-                                removeFromCart(item.id);
-                              }
-                            }}
-                            className="p-1 text-gray-500 hover:bg-gray-100 rounded"
-                            aria-label="تقليل الكمية"
-                          >
-                            <Minus className="w-4 h-4" />
-                          </button>
-                          <span className="mx-2 w-6 text-center">{item.quantity}</span>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              updateQuantity(item.id, item.quantity + 1);
-                            }}
-                            className="p-1 text-gray-500 hover:bg-gray-100 rounded"
-                            aria-label="زيادة الكمية"
-                          >
-                            <Plus className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removeFromCart(item.id);
-                        }}
-                        className="text-red-500 hover:text-red-700 p-2"
-                        aria-label="إزالة المنتج"
+                  {cartItems.map((item, index) => {
+                    const isZeroStock = item.track_stock && (item.stock_quantity ?? 0) <= 0;
+                    return (
+                      <motion.li
+                        key={item.id}
+                        className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg bg-white hover:shadow-md hover:border-blue-200 transition-all"
+                        variants={itemVariants}
+                        custom={index}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                        layout
                       >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
-                    </motion.li>
-                  ))}
+                        {item.imageUrl && (
+                          <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden border border-gray-200 shadow-sm">
+                            <img
+                              src={item.imageUrl}
+                              alt={item.title}
+                              className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
+                            />
+                          </div>
+                        )}
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-gray-800 text-sm">
+                            {item.title}
+                            {item.size && <span className="text-xs font-normal text-gray-500 ml-1">({item.size})</span>}
+                          </h3>
+                          <p className="text-blue-600 font-bold text-sm mt-1">{item.price} ج</p>
+                          
+                          {/* مؤشر المخزون للمنتج بالسلة */}
+                          {item.track_stock && (
+                            <div className="mt-1">
+                              {isZeroStock ? (
+                                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded">
+                                  <span>⚠️ (0) مخزون متبقي (طلب مسبق)</span>
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
+                                  <span>المتاح بالمخزن: {item.stock_quantity}</span>
+                                </span>
+                              )}
+                            </div>
+                          )}
+
+                          <div className="flex items-center mt-2">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (item.quantity > 1) {
+                                  updateQuantity(item.id, item.quantity - 1);
+                                } else {
+                                  removeFromCart(item.id);
+                                }
+                              }}
+                              className="p-1 text-gray-500 hover:bg-gray-100 rounded"
+                              aria-label="تقليل الكمية"
+                            >
+                              <Minus className="w-4 h-4" />
+                            </button>
+                            <span className="mx-2 w-6 text-center font-bold text-sm">{item.quantity}</span>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                updateQuantity(item.id, item.quantity + 1);
+                              }}
+                              className="p-1 text-gray-500 hover:bg-gray-100 rounded"
+                              aria-label="زيادة الكمية"
+                            >
+                              <Plus className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeFromCart(item.id);
+                          }}
+                          className="text-red-500 hover:text-red-700 p-2"
+                          aria-label="إزالة المنتج"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      </motion.li>
+                    );
+                  })}
                 </motion.ul>
               )}
             </div>
@@ -212,16 +231,33 @@ const Cart: React.FC = () => {
                   <span className="text-gray-700 font-bold text-lg">المجموع</span>
                   <span className="text-blue-600 font-bold text-2xl">{cartTotal} ج</span>
                 </div>
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-center">
-                  <p className="text-amber-800 text-sm font-medium">
+
+                {/* إشعار المخزون الصفري للعميل مع التأكيد على إتاحة إتمام الطلب */}
+                {cartItems.some(i => i.track_stock && (i.stock_quantity ?? 0) <= 0) && (
+                  <div className="bg-amber-50 border border-amber-300 rounded-lg p-3 text-right">
+                    <p className="text-amber-900 text-xs font-semibold flex items-center gap-1.5 mb-1">
+                      <span>⚠️ يتضمن طلبك منتجاً برصيد (0) مخزون متبقي</span>
+                    </p>
+                    <p className="text-amber-800 text-[11px] leading-relaxed">
+                      الطلب متاح ونشط بشكل كامل! يمكنك إتمام طلبك الآن وسيقوم فريق المتجر بتوفير وتجهيز الكمية المطلوبة فوراً.
+                    </p>
+                  </div>
+                )}
+
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-2.5 text-center">
+                  <p className="text-blue-800 text-xs font-medium">
                     يتم تقدير تكلفة الشحن حسب المنطقة
                   </p>
                 </div>
+
+                {/* زر إتمام الطلب - نشط دائماً حتى عند مخزون 0 حسب الشرط 3 */}
                 <button
+                  type="button"
                   onClick={sendOrderViaWhatsApp}
-                  className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-3 rounded-lg hover:from-green-600 hover:to-green-700 transition-all font-bold shadow-md hover:shadow-lg"
+                  className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-3.5 rounded-xl hover:from-green-600 hover:to-green-700 transition-all font-bold text-base shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
                 >
-                  إتمام الطلب
+                  <ShoppingCart className="w-5 h-5" />
+                  <span>إتمام الطلب عبر واتساب</span>
                 </button>
               </div>
             )}

@@ -1,8 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Sparkles, ShoppingCart, Check } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import type { ProductSize } from '../types/database';
+import { getProductInventory, subscribeToInventory } from '../utils/inventoryManager';
 
 interface ProductCardProps {
   title: string;
@@ -16,9 +17,25 @@ interface ProductCardProps {
   price_per_kg?: number | null;
   sale_price_per_kg?: number | null;
   sizes?: ProductSize[];
+  track_stock?: boolean;
+  stock_quantity?: number | null;
 }
 
-export default function ProductCard({ title, description, imageUrl, price, salePrice, id, has_multiple_sizes, has_weight_pricing, price_per_kg, sale_price_per_kg, sizes }: ProductCardProps) {
+export default function ProductCard({
+  title,
+  description,
+  imageUrl,
+  price,
+  salePrice,
+  id,
+  has_multiple_sizes,
+  has_weight_pricing,
+  price_per_kg,
+  sale_price_per_kg,
+  sizes,
+  track_stock,
+  stock_quantity
+}: ProductCardProps) {
 
   const { addToCart } = useCart();
   const [isAdding, setIsAdding] = useState(false);
@@ -132,6 +149,20 @@ export default function ProductCard({ title, description, imageUrl, price, saleP
     };
   }, [has_multiple_sizes, sizes, price, salePrice, title, has_weight_pricing, price_per_kg, sale_price_per_kg]);
 
+  const [inventoryState, setInventoryState] = useState(() => getProductInventory(id));
+
+  useEffect(() => {
+    setInventoryState(getProductInventory(id));
+    return subscribeToInventory(() => {
+      setInventoryState(getProductInventory(id));
+    });
+  }, [id]);
+
+  const isTrackingStock = track_stock !== undefined ? track_stock : inventoryState.track_stock;
+  const stockQty = isTrackingStock
+    ? (stock_quantity !== undefined && stock_quantity !== null ? stock_quantity : (inventoryState.stock_quantity ?? 0))
+    : null;
+
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -149,12 +180,14 @@ export default function ProductCard({ title, description, imageUrl, price, saleP
     }
 
     addToCart({
-      id,
+      productId: String(id),
       title,
       price: cartPrice.toString(),
       numericPrice: parseFloat(cartPrice.toString()),
       imageUrl,
       size: sizeLabel,
+      track_stock: isTrackingStock,
+      stock_quantity: stockQty
     });
 
     setIsAdded(true);
@@ -166,7 +199,7 @@ export default function ProductCard({ title, description, imageUrl, price, saleP
   };
 
   return (
-    <div className="group relative bg-primary rounded-xl border border-secondary/10 overflow-hidden transition-all duration-150 hover:scale-[1.02] hover:shadow-lg shadow-sm">
+    <div className="group relative bg-primary rounded-xl border border-secondary/10 overflow-hidden transition-all duration-150 hover:scale-[1.02] hover:shadow-lg shadow-sm flex flex-col justify-between">
       <Link to={`/product/${id}`} className="block">
         <div className="relative aspect-[4/3] w-full">
           <img
@@ -180,15 +213,35 @@ export default function ProductCard({ title, description, imageUrl, price, saleP
           />
           <div className="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
         </div>
-        <div className="p-5">
+        <div className="p-5 pb-2">
           <h3 className="text-lg font-bold mb-2 text-secondary flex items-center gap-2">
             {title}
             <Sparkles className={`h-4 w-4 text-accent`} />
           </h3>
           {description && (
-            <p className="text-sm text-secondary/70 line-clamp-2">
+            <p className="text-sm text-secondary/70 line-clamp-2 mb-3">
               {description}
             </p>
+          )}
+
+          {/* مؤشر المخزون المتاح للعميل بوضوح */}
+          {isTrackingStock && (
+            <div className="mb-2">
+              {stockQty === 0 ? (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-amber-500/15 text-amber-700 border border-amber-500/30">
+                  <span className="w-2 h-2 rounded-full bg-amber-600 animate-pulse"></span>
+                  <span>(0) مخزون متبقي</span>
+                </span>
+              ) : stockQty && stockQty <= 5 ? (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-amber-500/10 text-amber-800 border border-amber-500/20">
+                  <span>متبقي {stockQty} فقط</span>
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-500/10 text-emerald-800 border border-emerald-500/20">
+                  <span>المخزون: {stockQty} قطعة</span>
+                </span>
+              )}
+            </div>
           )}
         </div>
       </Link>
