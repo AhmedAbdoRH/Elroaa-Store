@@ -179,7 +179,7 @@ export default function Testimonials() {
           <div className="flex justify-center items-center mt-8 space-x-4 rtl:space-x-reverse">
             <button
               onClick={prevTestimonial}
-              className="bg-[#4B5E26]/15 hover:bg-[#4B5E26] text-[#3B4B1B] hover:text-[#f5f6db] p-3 rounded-full transition-all duration-200 focus:outline-none disabled:opacity-50"
+              className="bg-[#3A4522]/15 hover:bg-[#2B3318] text-[#2B3318] hover:text-[#F7F3E9] border border-[#D1A94F]/30 p-3 rounded-full transition-all duration-200 focus:outline-none disabled:opacity-50"
               aria-label="التعليق السابق"
               disabled={isAnimating}
             >
@@ -194,7 +194,7 @@ export default function Testimonials() {
                   onClick={() => goToTestimonial(index)}
                   disabled={isAnimating}
                   className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                    index === currentIndex ? 'bg-[#4B5E26] w-6' : 'bg-[#4B5E26]/30 hover:bg-[#4B5E26]/50'
+                    index === currentIndex ? 'bg-[#D1A94F] w-6' : 'bg-[#3A4522]/30 hover:bg-[#3A4522]/55'
                   } disabled:opacity-50`}
                   aria-label={`انتقل إلى التعليق ${index + 1}`}
                 />
@@ -203,7 +203,7 @@ export default function Testimonials() {
 
             <button
               onClick={nextTestimonial}
-              className="bg-[#4B5E26]/15 hover:bg-[#4B5E26] text-[#3B4B1B] hover:text-[#f5f6db] p-3 rounded-full transition-all duration-200 focus:outline-none disabled:opacity-50"
+              className="bg-[#3A4522]/15 hover:bg-[#2B3318] text-[#2B3318] hover:text-[#F7F3E9] border border-[#D1A94F]/30 p-3 rounded-full transition-all duration-200 focus:outline-none disabled:opacity-50"
               aria-label="التعليق التالي"
               disabled={isAnimating}
             >

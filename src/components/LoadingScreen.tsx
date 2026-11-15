@@ -75,7 +75,7 @@ export default function LoadingScreen({
       }`}
       style={{ 
         transitionDuration: `${FADE_OUT_DURATION_MS}ms`,
-        backgroundColor: '#2a2a2a'
+        backgroundColor: '#2B3318'
       }}
     >
       {/* Only render logo or custom loader once image loading status is determined */}
@@ -123,11 +123,11 @@ export default function LoadingScreen({
         @keyframes pulse-glow {
           0%, 100% {
             transform: scale(1); /* Maintain scale from fade-in-scale-up */
-            filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.4));
+            filter: drop-shadow(0 0 6px rgba(209, 169, 79, 0.45));
           }
           50% {
             transform: scale(1.04); /* Pulse effect */
-            filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.7));
+            filter: drop-shadow(0 0 18px rgba(227, 199, 120, 0.75));
           }
         }
 
@@ -158,7 +158,7 @@ export default function LoadingScreen({
         .custom-loader div {
           box-sizing: border-box; /* Ensure border doesn't add to size */
           position: absolute;
-          border: 4px solid #FFFFFF; /* Loader color set to white */
+          border: 4px solid #E3C778; /* Gold loader color */
           border-radius: 50%;
           animation: loader8435 1s ease-out infinite;
         }

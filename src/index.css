@@ -5,17 +5,18 @@
 @tailwind utilities;
 
 :root {
-  --color-primary: #f5f6db;
-  /* لون الخلفية الكريمي الحالي */
-  --color-secondary: #4f170c;
-  /* لون الكتابة الرئيسي */
-  --color-accent: #4B5E26;
-  /* اللون الزيتي الأساسي للهيدر والأزرار */
-  --color-olive: #4B5E26;
-  --color-olive-dark: #3B4B1B;
-  --color-accent-light: #f5f6db;
-  /* لون فرعي */
-  --background-color: #f5f6db;
+  --color-primary: #F7F3E9;
+  /* خلفية كريمية */
+  --color-secondary: #2B3318;
+  /* الأخضر الزيتوني الأساسي */
+  --color-accent: #2B3318;
+  --color-olive: #2B3318;
+  --color-olive-secondary: #3A4522;
+  --color-gold: #D1A94F;
+  --color-gold-light: #E3C778;
+  --color-sale: #B12704;
+  --color-accent-light: #F7F3E9;
+  --background-color: #F7F3E9;
   --background-gradient: none;
   --font-family: 'Cairo', sans-serif;
 }
@@ -27,8 +28,8 @@ html {
 
 body {
   font-family: var(--font-family, 'Cairo', sans-serif);
-  background-color: var(--background-color, #f5f6db);
-  color: var(--color-secondary, #4f170c);
+  background-color: var(--background-color, #F7F3E9);
+  color: var(--color-secondary, #2B3318);
   /* دعم التدرج اللوني للخلفية بدون اهتزاز أثناء التمرير */
   background-image: var(--background-gradient, none);
   background-size: cover;

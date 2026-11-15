@@ -107,7 +107,7 @@ export default function SubcategoryProducts() {
         <div className="text-xl text-secondary">{error || 'القسم الفرعي غير موجود'}</div>
         <Link
           to="/"
-          className="bg-[#4B5E26] hover:bg-[#3B4B1B] text-[#f5f6db] px-6 py-2 rounded-lg transition-colors font-semibold"
+          className="bg-[#E3C778] hover:bg-[#D1A94F] text-[#2B3318] px-6 py-2 rounded-lg transition-colors font-bold"
         >
           العودة للرئيسية
         </Link>
@@ -147,10 +147,10 @@ export default function SubcategoryProducts() {
           <span className="text-accent">{subcategory.name}</span>
         </div>
 
-        <div className="bg-[#4B5E26]/[0.04] rounded-2xl p-8 border border-[#4B5E26]/15 shadow-lg">
-          <h1 className="text-3xl font-bold mb-12 text-[#4B5E26]">{subcategory.name}</h1>
+        <div className="bg-[#2B3318]/[0.04] rounded-2xl p-8 border border-[#D1A94F]/25 shadow-lg">
+          <h1 className="text-3xl font-bold mb-12 text-[#2B3318]">{subcategory.name}</h1>
           {subcategory.description && (
-            <p className="text-secondary/70 mb-8">{subcategory.description}</p>
+            <p className="text-[#3A4522]/80 mb-8">{subcategory.description}</p>
           )}
 
           {services.length === 0 ? (

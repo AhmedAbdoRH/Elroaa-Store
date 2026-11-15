@@ -89,29 +89,29 @@ function CategorySvgVector({ iconKey }: { iconKey: CategoryIconKey }) {
     case 'herbs':
       return (
         <svg viewBox="0 0 48 48" className="w-full h-full" fill="none" aria-hidden="true">
-          <path d="M24 39V20" stroke="#3B4B1B" strokeWidth="2.8" strokeLinecap="round" />
+          <path d="M24 39V20" stroke="#2B3318" strokeWidth="2.8" strokeLinecap="round" />
           <path
             d="M24 27C15 27 10 20 11 11C19 11 25 16 24 27Z"
             fill="#65A30D"
-            stroke="#3B4B1B"
+            stroke="#2B3318"
             strokeWidth="2"
             strokeLinejoin="round"
           />
           <path
             d="M24 22C33 22 38 15 37 7C29 7 23 12 24 22Z"
-            fill="#4D7C0F"
-            stroke="#3B4B1B"
+            fill="#3A4522"
+            stroke="#2B3318"
             strokeWidth="2"
             strokeLinejoin="round"
           />
           <path
             d="M24 34C18 34 14 30 14 25C19 25 24 28 24 34Z"
             fill="#84CC16"
-            stroke="#3B4B1B"
+            stroke="#2B3318"
             strokeWidth="1.8"
             strokeLinejoin="round"
           />
-          <ellipse cx="24" cy="40" rx="10" ry="2.5" fill="#4B5E26" fillOpacity="0.22" />
+          <ellipse cx="24" cy="40" rx="10" ry="2.5" fill="#3A4522" fillOpacity="0.22" />
         </svg>
       );
 
@@ -175,11 +175,11 @@ function CategorySvgVector({ iconKey }: { iconKey: CategoryIconKey }) {
           />
           <path
             d="M24 22C24 22 29 27 29 31C29 33.8 26.8 36 24 36C21.2 36 19 33.8 19 31C19 27 24 22 24 22Z"
-            fill="#FEF08A"
-            stroke="#CA8A04"
+            fill="#E3C778"
+            stroke="#D1A94F"
             strokeWidth="1.5"
           />
-          <path d="M13 16C10 14 9 11 11 9C14 9 15 12 13 16Z" fill="#65A30D" stroke="#3B4B1B" strokeWidth="1.5" />
+          <path d="M13 16C10 14 9 11 11 9C14 9 15 12 13 16Z" fill="#65A30D" stroke="#2B3318" strokeWidth="1.5" />
         </svg>
       );
 
@@ -203,12 +203,12 @@ function CategorySvgVector({ iconKey }: { iconKey: CategoryIconKey }) {
     case 'therapy':
       return (
         <svg viewBox="0 0 48 48" className="w-full h-full" fill="none" aria-hidden="true">
-          <circle cx="24" cy="25" r="14" fill="#ECFCCB" stroke="#4B5E26" strokeWidth="2.2" />
-          <path d="M24 17V33M16 25H32" stroke="#4B5E26" strokeWidth="4.5" strokeLinecap="round" />
+          <circle cx="24" cy="25" r="14" fill="#F7F3E9" stroke="#2B3318" strokeWidth="2.2" />
+          <path d="M24 17V33M16 25H32" stroke="#2B3318" strokeWidth="4.5" strokeLinecap="round" />
           <path
             d="M32 10C37 10 40 13 39 18C34 18 31 15 32 10Z"
             fill="#65A30D"
-            stroke="#3B4B1B"
+            stroke="#2B3318"
             strokeWidth="1.8"
           />
         </svg>
@@ -334,17 +334,17 @@ function CategorySvgVector({ iconKey }: { iconKey: CategoryIconKey }) {
     default:
       return (
         <svg viewBox="0 0 48 48" className="w-full h-full" fill="none" aria-hidden="true">
-          <circle cx="24" cy="24" r="15" fill="#ECFCCB" stroke="#4B5E26" strokeWidth="2.2" />
+          <circle cx="24" cy="24" r="15" fill="#F7F3E9" stroke="#2B3318" strokeWidth="2.2" />
           <path
             d="M24 33C17 33 14 27 16 19C22 19 26 24 24 33Z"
             fill="#65A30D"
-            stroke="#3B4B1B"
+            stroke="#2B3318"
             strokeWidth="1.8"
           />
           <path
             d="M24 30C31 30 34 24 32 16C26 16 22 21 24 30Z"
-            fill="#4B5E26"
-            stroke="#2E3B16"
+            fill="#3A4522"
+            stroke="#2B3318"
             strokeWidth="1.8"
           />
         </svg>
@@ -387,8 +387,8 @@ export default function CategoryVisual({
       <div
         className={`${sizeClasses} overflow-hidden flex-shrink-0 border shadow-sm transition-colors ${
           isActive
-            ? 'bg-[#f5f6db] border-[#f5f6db]/80'
-            : 'bg-[#f5f6db] border-[#4B5E26]/20'
+            ? 'bg-[#F7F3E9] border-[#D1A94F]'
+            : 'bg-[#F7F3E9] border-[#3A4522]/20'
         }`}
       >
         <img
@@ -405,8 +405,8 @@ export default function CategoryVisual({
     <div
       className={`${sizeClasses} p-1.5 flex items-center justify-center flex-shrink-0 border shadow-sm transition-colors ${
         isActive
-          ? 'bg-[#f5f6db] border-[#f5f6db]/80'
-          : 'bg-[#f5f6db]/90 border-[#4B5E26]/20'
+          ? 'bg-[#F7F3E9] border-[#D1A94F]'
+          : 'bg-[#F7F3E9] border-[#3A4522]/20'
       }`}
     >
       <CategorySvgVector iconKey={iconKey} />

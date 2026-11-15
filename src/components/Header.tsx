@@ -271,11 +271,11 @@ export default function Header({ storeSettings }: HeaderProps) {
     if (!isListening && !voiceNotice && !hasEnoughQuery) return null;
 
     return (
-      <div className="mt-2 w-full bg-[#f5f6db] rounded-xl shadow-xl border border-[#4B5E26]/25 overflow-hidden z-50">
+      <div className="mt-2 w-full bg-[#F7F3E9] rounded-xl shadow-xl border border-[#D1A94F]/45 overflow-hidden z-50">
         {isListening && (
-          <div className="flex items-center justify-between gap-2 px-4 py-2.5 bg-[#4B5E26]/10 border-b border-[#4B5E26]/15 text-xs font-semibold text-[#3B4B1B]">
+          <div className="flex items-center justify-between gap-2 px-4 py-2.5 bg-[#E3C778]/35 border-b border-[#D1A94F]/30 text-xs font-semibold text-[#2B3318]">
             <div className="flex items-center gap-2">
-              <span className="inline-flex h-2.5 w-2.5 rounded-full bg-red-500 animate-ping" />
+              <span className="inline-flex h-2.5 w-2.5 rounded-full bg-[#B12704] animate-ping" />
               <span>
                 {voiceTranscript
                   ? `تم التقاط: "${voiceTranscript}"`
@@ -285,7 +285,7 @@ export default function Header({ storeSettings }: HeaderProps) {
             <button
               type="button"
               onClick={stopVoiceSearch}
-              className="text-red-700 hover:text-red-900 font-bold whitespace-nowrap"
+              className="text-[#B12704] hover:opacity-80 font-bold whitespace-nowrap"
             >
               إيقاف
             </button>
@@ -293,12 +293,12 @@ export default function Header({ storeSettings }: HeaderProps) {
         )}
 
         {voiceNotice && !isListening && (
-          <div className="flex items-center justify-between gap-2 px-4 py-2.5 bg-amber-500/15 border-b border-amber-500/25 text-xs font-semibold text-amber-900">
+          <div className="flex items-center justify-between gap-2 px-4 py-2.5 bg-[#E3C778]/35 border-b border-[#D1A94F]/40 text-xs font-semibold text-[#2B3318]">
             <span>{voiceNotice}</span>
             <button
               type="button"
               onClick={() => setVoiceNotice(null)}
-              className="text-amber-800 hover:text-amber-950 font-bold"
+              className="text-[#B12704] font-bold"
               aria-label="إغلاق التنبيه"
             >
               ✕
@@ -307,15 +307,15 @@ export default function Header({ storeSettings }: HeaderProps) {
         )}
 
         {searchResults.length > 0 ? (
-          <div className="max-h-72 overflow-y-auto divide-y divide-[#4B5E26]/10">
+          <div className="max-h-72 overflow-y-auto divide-y divide-[#3A4522]/10">
             {searchResults.map((product) => (
               <Link
                 key={product.id}
                 to={`/product/${product.id}`}
-                className="flex items-center p-3 hover:bg-[#4B5E26]/10 transition-colors"
+                className="flex items-center p-3 hover:bg-[#E3C778]/25 transition-colors"
                 onClick={clearSearch}
               >
-                <div className="w-12 h-12 rounded-lg bg-[#4B5E26]/10 overflow-hidden flex-shrink-0 border border-[#4B5E26]/15">
+                <div className="w-12 h-12 rounded-lg bg-[#2B3318]/10 overflow-hidden flex-shrink-0 border border-[#D1A94F]/30">
                   <img
                     src={product.displayImage || '/favicon.png'}
                     alt={product.title}
@@ -329,14 +329,14 @@ export default function Header({ storeSettings }: HeaderProps) {
                   />
                 </div>
                 <div className="flex-1 text-right pr-3 min-w-0">
-                  <h4 className="text-[#2E3B16] font-semibold text-sm truncate">{product.title}</h4>
-                  <p className="text-xs text-[#4B5E26] font-medium">{product.category?.name}</p>
+                  <h4 className="text-[#2B3318] font-semibold text-sm truncate">{product.title}</h4>
+                  <p className="text-xs text-[#3A4522] font-medium">{product.category?.name}</p>
                 </div>
               </Link>
             ))}
           </div>
         ) : hasEnoughQuery ? (
-          <div className="p-4 text-center text-sm text-[#3B4B1B]/75">
+          <div className="p-4 text-center text-sm text-[#3A4522]/80">
             لا توجد نتائج للبحث عن "{searchQuery}"
           </div>
         ) : null}
@@ -347,7 +347,7 @@ export default function Header({ storeSettings }: HeaderProps) {
   return (
     <>
       <header
-        className="fixed top-0 inset-x-0 z-50 bg-[#4B5E26] text-[#f5f6db] border-b border-[#3B4B1B] shadow-md"
+        className="fixed top-0 inset-x-0 z-50 bg-[#2B3318] text-[#F7F3E9] border-b border-[#D1A94F]/35 shadow-md"
         style={{
           transform: 'translate3d(0, 0, 0)',
           backfaceVisibility: 'hidden',
@@ -359,7 +359,7 @@ export default function Header({ storeSettings }: HeaderProps) {
           <div className="flex items-center gap-3 shrink-0">
             <button
               type="button"
-              className="md:hidden text-[#f5f6db] hover:bg-[#3B4B1B] p-2 rounded-lg transition-colors mobile-menu-button"
+              className="md:hidden text-[#F7F3E9] hover:bg-[#3A4522] p-2 rounded-lg transition-colors mobile-menu-button"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-label="القائمة"
             >
@@ -372,15 +372,15 @@ export default function Header({ storeSettings }: HeaderProps) {
                 alt={storeSettings?.store_name || 'شركة الرؤى للتجارة والتوريدات والعطارة'}
                 width={56}
                 height={56}
-                className="h-10 w-10 md:h-14 md:w-14 rounded-full object-cover bg-[#f5f6db] p-0.5 shadow-sm flex-shrink-0"
+                className="h-10 w-10 md:h-14 md:w-14 rounded-full object-cover bg-[#F7F3E9] p-0.5 ring-1 ring-[#D1A94F]/60 shadow-sm flex-shrink-0"
                 onError={() => {
                   if (logoSrc !== '/favicon.png') {
                     setLogoSrc('/favicon.png');
                   }
                 }}
               />
-              <span className="font-bold text-base md:text-lg text-[#f5f6db] whitespace-nowrap">
-                متجر الرؤى
+              <span className="font-bold text-base md:text-lg text-[#F7F3E9] whitespace-nowrap">
+                متجر <span className="text-[#E3C778]">الرؤى</span>
               </span>
             </Link>
           </div>
@@ -395,13 +395,13 @@ export default function Header({ storeSettings }: HeaderProps) {
                 onChange={(e) => handleSearch(e.target.value)}
                 onFocus={() => setIsSearchFocused(true)}
                 placeholder="ابحث عن منتج بالكتابة أو بالصوت..."
-                className="w-full bg-[#f5f6db] text-[#2E3B16] placeholder-[#4B5E26]/70 rounded-full py-2.5 pr-9 pl-24 text-sm font-medium border border-[#3B4B1B]/30 focus:outline-none focus:ring-2 focus:ring-[#e6ebd4] shadow-inner"
+                className="w-full bg-[#F7F3E9] text-[#2B3318] placeholder-[#3A4522]/70 rounded-full py-2.5 pr-9 pl-24 text-sm font-medium border border-[#D1A94F]/50 focus:outline-none focus:ring-2 focus:ring-[#E3C778] shadow-inner"
               />
               {searchQuery && (
                 <button
                   type="button"
                   onClick={clearSearch}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#4B5E26]/70 hover:text-[#2E3B16] p-1"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#3A4522]/70 hover:text-[#2B3318] p-1"
                   aria-label="مسح البحث"
                 >
                   <X className="h-4 w-4" />
@@ -418,13 +418,13 @@ export default function Header({ storeSettings }: HeaderProps) {
                   title={isListening ? 'جاري الاستماع... اضغط للإيقاف' : 'اضغط للبحث الصوتي بالمايكروفون'}
                   className={`p-1.5 rounded-full transition-all flex items-center justify-center ${
                     isListening
-                      ? 'bg-red-600 text-white shadow-sm ring-2 ring-red-300 animate-pulse'
-                      : 'bg-[#4B5E26]/12 text-[#3B4B1B] hover:bg-[#4B5E26] hover:text-[#f5f6db]'
+                      ? 'bg-[#B12704] text-white shadow-sm ring-2 ring-[#E3C778] animate-pulse'
+                      : 'bg-[#E3C778]/50 text-[#2B3318] hover:bg-[#D1A94F] hover:text-[#2B3318]'
                   }`}
                 >
                   {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
                 </button>
-                <span className="h-4 w-px bg-[#4B5E26]/20" aria-hidden="true" />
+                <span className="h-4 w-px bg-[#3A4522]/25" aria-hidden="true" />
                 <button
                   type="button"
                   onClick={() => {
@@ -434,7 +434,7 @@ export default function Header({ storeSettings }: HeaderProps) {
                       handleSearch(searchQuery);
                     }
                   }}
-                  className="p-1.5 rounded-full text-[#4B5E26] hover:bg-[#4B5E26]/10 transition-colors"
+                  className="p-1.5 rounded-full text-[#2B3318] hover:bg-[#E3C778]/40 transition-colors"
                   aria-label="بحث"
                 >
                   <Search className="h-4 w-4" />
@@ -454,7 +454,7 @@ export default function Header({ storeSettings }: HeaderProps) {
                 <li>
                   <Link
                     to="/"
-                    className="text-[#f5f6db] hover:text-white hover:bg-[#3B4B1B]/70 px-3 py-2 rounded-lg transition-colors whitespace-nowrap shrink-0"
+                    className="text-[#F7F3E9] hover:text-[#E3C778] hover:bg-[#3A4522] px-3 py-2 rounded-lg transition-colors whitespace-nowrap shrink-0"
                   >
                     الرئيسية
                   </Link>
@@ -462,18 +462,18 @@ export default function Header({ storeSettings }: HeaderProps) {
                 <li className="relative group">
                   <button
                     type="button"
-                    className="text-[#f5f6db] hover:text-white hover:bg-[#3B4B1B]/70 px-3 py-2 rounded-lg transition-colors flex items-center gap-1 whitespace-nowrap shrink-0"
+                    className="text-[#F7F3E9] hover:text-[#E3C778] hover:bg-[#3A4522] px-3 py-2 rounded-lg transition-colors flex items-center gap-1 whitespace-nowrap shrink-0"
                   >
                     <span>الأقسام</span>
                     <ChevronDown className="h-4 w-4" />
                   </button>
                   <div className="absolute top-full right-0 pt-2 w-64 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-150">
-                    <div className="bg-[#f5f6db] rounded-xl shadow-xl border border-[#4B5E26]/25 p-2 max-h-96 overflow-y-auto">
+                    <div className="bg-[#F7F3E9] rounded-xl shadow-xl border border-[#D1A94F]/40 p-2 max-h-96 overflow-y-auto">
                       {categories.map(cat => (
                         <Link
                           key={cat.id}
                           to={`/category/${cat.id}`}
-                          className="block px-3 py-2 rounded-lg text-[#2E3B16] hover:bg-[#4B5E26] hover:text-[#f5f6db] font-medium text-sm transition-colors"
+                          className="block px-3 py-2 rounded-lg text-[#2B3318] hover:bg-[#2B3318] hover:text-[#F7F3E9] font-medium text-sm transition-colors"
                         >
                           {cat.name}
                         </Link>
@@ -484,7 +484,7 @@ export default function Header({ storeSettings }: HeaderProps) {
                 <li>
                   <a
                     href="#contact"
-                    className="text-[#f5f6db] hover:text-white hover:bg-[#3B4B1B]/70 px-3 py-2 rounded-lg transition-colors whitespace-nowrap shrink-0"
+                    className="text-[#F7F3E9] hover:text-[#E3C778] hover:bg-[#3A4522] px-3 py-2 rounded-lg transition-colors whitespace-nowrap shrink-0"
                   >
                     تواصل معنا
                   </a>
@@ -495,12 +495,12 @@ export default function Header({ storeSettings }: HeaderProps) {
             <button
               type="button"
               onClick={() => toggleCart(!isCartOpen)}
-              className="relative p-2 md:p-2.5 rounded-xl bg-[#3B4B1B] hover:bg-[#2E3B16] text-[#f5f6db] transition-colors flex items-center gap-2 shrink-0"
+              className="relative p-2 md:p-2.5 rounded-xl bg-[#3A4522] hover:bg-[#D1A94F] text-[#F7F3E9] hover:text-[#2B3318] border border-[#D1A94F]/35 transition-colors flex items-center gap-2 shrink-0"
               aria-label="سلة التسوق"
             >
               <ShoppingCart className="h-5 w-5" />
               {itemCount > 0 && (
-                <span className="bg-[#f5f6db] text-[#3B4B1B] text-[11px] font-extrabold rounded-full min-w-[20px] h-5 px-1 flex items-center justify-center tabular-nums">
+                <span className="bg-[#E3C778] text-[#2B3318] text-[11px] font-extrabold rounded-full min-w-[20px] h-5 px-1 flex items-center justify-center tabular-nums">
                   {itemCount}
                 </span>
               )}
@@ -510,7 +510,7 @@ export default function Header({ storeSettings }: HeaderProps) {
 
         {/* Always-Visible Mobile Search Bar Row */}
         <div
-          className="md:hidden bg-[#4B5E26] px-3 pb-2.5 pt-0.5 relative"
+          className="md:hidden bg-[#2B3318] px-3 pb-2.5 pt-0.5 relative"
           ref={mobileSearchRef}
         >
           <div className="relative flex items-center">
@@ -521,13 +521,13 @@ export default function Header({ storeSettings }: HeaderProps) {
               onChange={(e) => handleSearch(e.target.value)}
               onFocus={() => setIsSearchFocused(true)}
               placeholder="ابحث عن منتج بالكتابة أو بالصوت..."
-              className="w-full bg-[#f5f6db] text-[#2E3B16] placeholder-[#4B5E26]/70 rounded-full py-2 pr-9 pl-24 text-sm font-medium border border-[#3B4B1B]/30 focus:outline-none focus:ring-2 focus:ring-[#e6ebd4] shadow-inner"
+              className="w-full bg-[#F7F3E9] text-[#2B3318] placeholder-[#3A4522]/70 rounded-full py-2 pr-9 pl-24 text-sm font-medium border border-[#D1A94F]/50 focus:outline-none focus:ring-2 focus:ring-[#E3C778] shadow-inner"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={clearSearch}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#4B5E26]/70 hover:text-[#2E3B16] p-1"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#3A4522]/70 hover:text-[#2B3318] p-1"
                 aria-label="مسح البحث"
               >
                 <X className="h-4 w-4" />
@@ -543,13 +543,13 @@ export default function Header({ storeSettings }: HeaderProps) {
                 title={isListening ? 'جاري الاستماع... اضغط للإيقاف' : 'البحث الصوتي بالمايكروفون'}
                 className={`p-1.5 rounded-full transition-all flex items-center justify-center ${
                   isListening
-                    ? 'bg-red-600 text-white ring-2 ring-red-300 animate-pulse'
-                    : 'bg-[#4B5E26]/12 text-[#3B4B1B] hover:bg-[#4B5E26] hover:text-[#f5f6db]'
+                    ? 'bg-[#B12704] text-white ring-2 ring-[#E3C778] animate-pulse'
+                    : 'bg-[#E3C778]/50 text-[#2B3318] hover:bg-[#D1A94F]'
                 }`}
               >
                 {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
               </button>
-              <span className="h-4 w-px bg-[#4B5E26]/20" aria-hidden="true" />
+              <span className="h-4 w-px bg-[#3A4522]/25" aria-hidden="true" />
               <button
                 type="button"
                 onClick={() => {
@@ -559,7 +559,7 @@ export default function Header({ storeSettings }: HeaderProps) {
                     handleSearch(searchQuery);
                   }
                 }}
-                className="p-1.5 rounded-full text-[#4B5E26] hover:bg-[#4B5E26]/10 transition-colors"
+                className="p-1.5 rounded-full text-[#2B3318] hover:bg-[#E3C778]/40 transition-colors"
                 aria-label="بحث"
               >
                 <Search className="h-4 w-4" />
@@ -581,13 +581,13 @@ export default function Header({ storeSettings }: HeaderProps) {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="fixed inset-y-0 right-0 w-72 bg-[#4B5E26] text-[#f5f6db] z-[60] shadow-2xl md:hidden flex flex-col pt-16 border-l border-[#3B4B1B]"
+            className="fixed inset-y-0 right-0 w-72 bg-[#2B3318] text-[#F7F3E9] z-[60] shadow-2xl md:hidden flex flex-col pt-16 border-l border-[#3A4522]"
             ref={menuRef}
           >
             <button
               type="button"
               onClick={() => setIsMenuOpen(false)}
-              className="absolute top-4 left-4 p-2 rounded-lg text-[#f5f6db] hover:bg-[#3B4B1B]"
+              className="absolute top-4 left-4 p-2 rounded-lg text-[#F7F3E9] hover:bg-[#3A4522]"
               aria-label="إغلاق القائمة"
             >
               <X className="h-6 w-6" />
@@ -595,28 +595,28 @@ export default function Header({ storeSettings }: HeaderProps) {
             <nav className="p-4 space-y-3 overflow-y-auto">
               <Link
                 to="/"
-                className="block px-3 py-2 rounded-lg text-[#f5f6db] hover:bg-[#3B4B1B] font-bold text-lg"
+                className="block px-3 py-2 rounded-lg text-[#F7F3E9] hover:bg-[#3A4522] font-bold text-lg"
                 onClick={() => setIsMenuOpen(false)}
               >
                 الرئيسية
               </Link>
-              <div className="space-y-1.5 pt-2 border-t border-[#f5f6db]/15">
-                <span className="block px-3 text-[#f5f6db]/75 text-xs font-semibold">الأقسام</span>
+              <div className="space-y-1.5 pt-2 border-t border-[#D1A94F]/25">
+                <span className="block px-3 text-[#E3C778] text-xs font-semibold">الأقسام</span>
                 {categories.map(cat => (
                   <Link
                     key={cat.id}
                     to={`/category/${cat.id}`}
-                    className="block px-4 py-2 rounded-lg text-[#f5f6db] hover:bg-[#3B4B1B] text-sm font-medium"
+                    className="block px-4 py-2 rounded-lg text-[#F7F3E9] hover:bg-[#3A4522] text-sm font-medium"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     {cat.name}
                   </Link>
                 ))}
               </div>
-              <div className="pt-2 border-t border-[#f5f6db]/15">
+              <div className="pt-2 border-t border-[#D1A94F]/25">
                 <a
                   href="#contact"
-                  className="block px-3 py-2 rounded-lg text-[#f5f6db] hover:bg-[#3B4B1B] font-bold text-lg"
+                  className="block px-3 py-2 rounded-lg text-[#F7F3E9] hover:bg-[#3A4522] font-bold text-lg"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   تواصل معنا

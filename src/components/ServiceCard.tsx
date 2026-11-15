@@ -199,9 +199,9 @@ export default function ProductCard({
   };
 
   return (
-    <div className="group relative bg-primary rounded-xl border border-[#4B5E26]/15 hover:border-[#4B5E26]/40 overflow-hidden transition-all duration-150 hover:scale-[1.02] hover:shadow-lg shadow-sm flex flex-col justify-between">
+    <div className="group relative bg-[#F7F3E9] rounded-xl border border-[#3A4522]/15 hover:border-[#D1A94F] overflow-hidden transition-all duration-150 hover:scale-[1.02] hover:shadow-lg shadow-sm flex flex-col justify-between">
       <Link to={`/product/${id}`} className="block">
-        <div className="relative aspect-[4/3] w-full bg-[#4B5E26]/5">
+        <div className="relative aspect-[4/3] w-full bg-[#2B3318]/5">
           <img
             src={imageUrl || '/favicon.png'}
             alt={title}
@@ -213,15 +213,15 @@ export default function ProductCard({
               }
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#F7F3E9]/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
         </div>
         <div className="p-3.5 sm:p-5 pb-2">
-          <h3 className="text-sm md:text-base font-bold mb-1.5 text-secondary flex items-start gap-1.5 leading-snug">
+          <h3 className="text-sm md:text-base font-bold mb-1.5 text-[#2B3318] flex items-start gap-1.5 leading-snug">
             <span className="line-clamp-2 flex-1">{title}</span>
-            <Sparkles className="h-3.5 w-3.5 text-accent shrink-0 mt-0.5" />
+            <Sparkles className="h-3.5 w-3.5 text-[#D1A94F] shrink-0 mt-0.5" />
           </h3>
           {description && (
-            <p className="text-xs sm:text-sm text-secondary/70 line-clamp-2 mb-2.5">
+            <p className="text-xs sm:text-sm text-[#3A4522]/80 line-clamp-2 mb-2.5">
               {description}
             </p>
           )}
@@ -255,62 +255,62 @@ export default function ProductCard({
               <>
                 <div className="flex flex-col items-end">
                   <div className="flex items-center gap-1">
-                    <span className="font-bold text-base sm:text-lg text-accent">
+                    <span className={`font-bold text-base sm:text-lg ${displaySalePrice ? 'text-[#B12704]' : 'text-[#2B3318]'}`}>
                       {((displaySalePrice || displayPrice || 0) / 10).toFixed(1)}
                     </span>
-                    <span className="font-bold text-base sm:text-lg text-accent">ج</span>
+                    <span className={`font-bold text-base sm:text-lg ${displaySalePrice ? 'text-[#B12704]' : 'text-[#2B3318]'}`}>ج</span>
                   </div>
-                  <span className="text-xs text-secondary/40">/100 جرام</span>
+                  <span className="text-xs text-[#3A4522]/55">/100 جرام</span>
                 </div>
                 {displaySalePrice && displayPrice && (
                   <div className="flex flex-col items-end">
                     <div className="flex items-center gap-1">
-                      <span className="text-sm text-secondary/40 line-through">{((displayPrice || 0) / 10).toFixed(1)}</span>
-                      <span className="text-sm text-secondary/40 line-through">ج</span>
+                      <span className="text-xs sm:text-sm text-[#3A4522]/45 line-through">{((displayPrice || 0) / 10).toFixed(1)}</span>
+                      <span className="text-xs sm:text-sm text-[#3A4522]/45 line-through">ج</span>
                     </div>
-                    <span className="text-xs text-secondary/30">/100 جرام</span>
+                    <span className="text-xs text-[#3A4522]/40">/100 جرام</span>
                   </div>
                 )}
               </>
             ) : has_multiple_sizes && (displayPrice || displaySalePrice) ? (
               <>
                 <div className="flex items-center gap-1">
-                  <span className="font-bold text-base sm:text-lg text-accent">
+                  <span className={`font-bold text-base sm:text-lg ${displaySalePrice ? 'text-[#B12704]' : 'text-[#2B3318]'}`}>
                     {displaySalePrice || displayPrice}
                   </span>
-                  <span className="font-bold text-base sm:text-lg text-accent">ج</span>
+                  <span className={`font-bold text-base sm:text-lg ${displaySalePrice ? 'text-[#B12704]' : 'text-[#2B3318]'}`}>ج</span>
                 </div>
                 {pricingStrategy === 'smart-fallback' || hasMultiplePrices ? (
-                  <span className="text-xs text-secondary/50">ابتداءً من</span>
+                  <span className="text-xs text-[#3A4522]/60">ابتداءً من</span>
                 ) : (
-                  <span className="text-xs text-secondary/50">سعر موحد</span>
+                  <span className="text-xs text-[#3A4522]/60">سعر موحد</span>
                 )}
               </>
             ) : displaySalePrice ? (
               <>
                 <div className="flex items-center gap-1">
-                  <span className="font-bold text-base sm:text-lg text-accent">{displaySalePrice}</span>
-                  <span className="font-bold text-base sm:text-lg text-accent">ج</span>
+                  <span className="font-bold text-base sm:text-lg text-[#B12704]">{displaySalePrice}</span>
+                  <span className="font-bold text-base sm:text-lg text-[#B12704]">ج</span>
                 </div>
                 {displayPrice && (
                   <div className="flex items-center gap-1">
-                    <span className="text-xs sm:text-sm text-secondary/40 line-through">{displayPrice}</span>
-                    <span className="text-xs sm:text-sm text-secondary/40 line-through">ج</span>
+                    <span className="text-xs sm:text-sm text-[#3A4522]/45 line-through">{displayPrice}</span>
+                    <span className="text-xs sm:text-sm text-[#3A4522]/45 line-through">ج</span>
                   </div>
                 )}
               </>
             ) : displayPrice ? (
               <>
                 <div className="flex items-center gap-1">
-                  <span className="font-bold text-base sm:text-lg text-accent">{displayPrice}</span>
-                  <span className="font-bold text-base sm:text-lg text-accent">ج</span>
+                  <span className="font-bold text-base sm:text-lg text-[#2B3318]">{displayPrice}</span>
+                  <span className="font-bold text-base sm:text-lg text-[#2B3318]">ج</span>
                 </div>
                 {pricingStrategy === 'smart-fallback' && (
-                  <span className="text-xs text-secondary/50">ابتداءً من</span>
+                  <span className="text-xs text-[#3A4522]/60">ابتداءً من</span>
                 )}
               </>
             ) : (
-              <span className="text-sm text-secondary/50 text-right">يرجى التواصل للاستفسار عن السعر</span>
+              <span className="text-sm text-[#3A4522]/60 text-right">يرجى التواصل للاستفسار عن السعر</span>
             )}
           </div>
 
@@ -318,18 +318,18 @@ export default function ProductCard({
             <button
               onClick={handleAddToCart}
               disabled={isAdding || isAdded}
-              className={`flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-all duration-300 font-semibold text-sm min-w-max ${isAdded
-                  ? 'bg-[#3B4B1B] text-[#f5f6db]'
-                  : 'bg-[#4B5E26] text-[#f5f6db] hover:bg-[#3B4B1B] shadow-md hover:shadow-lg'
+              className={`flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg transition-all duration-300 font-bold text-sm min-w-max border ${isAdded
+                  ? 'bg-[#2B3318] text-[#E3C778] border-[#D1A94F]'
+                  : 'bg-[#E3C778] text-[#2B3318] border-[#D1A94F]/70 hover:bg-[#D1A94F] shadow-sm hover:shadow-md'
                 } ${isAdding ? 'opacity-75' : ''}`}
               title={isAdded ? 'تمت الإضافة' : 'أضف إلى السلة'}
             >
               {isAdding ? (
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-4 h-4 border-2 border-[#2B3318] border-t-transparent rounded-full animate-spin"></div>
               ) : isAdded ? (
-                <Check className="h-5 w-5" />
+                <Check className="h-4 w-4" />
               ) : (
-                <ShoppingCart className="h-5 w-5" />
+                <ShoppingCart className="h-4 w-4" />
               )}
               <span className="hidden sm:inline text-xs">سلة</span>
             </button>

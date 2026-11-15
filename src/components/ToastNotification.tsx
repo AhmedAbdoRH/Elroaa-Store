@@ -24,9 +24,9 @@ const ToastNotification: React.FC<ToastNotificationProps> = ({
           transition={{ duration: 0.3, ease: 'easeOut' }}
           className="fixed top-4 left-4 right-4 md:left-1/2 md:right-auto md:-translate-x-1/2 md:w-auto z-50"
         >
-          <div className="bg-gradient-to-r from-[#4B5E26] to-[#3B4B1B] text-[#f5f6db] px-4 py-3 md:px-6 md:py-3 rounded-xl shadow-2xl flex items-center justify-between gap-2 md:gap-3 border border-[#657C38]/40">
+          <div className="bg-gradient-to-r from-[#2B3318] to-[#3A4522] text-[#F7F3E9] px-4 py-3 md:px-6 md:py-3 rounded-xl shadow-2xl flex items-center justify-between gap-2 md:gap-3 border border-[#D1A94F]/50">
             <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
-              <Check className="w-5 h-5 flex-shrink-0" />
+              <Check className="w-5 h-5 text-[#E3C778] flex-shrink-0" />
               <span className="font-medium text-sm md:text-base truncate">
                 تمت إضافة {productName} للسلة ✅
               </span>
@@ -35,7 +35,7 @@ const ToastNotification: React.FC<ToastNotificationProps> = ({
               {onViewCart && (
                 <button
                   onClick={onViewCart}
-                  className="bg-white/20 hover:bg-white/30 px-2 py-1 md:px-3 md:py-1 rounded-full text-xs md:text-sm font-medium flex items-center gap-1 transition-colors whitespace-nowrap"
+                  className="bg-[#E3C778] hover:bg-[#D1A94F] text-[#2B3318] px-2.5 py-1 md:px-3 md:py-1 rounded-full text-xs md:text-sm font-bold flex items-center gap-1 transition-colors whitespace-nowrap"
                 >
                   <ShoppingCart className="w-3 h-3 md:w-4 md:h-4" />
                   <span>عرض السلة</span>
@@ -44,7 +44,7 @@ const ToastNotification: React.FC<ToastNotificationProps> = ({
               {onClose && (
                 <button
                   onClick={onClose}
-                  className="text-white/80 hover:text-white p-1 rounded-full hover:bg-white/20 transition-colors"
+                  className="text-[#F7F3E9]/80 hover:text-white p-1 rounded-full hover:bg-white/20 transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>

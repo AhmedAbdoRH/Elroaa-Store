@@ -152,18 +152,22 @@ function App() {
   useEffect(() => {
     if (storeSettings) {
       const theme = (storeSettings as any).theme_settings || {};
-      const primary = theme.primaryColor || '#f5f6db';
-      const secondary = theme.secondaryColor || '#4f170c';
-      const accent = theme.accentColor || '#4B5E26';
+      const primary = theme.primaryColor && theme.primaryColor !== '#f5f6db' ? theme.primaryColor : '#F7F3E9';
+      const secondary = theme.secondaryColor && theme.secondaryColor !== '#4f170c' ? theme.secondaryColor : '#2B3318';
+      const accent = theme.accentColor && theme.accentColor !== '#4B5E26' ? theme.accentColor : '#2B3318';
       const fontFamily = theme.fontFamily || 'Cairo, sans-serif';
       const backgroundGradient = theme.backgroundGradient || '';
-      const backgroundColor = theme.backgroundColor || '#f5f6db';
+      const backgroundColor = theme.backgroundColor && theme.backgroundColor !== '#f5f6db' ? theme.backgroundColor : '#F7F3E9';
 
       const root = document.documentElement;
       root.style.setProperty('--color-primary', primary);
       root.style.setProperty('--color-secondary', secondary);
       root.style.setProperty('--color-accent', accent);
-      root.style.setProperty('--color-olive', accent);
+      root.style.setProperty('--color-olive', '#2B3318');
+      root.style.setProperty('--color-olive-secondary', '#3A4522');
+      root.style.setProperty('--color-gold', '#D1A94F');
+      root.style.setProperty('--color-gold-light', '#E3C778');
+      root.style.setProperty('--color-sale', '#B12704');
       root.style.setProperty('--color-accent-light', primary);
       root.style.setProperty('--font-family', fontFamily);
 
@@ -197,11 +201,11 @@ function App() {
           meta_title: 'شركة الرؤى للتجارة والتوريدات والعطارة',
           meta_description: 'نقدم أفضل أنواع الأعشاب الطبيعية، التوابل، والزيوت العطرية بأسعار تنافسية وجودة عالية',
           theme_settings: {
-            primaryColor: '#f5f6db',
-            secondaryColor: '#4f170c',
-            accentColor: '#4B5E26',
+            primaryColor: '#F7F3E9',
+            secondaryColor: '#2B3318',
+            accentColor: '#2B3318',
             fontFamily: 'Cairo, sans-serif',
-            backgroundColor: '#f5f6db',
+            backgroundColor: '#F7F3E9',
             backgroundGradient: ''
           }
         } as StoreSettings);
@@ -220,11 +224,11 @@ function App() {
           meta_title: 'شركة الرؤى للتجارة والتوريدات والعطارة',
           meta_description: 'نقدم أفضل أنواع الأعشاب الطبيعية، التوابل، والزيوت العطرية بأسعار تنافسية وجودة عالية',
           theme_settings: {
-            primaryColor: '#f5f6db',
-            secondaryColor: '#4f170c',
-            accentColor: '#4B5E26',
+            primaryColor: '#F7F3E9',
+            secondaryColor: '#2B3318',
+            accentColor: '#2B3318',
             fontFamily: 'Cairo, sans-serif',
-            backgroundColor: '#f5f6db',
+            backgroundColor: '#F7F3E9',
             backgroundGradient: ''
           }
         } as StoreSettings);
@@ -240,11 +244,11 @@ function App() {
         meta_title: 'شركة الرؤى للتجارة والتوريدات والعطارة',
         meta_description: 'نقدم أفضل أنواع الأعشاب الطبيعية، التوابل، والزيوت العطرية بأسعار تنافسية وجودة عالية',
         theme_settings: {
-          primaryColor: '#f5f6db',
-          secondaryColor: '#4f170c',
-          accentColor: '#4B5E26',
+          primaryColor: '#F7F3E9',
+          secondaryColor: '#2B3318',
+          accentColor: '#2B3318',
           fontFamily: 'Cairo, sans-serif',
-          backgroundColor: '#f5f6db',
+          backgroundColor: '#F7F3E9',
           backgroundGradient: ''
         }
       } as StoreSettings);
@@ -372,9 +376,9 @@ function Layout({ children, banners: layoutBanners, storeSettings }: LayoutProps
       style={{
         background: (storeSettings && (storeSettings as any).theme_settings?.backgroundGradient)
           ? (storeSettings as any).theme_settings.backgroundGradient
-          : (storeSettings && (storeSettings as any).theme_settings?.backgroundColor)
+          : (storeSettings && (storeSettings as any).theme_settings?.backgroundColor && (storeSettings as any).theme_settings?.backgroundColor !== '#f5f6db')
             ? (storeSettings as any).theme_settings.backgroundColor
-            : '#f5f6db',
+            : '#F7F3E9',
         backgroundSize: 'cover',
         backgroundRepeat: 'no-repeat',
       }}

@@ -6,7 +6,7 @@ type ThemeContextType = {
 };
 
 const ThemeContext = createContext<ThemeContextType>({
-  primaryColor: '#f5f6db',
+  primaryColor: '#F7F3E9',
   setPrimaryColor: () => { },
 });
 
@@ -16,7 +16,7 @@ export const ThemeProvider = ({
   children: ReactNode;
 }) => {
   // إدارة الحالة داخليًا
-  const [primaryColor, setPrimaryColor] = useState('#f5f6db');
+  const [primaryColor, setPrimaryColor] = useState('#F7F3E9');
 
   return (
     <ThemeContext.Provider value={{ primaryColor, setPrimaryColor }}>

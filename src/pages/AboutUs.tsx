@@ -12,14 +12,14 @@ export default function AboutUs() {
         <link rel="canonical" href="https://elroaa-store.com/about" />
       </Helmet>
 
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 py-16">
+      <div className="min-h-screen bg-[#F7F3E9] py-16 pt-28">
         <div className="container mx-auto px-4">
           {/* Header */}
           <div className="text-center mb-16">
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-              من نحن - <span className="text-[#CA8A04]">شركة الرؤى للتجارة والتوريدات والعطارة</span>
+            <h1 className="text-4xl md:text-6xl font-bold text-[#2B3318] mb-6">
+              من نحن - <span className="text-[#D1A94F]">شركة الرؤى للتجارة والتوريدات والعطارة</span>
             </h1>
-            <p className="text-xl text-white/80 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl text-[#3A4522] max-w-3xl mx-auto leading-relaxed">
               نحن رواد في مجال العطارة والتوريدات، نقدم جودة حقيقية بسعر عادل وننشر ثقافة المنتجات الطبيعية الصحية.
             </p>
           </div>
@@ -27,9 +27,9 @@ export default function AboutUs() {
           {/* Main Content */}
           <div className="grid lg:grid-cols-2 gap-12 mb-16">
             {/* Our Story */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
-              <h2 className="text-3xl font-bold text-[#CA8A04] mb-6">رؤيتنا ورسالتنا</h2>
-              <div className="space-y-4 text-white/90 leading-relaxed">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-[#D1A94F]/35 shadow-sm">
+              <h2 className="text-3xl font-bold text-[#2B3318] mb-6">رؤيتنا ورسالتنا</h2>
+              <div className="space-y-4 text-[#3A4522] leading-relaxed">
                 <p>
                   <strong>رؤيتنا:</strong> أن نكون من الرواد في مجال العطارة والتوريدات داخل مصر، من خلال تقديم منتجات طبيعية موثوقة وخدمة احترافية تبني الثقة طويلة المدى مع عملائنا.
                 </p>
@@ -43,28 +43,28 @@ export default function AboutUs() {
             </div>
 
             {/* Our Values */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
-              <h2 className="text-3xl font-bold text-[#CA8A04] mb-6">قيمنا الأساسية</h2>
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-[#D1A94F]/35 shadow-sm">
+              <h2 className="text-3xl font-bold text-[#2B3318] mb-6">قيمنا الأساسية</h2>
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
-                  <Award className="h-8 w-8 text-[#CA8A04] mt-1 flex-shrink-0" />
+                  <Award className="h-8 w-8 text-[#D1A94F] mt-1 flex-shrink-0" />
                   <div>
-                    <h3 className="text-xl font-semibold text-white mb-2">الجودة</h3>
-                    <p className="text-white/80">نوفر أفضل أنواع الأعشاب والتوابل طبقاً للمواصفات القياسية</p>
+                    <h3 className="text-xl font-semibold text-[#2B3318] mb-2">الجودة</h3>
+                    <p className="text-[#3A4522]">نوفر أفضل أنواع الأعشاب والتوابل طبقاً للمواصفات القياسية</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <Users className="h-8 w-8 text-[#CA8A04] mt-1 flex-shrink-0" />
+                  <Users className="h-8 w-8 text-[#D1A94F] mt-1 flex-shrink-0" />
                   <div>
-                    <h3 className="text-xl font-semibold text-white mb-2">التنوع والخبرة</h3>
-                    <p className="text-white/80">فريق متخصص يقدم استشارات لاختيار أفضل المنتجات والتركيبات</p>
+                    <h3 className="text-xl font-semibold text-[#2B3318] mb-2">التنوع والخبرة</h3>
+                    <p className="text-[#3A4522]">فريق متخصص يقدم استشارات لاختيار أفضل المنتجات والتركيبات</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <Star className="h-8 w-8 text-[#CA8A04] mt-1 flex-shrink-0" />
+                  <Star className="h-8 w-8 text-[#D1A94F] mt-1 flex-shrink-0" />
                   <div>
-                    <h3 className="text-xl font-semibold text-white mb-2">الالتزام</h3>
-                    <p className="text-white/80">نلتزم بالدقة في المواعيد والشفافية التامة في التعامل</p>
+                    <h3 className="text-xl font-semibold text-[#2B3318] mb-2">الالتزام</h3>
+                    <p className="text-[#3A4522]">نلتزم بالدقة في المواعيد والشفافية التامة في التعامل</p>
                   </div>
                 </div>
               </div>
@@ -73,33 +73,33 @@ export default function AboutUs() {
 
           {/* Statistics */}
           <div className="grid md:grid-cols-3 gap-8 mb-16">
-            <div className="text-center bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
-              <div className="text-4xl font-bold text-[#CA8A04] mb-2">100%</div>
-              <div className="text-white/80">منتجات طبيعية</div>
+            <div className="text-center bg-[#2B3318] rounded-xl p-6 border border-[#D1A94F]/40 shadow-md">
+              <div className="text-4xl font-bold text-[#E3C778] mb-2">100%</div>
+              <div className="text-[#F7F3E9]">منتجات طبيعية</div>
             </div>
-            <div className="text-center bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
-              <div className="text-4xl font-bold text-[#CA8A04] mb-2">500+</div>
-              <div className="text-white/80">صنف متاح</div>
+            <div className="text-center bg-[#2B3318] rounded-xl p-6 border border-[#D1A94F]/40 shadow-md">
+              <div className="text-4xl font-bold text-[#E3C778] mb-2">500+</div>
+              <div className="text-[#F7F3E9]">صنف متاح</div>
             </div>
-            <div className="text-center bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
-              <div className="text-4xl font-bold text-[#CA8A04] mb-2">24/7</div>
-              <div className="text-white/80">خدمة عملاء</div>
+            <div className="text-center bg-[#2B3318] rounded-xl p-6 border border-[#D1A94F]/40 shadow-md">
+              <div className="text-4xl font-bold text-[#E3C778] mb-2">24/7</div>
+              <div className="text-[#F7F3E9]">خدمة عملاء</div>
             </div>
           </div>
 
           {/* Services */}
-          <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10 mb-16">
-            <h2 className="text-3xl font-bold text-[#CA8A04] mb-8 text-center">خدمات التوريد</h2>
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-[#D1A94F]/35 mb-16 shadow-sm">
+            <h2 className="text-3xl font-bold text-[#2B3318] mb-8 text-center">خدمات التوريد</h2>
             <div className="grid md:grid-cols-2 gap-8">
-              <div className="bg-white/5 rounded-xl p-6">
-                <h3 className="text-xl font-semibold text-white mb-4">توريدات تجارية</h3>
-                <p className="text-white/80">
+              <div className="bg-[#3A4522]/[0.06] rounded-xl p-6 border border-[#3A4522]/15">
+                <h3 className="text-xl font-semibold text-[#2B3318] mb-4">توريدات تجارية</h3>
+                <p className="text-[#3A4522]">
                   نوفر خدمات التوريد للمحلات، المصانع، المطاعم، وشركات التعبئة والتغليف بأسعار تنافسية وكميات حسب الطلب.
                 </p>
               </div>
-              <div className="bg-white/5 rounded-xl p-6">
-                <h3 className="text-xl font-semibold text-white mb-4">خلطات خاصة</h3>
-                <p className="text-white/80">
+              <div className="bg-[#3A4522]/[0.06] rounded-xl p-6 border border-[#3A4522]/15">
+                <h3 className="text-xl font-semibold text-[#2B3318] mb-4">خلطات خاصة</h3>
+                <p className="text-[#3A4522]">
                   نتميز بتقديم خلطات وتراكيب خاصة وحصرية تلبي احتياجات عملائنا الخاصة وتضمن لهم مذاقاً فريداً.
                 </p>
               </div>
@@ -107,13 +107,13 @@ export default function AboutUs() {
           </div>
 
           {/* Working Hours */}
-          <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10 text-center">
-            <h2 className="text-3xl font-bold text-[#CA8A04] mb-6">ساعات العمل</h2>
+          <div className="bg-[#2B3318] rounded-2xl p-8 border border-[#D1A94F]/40 text-center shadow-md">
+            <h2 className="text-3xl font-bold text-[#E3C778] mb-6">ساعات العمل</h2>
             <div className="flex items-center justify-center gap-4 mb-4">
-              <Clock className="h-6 w-6 text-[#CA8A04]" />
-              <span className="text-xl text-white">يومياً من 9:00 صباحاً إلى 10:00 مساءً</span>
+              <Clock className="h-6 w-6 text-[#D1A94F]" />
+              <span className="text-xl text-[#F7F3E9]">يومياً من 9:00 صباحاً إلى 10:00 مساءً</span>
             </div>
-            <p className="text-white/80">
+            <p className="text-[#F7F3E9]/85">
               نحن متاحون لخدمتكم على مدار الساعة عبر الهاتف والواتساب
             </p>
           </div>

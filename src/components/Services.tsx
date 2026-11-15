@@ -167,7 +167,7 @@ export default function Services() {
   return (
     <section className="py-16" style={{ backgroundColor: 'var(--color-primary)' }} id="products">
       <motion.div
-        className="container mx-auto px-3 sm:px-4 bg-[#4B5E26]/[0.04] rounded-2xl p-4 sm:p-8 border border-[#4B5E26]/15 shadow-lg"
+        className="container mx-auto px-3 sm:px-4 bg-[#2B3318]/[0.03] rounded-2xl p-4 sm:p-8 border border-[#3A4522]/15 shadow-lg"
         initial="hidden"
         animate="visible"
         variants={{
@@ -184,7 +184,7 @@ export default function Services() {
           }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
         >
-          <h2 className="text-2xl sm:text-3xl font-bold mb-2 text-[#2E3B16] inline-flex items-center justify-center gap-2">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-2 text-[#2B3318] inline-flex items-center justify-center gap-2">
             <span>بتدور على إيه؟</span>
           </h2>
         </motion.div>
@@ -206,8 +206,8 @@ export default function Services() {
                   onClick={() => handleCategoryClick(category.id)}
                   className={`flex items-center gap-2.5 md:gap-3 px-2.5 py-2.5 md:px-4 md:py-3 rounded-xl transition-all duration-200 text-right ${
                     isSelected
-                      ? 'bg-[#4B5E26] text-[#f5f6db] font-bold shadow-md ring-2 ring-[#3B4B1B]/30'
-                      : 'bg-[#4B5E26]/10 text-[#3B4B1B] border border-[#4B5E26]/15 hover:bg-[#4B5E26]/20 hover:shadow-md'
+                      ? 'bg-[#2B3318] text-[#F7F3E9] font-bold shadow-md ring-2 ring-[#D1A94F]'
+                      : 'bg-[#F7F3E9] text-[#2B3318] border border-[#3A4522]/20 hover:border-[#D1A94F] hover:bg-[#E3C778]/20 shadow-sm hover:shadow-md'
                   }`}
                   variants={{
                     hidden: { opacity: 0, y: 12 },
@@ -230,7 +230,7 @@ export default function Services() {
           </AnimatePresence>
         </motion.div>
 
-        {/* Special Highlights: أحدث العروض & الأكثر مبيعاً (أسفل الأقسام الرئيسية بشكل مصغر ومميز) */}
+        {/* Special Highlights: أحدث العروض & الأكثر مبيعاً */}
         {(hasFeaturedProducts || hasBestSellerProducts || selectedCategory !== null) && (
           <div className="flex flex-wrap items-center justify-center gap-2.5 mb-6">
             {hasFeaturedProducts && (
@@ -245,8 +245,8 @@ export default function Services() {
                 }}
                 className={`px-4 py-1.5 sm:px-5 sm:py-2 rounded-full text-xs sm:text-sm font-bold transition-all duration-200 flex items-center gap-1.5 border ${
                   selectedCategory === 'featured'
-                    ? 'bg-[#CA8A04] text-white border-[#B45309] shadow-md scale-[1.03]'
-                    : 'bg-[#CA8A04]/12 text-[#854D0E] border-[#CA8A04]/40 hover:bg-[#CA8A04]/25'
+                    ? 'bg-[#B12704] text-[#F7F3E9] border-[#8A1E03] shadow-md scale-[1.03]'
+                    : 'bg-[#B12704]/10 text-[#B12704] border-[#B12704]/35 hover:bg-[#B12704]/20'
                 }`}
               >
                 <span>✨</span>
@@ -266,8 +266,8 @@ export default function Services() {
                 }}
                 className={`px-4 py-1.5 sm:px-5 sm:py-2 rounded-full text-xs sm:text-sm font-bold transition-all duration-200 flex items-center gap-1.5 border ${
                   selectedCategory === 'best_sellers'
-                    ? 'bg-[#4f170c] text-[#f5f6db] border-[#3d1108] shadow-md scale-[1.03]'
-                    : 'bg-[#4f170c]/10 text-[#4f170c] border-[#4f170c]/30 hover:bg-[#4f170c]/20'
+                    ? 'bg-[#2B3318] text-[#E3C778] border-[#D1A94F] shadow-md scale-[1.03]'
+                    : 'bg-[#E3C778]/35 text-[#2B3318] border-[#D1A94F]/60 hover:bg-[#E3C778]/70'
                 }`}
               >
                 <span>🔥</span>
@@ -283,7 +283,7 @@ export default function Services() {
                   setSelectedSubcategory(null);
                   setOpenCategoryId(null);
                 }}
-                className="px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-semibold bg-[#4B5E26]/10 text-[#3B4B1B] border border-[#4B5E26]/25 hover:bg-[#4B5E26]/20 transition-colors"
+                className="px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-semibold bg-[#3A4522]/10 text-[#2B3318] border border-[#3A4522]/25 hover:bg-[#3A4522] hover:text-[#F7F3E9] transition-colors"
               >
                 عرض الكل ✕
               </button>
@@ -316,11 +316,11 @@ export default function Services() {
             if (!headingText) return null;
 
             return (
-              <div className="mb-5 p-4 rounded-xl bg-[#4B5E26]/[0.08] border border-[#4B5E26]/20 text-center">
-                <h3 className="text-lg sm:text-xl font-bold text-[#2E3B16] mb-1.5">
+              <div className="mb-5 p-4 rounded-xl bg-[#3A4522]/[0.07] border border-[#D1A94F]/45 text-center">
+                <h3 className="text-lg sm:text-xl font-bold text-[#2B3318] mb-1.5">
                   {headingText}
                 </h3>
-                <div className="max-w-3xl mx-auto text-secondary/80 text-xs sm:text-sm md:text-base leading-relaxed">
+                <div className="max-w-3xl mx-auto text-[#3A4522] text-xs sm:text-sm md:text-base leading-relaxed">
                   {activeSubcatObj ? (
                     <p>
                       {activeSubcatObj.description || (
@@ -363,8 +363,8 @@ export default function Services() {
                 <motion.button
                   onClick={() => handleSubcategoryClick(null)}
                   className={`px-3.5 py-1.5 md:px-5 md:py-1.5 rounded-full text-xs md:text-sm font-semibold transition-all duration-200 ${selectedSubcategory === null
-                      ? 'bg-[#4B5E26] text-[#f5f6db] shadow-md'
-                      : 'bg-[#4B5E26]/10 text-[#3B4B1B] border border-[#4B5E26]/25 hover:bg-[#4B5E26]/20'
+                      ? 'bg-[#3A4522] text-[#F7F3E9] border border-[#D1A94F]/60 shadow-sm'
+                      : 'bg-[#F7F3E9] text-[#2B3318] border border-[#3A4522]/25 hover:border-[#D1A94F] hover:bg-[#E3C778]/25'
                     }`}
                   whileTap={{ scale: 0.96 }}
                 >
@@ -380,8 +380,8 @@ export default function Services() {
                         key={subcategory.id}
                         onClick={() => handleSubcategoryClick(subcategory.id)}
                         className={`px-3.5 py-1.5 md:px-5 md:py-1.5 rounded-full text-xs md:text-sm font-semibold transition-all duration-200 ${selectedSubcategory === subcategory.id
-                            ? 'bg-[#4B5E26] text-[#f5f6db] shadow-md'
-                            : 'bg-[#4B5E26]/10 text-[#3B4B1B] border border-[#4B5E26]/25 hover:bg-[#4B5E26]/20'
+                            ? 'bg-[#3A4522] text-[#F7F3E9] border border-[#D1A94F]/60 shadow-sm'
+                            : 'bg-[#F7F3E9] text-[#2B3318] border border-[#3A4522]/25 hover:border-[#D1A94F] hover:bg-[#E3C778]/25'
                           }`}
                         whileTap={{ scale: 0.96 }}
                       >
@@ -449,7 +449,7 @@ export default function Services() {
             <button
               type="button"
               onClick={() => setVisibleCount((c) => c + 24)}
-              className="px-6 py-3 rounded-xl bg-[#4B5E26] hover:bg-[#3B4B1B] text-[#f5f6db] font-bold shadow-md hover:shadow-lg transition-all duration-200"
+              className="px-6 py-3 rounded-xl bg-[#E3C778] hover:bg-[#D1A94F] text-[#2B3318] border border-[#D1A94F] font-bold shadow-md hover:shadow-lg transition-all duration-200"
             >
               تحميل المزيد
             </button>

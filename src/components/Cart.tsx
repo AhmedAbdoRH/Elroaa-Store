@@ -106,7 +106,7 @@ const Cart: React.FC = () => {
           
           {/* Cart panel with slide animation */}
           <motion.div
-            className="absolute inset-y-0 left-0 w-full max-w-md bg-gradient-to-b from-gray-50 to-white shadow-2xl flex flex-col"
+            className="absolute inset-y-0 left-0 w-full max-w-md bg-[#F7F3E9] shadow-2xl flex flex-col"
             initial="hidden"
             animate="visible"
             exit="exit"
@@ -114,11 +114,11 @@ const Cart: React.FC = () => {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="p-5 border-b border-[#4B5E26]/15 flex justify-between items-center bg-[#4B5E26] text-[#f5f6db]">
+            <div className="p-5 border-b border-[#D1A94F]/35 flex justify-between items-center bg-[#2B3318] text-[#F7F3E9]">
               <h2 className="text-2xl font-bold">سلة التسوق</h2>
               <button
                 onClick={() => toggleCart(false)}
-                className="text-[#f5f6db]/80 hover:text-white"
+                className="text-[#F7F3E9]/80 hover:text-[#E3C778] transition-colors"
                 aria-label="إغلاق السلة"
               >
                 <X className="w-6 h-6" />
@@ -129,9 +129,9 @@ const Cart: React.FC = () => {
             <div className="flex-1 overflow-y-auto p-5 space-y-3">
               {cartItems.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-center p-8">
-                  <ShoppingCart className="w-16 h-16 text-gray-300 mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900">سلة التسوق فارغة</h3>
-                  <p className="mt-1 text-gray-500">ابدأ بإضافة بعض المنتجات</p>
+                  <ShoppingCart className="w-16 h-16 text-[#3A4522]/30 mb-4" />
+                  <h3 className="text-lg font-medium text-[#2B3318]">سلة التسوق فارغة</h3>
+                  <p className="mt-1 text-[#3A4522]/70">ابدأ بإضافة بعض المنتجات</p>
                 </div>
               ) : (
                 <motion.ul className="space-y-3">
@@ -140,7 +140,7 @@ const Cart: React.FC = () => {
                     return (
                       <motion.li
                         key={item.id}
-                        className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg bg-white hover:shadow-md hover:border-blue-200 transition-all"
+                        className="flex items-center gap-3 p-3 border border-[#3A4522]/15 rounded-lg bg-white/90 hover:shadow-md hover:border-[#D1A94F] transition-all"
                         variants={itemVariants}
                         custom={index}
                         initial="hidden"
@@ -149,7 +149,7 @@ const Cart: React.FC = () => {
                         layout
                       >
                         {item.imageUrl && (
-                          <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden border border-gray-200 shadow-sm">
+                          <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden border border-[#3A4522]/15 shadow-sm">
                             <img
                               src={item.imageUrl}
                               alt={item.title}
@@ -158,11 +158,11 @@ const Cart: React.FC = () => {
                           </div>
                         )}
                         <div className="flex-1">
-                          <h3 className="font-semibold text-gray-800 text-sm">
+                          <h3 className="font-semibold text-[#2B3318] text-sm">
                             {item.title}
-                            {item.size && <span className="text-xs font-normal text-gray-500 ml-1">({item.size})</span>}
+                            {item.size && <span className="text-xs font-normal text-[#3A4522]/70 ml-1">({item.size})</span>}
                           </h3>
-                          <p className="text-[#4B5E26] font-bold text-sm mt-1">{item.price} ج</p>
+                          <p className="text-[#2B3318] font-bold text-sm mt-1">{item.price} ج</p>
                           
                           {/* مؤشر المخزون للمنتج بالسلة */}
                           {item.track_stock && (
@@ -212,7 +212,7 @@ const Cart: React.FC = () => {
                             e.stopPropagation();
                             removeFromCart(item.id);
                           }}
-                          className="text-red-500 hover:text-red-700 p-2"
+                          className="text-[#B12704] hover:opacity-80 p-2"
                           aria-label="إزالة المنتج"
                         >
                           <Trash2 className="w-5 h-5" />
@@ -226,10 +226,10 @@ const Cart: React.FC = () => {
 
             {/* Footer with total and checkout button */}
             {cartItems.length > 0 && (
-              <div className="border-t border-gray-200 p-5 bg-gradient-to-t from-gray-50 to-transparent space-y-4">
-                <div className="flex justify-between items-center bg-white rounded-lg p-4 shadow-sm border border-[#4B5E26]/10">
-                  <span className="text-gray-700 font-bold text-lg">المجموع</span>
-                  <span className="text-[#4B5E26] font-bold text-2xl">{cartTotal} ج</span>
+              <div className="border-t border-[#D1A94F]/30 p-5 bg-[#F7F3E9] space-y-4">
+                <div className="flex justify-between items-center bg-white/95 rounded-lg p-4 shadow-sm border border-[#D1A94F]/30">
+                  <span className="text-[#2B3318] font-bold text-lg">المجموع</span>
+                  <span className="text-[#2B3318] font-bold text-2xl">{cartTotal} ج</span>
                 </div>
 
                 {/* إشعار المخزون الصفري للعميل مع التأكيد على إتاحة إتمام الطلب */}
@@ -244,8 +244,8 @@ const Cart: React.FC = () => {
                   </div>
                 )}
 
-                <div className="bg-[#4B5E26]/10 border border-[#4B5E26]/20 rounded-lg p-2.5 text-center">
-                  <p className="text-[#3B4B1B] text-xs font-medium">
+                <div className="bg-[#3A4522]/10 border border-[#3A4522]/20 rounded-lg p-2.5 text-center">
+                  <p className="text-[#2B3318] text-xs font-medium">
                     يتم تقدير تكلفة الشحن حسب المنطقة
                   </p>
                 </div>
@@ -254,7 +254,7 @@ const Cart: React.FC = () => {
                 <button
                   type="button"
                   onClick={sendOrderViaWhatsApp}
-                  className="w-full bg-gradient-to-r from-[#4B5E26] to-[#3B4B1B] text-[#f5f6db] py-3.5 rounded-xl hover:from-[#3B4B1B] hover:to-[#2E3B16] transition-all font-bold text-base shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
+                  className="w-full bg-[#E3C778] hover:bg-[#D1A94F] text-[#2B3318] border border-[#D1A94F] py-3.5 rounded-xl transition-all font-bold text-base shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
                 >
                   <ShoppingCart className="w-5 h-5" />
                   <span>إتمام الطلب عبر واتساب</span>
