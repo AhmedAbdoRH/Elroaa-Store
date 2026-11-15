@@ -92,13 +92,7 @@ export default function SubcategoryProducts() {
   if (isLoading) {
     return (
     <div
-      className="min-h-screen pt-24 flex items-center justify-center"
-      style={{
-        background: '#2a2a2a !important',
-        backgroundSize: 'cover',
-        backgroundRepeat: 'no-repeat',
-        backgroundAttachment: 'fixed',
-      }}
+      className="min-h-screen pt-[116px] md:pt-24 flex items-center justify-center bg-primary"
     >
         <div className="text-xl text-secondary">جاري التحميل...</div>
       </div>
@@ -108,18 +102,12 @@ export default function SubcategoryProducts() {
   if (error || !subcategory) {
     return (
     <div
-      className="min-h-screen pt-24 flex flex-col items-center justify-center gap-4"
-      style={{
-        background: '#2a2a2a !important',
-        backgroundSize: 'cover',
-        backgroundRepeat: 'no-repeat',
-        backgroundAttachment: 'fixed',
-      }}
+      className="min-h-screen pt-[116px] md:pt-24 flex flex-col items-center justify-center gap-4 bg-primary"
     >
         <div className="text-xl text-secondary">{error || 'القسم الفرعي غير موجود'}</div>
         <Link
           to="/"
-          className="bg-accent text-white px-6 py-2 rounded-lg hover:bg-accent-light transition-colors"
+          className="bg-[#4B5E26] hover:bg-[#3B4B1B] text-[#f5f6db] px-6 py-2 rounded-lg transition-colors font-semibold"
         >
           العودة للرئيسية
         </Link>
@@ -129,13 +117,7 @@ export default function SubcategoryProducts() {
 
   return (
     <div
-      className="min-h-screen pt-24"
-      style={{
-        background: '#2a2a2a !important',
-        backgroundSize: 'cover',
-        backgroundRepeat: 'no-repeat',
-        backgroundAttachment: 'fixed',
-      }}
+      className="min-h-screen pt-[116px] md:pt-24 bg-primary"
     >
       <Helmet>
         <title>{`${subcategory.name} | شركة الرؤى للتجارة والتوريدات والعطارة`}</title>
@@ -165,8 +147,8 @@ export default function SubcategoryProducts() {
           <span className="text-accent">{subcategory.name}</span>
         </div>
 
-        <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-8 border border-white/10 shadow-2xl shadow-black/40">
-          <h1 className="text-3xl font-bold mb-12 text-accent">{subcategory.name}</h1>
+        <div className="bg-[#4B5E26]/[0.04] rounded-2xl p-8 border border-[#4B5E26]/15 shadow-lg">
+          <h1 className="text-3xl font-bold mb-12 text-[#4B5E26]">{subcategory.name}</h1>
           {subcategory.description && (
             <p className="text-secondary/70 mb-8">{subcategory.description}</p>
           )}

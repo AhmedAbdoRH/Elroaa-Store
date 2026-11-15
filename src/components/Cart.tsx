@@ -114,11 +114,11 @@ const Cart: React.FC = () => {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="p-5 border-b border-gray-200 flex justify-between items-center bg-gradient-to-r from-blue-50 to-transparent">
-              <h2 className="text-2xl font-bold text-gray-800">سلة التسوق</h2>
+            <div className="p-5 border-b border-[#4B5E26]/15 flex justify-between items-center bg-[#4B5E26] text-[#f5f6db]">
+              <h2 className="text-2xl font-bold">سلة التسوق</h2>
               <button
                 onClick={() => toggleCart(false)}
-                className="text-gray-500 hover:text-gray-700"
+                className="text-[#f5f6db]/80 hover:text-white"
                 aria-label="إغلاق السلة"
               >
                 <X className="w-6 h-6" />
@@ -162,7 +162,7 @@ const Cart: React.FC = () => {
                             {item.title}
                             {item.size && <span className="text-xs font-normal text-gray-500 ml-1">({item.size})</span>}
                           </h3>
-                          <p className="text-blue-600 font-bold text-sm mt-1">{item.price} ج</p>
+                          <p className="text-[#4B5E26] font-bold text-sm mt-1">{item.price} ج</p>
                           
                           {/* مؤشر المخزون للمنتج بالسلة */}
                           {item.track_stock && (
@@ -227,9 +227,9 @@ const Cart: React.FC = () => {
             {/* Footer with total and checkout button */}
             {cartItems.length > 0 && (
               <div className="border-t border-gray-200 p-5 bg-gradient-to-t from-gray-50 to-transparent space-y-4">
-                <div className="flex justify-between items-center bg-white rounded-lg p-4 shadow-sm">
+                <div className="flex justify-between items-center bg-white rounded-lg p-4 shadow-sm border border-[#4B5E26]/10">
                   <span className="text-gray-700 font-bold text-lg">المجموع</span>
-                  <span className="text-blue-600 font-bold text-2xl">{cartTotal} ج</span>
+                  <span className="text-[#4B5E26] font-bold text-2xl">{cartTotal} ج</span>
                 </div>
 
                 {/* إشعار المخزون الصفري للعميل مع التأكيد على إتاحة إتمام الطلب */}
@@ -244,8 +244,8 @@ const Cart: React.FC = () => {
                   </div>
                 )}
 
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-2.5 text-center">
-                  <p className="text-blue-800 text-xs font-medium">
+                <div className="bg-[#4B5E26]/10 border border-[#4B5E26]/20 rounded-lg p-2.5 text-center">
+                  <p className="text-[#3B4B1B] text-xs font-medium">
                     يتم تقدير تكلفة الشحن حسب المنطقة
                   </p>
                 </div>
@@ -254,7 +254,7 @@ const Cart: React.FC = () => {
                 <button
                   type="button"
                   onClick={sendOrderViaWhatsApp}
-                  className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-3.5 rounded-xl hover:from-green-600 hover:to-green-700 transition-all font-bold text-base shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
+                  className="w-full bg-gradient-to-r from-[#4B5E26] to-[#3B4B1B] text-[#f5f6db] py-3.5 rounded-xl hover:from-[#3B4B1B] hover:to-[#2E3B16] transition-all font-bold text-base shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
                 >
                   <ShoppingCart className="w-5 h-5" />
                   <span>إتمام الطلب عبر واتساب</span>

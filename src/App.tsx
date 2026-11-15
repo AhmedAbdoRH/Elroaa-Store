@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { supabase } from './lib/supabase';
 import { CartProvider, useCart } from './contexts/CartContext';
 import Cart from './components/Cart';
@@ -67,7 +69,6 @@ function App() {
   const [storeSettings, setStoreSettings] = useState<StoreSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [banners, setBanners] = useState<Banner[]>([]);
-  const [mainContentLoaded, setMainContentLoaded] = useState(false);
   const [services, setServices] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
 
@@ -153,7 +154,7 @@ function App() {
       const theme = (storeSettings as any).theme_settings || {};
       const primary = theme.primaryColor || '#f5f6db';
       const secondary = theme.secondaryColor || '#4f170c';
-      const accent = theme.accentColor || '#4f170c';
+      const accent = theme.accentColor || '#4B5E26';
       const fontFamily = theme.fontFamily || 'Cairo, sans-serif';
       const backgroundGradient = theme.backgroundGradient || '';
       const backgroundColor = theme.backgroundColor || '#f5f6db';
@@ -162,6 +163,7 @@ function App() {
       root.style.setProperty('--color-primary', primary);
       root.style.setProperty('--color-secondary', secondary);
       root.style.setProperty('--color-accent', accent);
+      root.style.setProperty('--color-olive', accent);
       root.style.setProperty('--color-accent-light', primary);
       root.style.setProperty('--font-family', fontFamily);
 
@@ -191,12 +193,13 @@ function App() {
           id: '00000000-0000-0000-0000-000000000001',
           store_name: 'شركة الرؤى للتجارة والتوريدات والعطارة',
           store_description: 'أفضل أنواع الأعشاب الطبيعية، التوابل، والزيوت العطرية',
-          logo_url: '/logo.webp',
+          logo_url: '/favicon.png',
           meta_title: 'شركة الرؤى للتجارة والتوريدات والعطارة',
           meta_description: 'نقدم أفضل أنواع الأعشاب الطبيعية، التوابل، والزيوت العطرية بأسعار تنافسية وجودة عالية',
           theme_settings: {
             primaryColor: '#f5f6db',
             secondaryColor: '#4f170c',
+            accentColor: '#4B5E26',
             fontFamily: 'Cairo, sans-serif',
             backgroundColor: '#f5f6db',
             backgroundGradient: ''
@@ -213,12 +216,13 @@ function App() {
           id: '00000000-0000-0000-0000-000000000001',
           store_name: 'شركة الرؤى للتجارة والتوريدات والعطارة',
           store_description: 'أفضل أنواع الأعشاب الطبيعية، التوابل، والزيوت العطرية',
-          logo_url: '/logo.png',
+          logo_url: '/favicon.png',
           meta_title: 'شركة الرؤى للتجارة والتوريدات والعطارة',
           meta_description: 'نقدم أفضل أنواع الأعشاب الطبيعية، التوابل، والزيوت العطرية بأسعار تنافسية وجودة عالية',
           theme_settings: {
             primaryColor: '#f5f6db',
             secondaryColor: '#4f170c',
+            accentColor: '#4B5E26',
             fontFamily: 'Cairo, sans-serif',
             backgroundColor: '#f5f6db',
             backgroundGradient: ''
@@ -232,12 +236,13 @@ function App() {
         id: '00000000-0000-0000-0000-000000000001',
         store_name: 'شركة الرؤى للتجارة والتوريدات والعطارة',
         store_description: 'أفضل أنواع الأعشاب الطبيعية، التوابل، والزيوت العطرية',
-        logo_url: '/logo.webp',
+        logo_url: '/favicon.png',
         meta_title: 'شركة الرؤى للتجارة والتوريدات والعطارة',
         meta_description: 'نقدم أفضل أنواع الأعشاب الطبيعية، التوابل، والزيوت العطرية بأسعار تنافسية وجودة عالية',
         theme_settings: {
           primaryColor: '#f5f6db',
           secondaryColor: '#4f170c',
+          accentColor: '#4B5E26',
           fontFamily: 'Cairo, sans-serif',
           backgroundColor: '#f5f6db',
           backgroundGradient: ''
@@ -246,55 +251,10 @@ function App() {
     }
   };
 
-  interface LayoutProps {
-    children: React.ReactNode;
-    banners: Banner[];
-  }
-
-  const Layout = ({ children, banners: layoutBanners }: LayoutProps) => {
-    // Filter banners for different purposes
-    const mainBanners = layoutBanners.filter(banner =>
-      banner.type === 'image' && banner.is_active
-    );
-    const stripBanners = layoutBanners.filter(banner =>
-      banner.type === 'strip' && banner.is_active
-    );
-
-    return (
-      <div
-        className="min-h-screen font-cairo" // Ensure font-cairo is defined in tailwind.config.js if used like this
-        style={{
-          background: (storeSettings && (storeSettings as any).theme_settings?.backgroundGradient)
-            ? (storeSettings as any).theme_settings.backgroundGradient
-            : (storeSettings && (storeSettings as any).theme_settings?.backgroundColor)
-              ? (storeSettings as any).theme_settings.backgroundColor
-              : "", // Default fallback
-          backgroundSize: 'cover',
-          backgroundRepeat: 'no-repeat',
-          backgroundAttachment: 'fixed',
-        }}
-      >
-        <Header storeSettings={storeSettings} />
-        {window.location.pathname === '/' && mainBanners.length > 0 && (
-          <BannerSlider banners={mainBanners} />
-        )}
-        {window.location.pathname === '/' && stripBanners.length > 0 && (
-          <BannerStrip banners={stripBanners} />
-        )}
-        <MainFade>{children}</MainFade>
-        {window.location.pathname === '/' && (
-          <Testimonials />
-        )}
-        <Footer storeSettings={storeSettings} />
-        <WhatsAppButton />
-      </div>
-    );
-  };
-
   if (loading) {
     return (
       <LoadingScreen
-        logoUrl={storeSettings?.logo_url || '/logo.webp'} // Provide a default logo
+        logoUrl={storeSettings?.logo_url || '/favicon.png'}
       />
     );
   }
@@ -344,41 +304,39 @@ function App() {
             } />
 
             <Route path="/service/:id" element={
-              <Layout banners={banners}>
+              <Layout banners={banners} storeSettings={storeSettings}>
                 <ServiceDetails />
               </Layout>
             } />
             <Route path="/product/:id" element={
-              <Layout banners={banners}>
+              <Layout banners={banners} storeSettings={storeSettings}>
                 <ProductDetails />
               </Layout>
             } />
             <Route path="/category/:categoryId" element={
-              <Layout banners={banners}>
+              <Layout banners={banners} storeSettings={storeSettings}>
                 <CategoryProducts />
               </Layout>
             } />
             <Route path="/subcategory/:subcategoryId" element={
-              <Layout banners={banners}>
+              <Layout banners={banners} storeSettings={storeSettings}>
                 <SubcategoryProducts />
               </Layout>
             } />
             <Route path="/about" element={
-              <Layout banners={banners}>
+              <Layout banners={banners} storeSettings={storeSettings}>
                 <AboutUs />
               </Layout>
             } />
             <Route path="/contact" element={
-              <Layout banners={banners}>
+              <Layout banners={banners} storeSettings={storeSettings}>
                 <ContactUs />
               </Layout>
             } />
             <Route path="/" element={
-              <Layout banners={banners}>
+              <Layout banners={banners} storeSettings={storeSettings}>
                 <StaggeredHome
                   storeSettings={storeSettings}
-                  banners={banners}
-                  setMainContentLoaded={setMainContentLoaded}
                 />
               </Layout>
             } />
@@ -391,19 +349,67 @@ function App() {
   );
 }
 
+interface LayoutProps {
+  children: React.ReactNode;
+  banners: Banner[];
+  storeSettings: StoreSettings | null;
+}
+
+function Layout({ children, banners: layoutBanners, storeSettings }: LayoutProps) {
+  const location = useLocation();
+  const isHome = location.pathname === '/';
+
+  const mainBanners = layoutBanners.filter(banner =>
+    banner.type === 'image' && banner.is_active
+  );
+  const stripBanners = layoutBanners.filter(banner =>
+    banner.type === 'strip' && banner.is_active
+  );
+
+  return (
+    <div
+      className="min-h-screen font-cairo"
+      style={{
+        background: (storeSettings && (storeSettings as any).theme_settings?.backgroundGradient)
+          ? (storeSettings as any).theme_settings.backgroundGradient
+          : (storeSettings && (storeSettings as any).theme_settings?.backgroundColor)
+            ? (storeSettings as any).theme_settings.backgroundColor
+            : '#f5f6db',
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
+      }}
+    >
+      <Header storeSettings={storeSettings} />
+      {isHome && mainBanners.length > 0 && (
+        <BannerSlider banners={mainBanners} />
+      )}
+      {isHome && stripBanners.length > 0 && (
+        <BannerStrip banners={stripBanners} />
+      )}
+      <MainFade>{children}</MainFade>
+      {isHome && (
+        <Testimonials />
+      )}
+      <Footer storeSettings={storeSettings} />
+      <WhatsAppButton />
+      <ToastContainer
+        position="bottom-center"
+        autoClose={3500}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl
+        pauseOnHover
+      />
+    </div>
+  );
+}
+
 function StaggeredHome({
   storeSettings,
-  banners,
-  setMainContentLoaded,
 }: {
   storeSettings: StoreSettings | null;
-  banners: Banner[];
-  setMainContentLoaded: (v: boolean) => void;
 }) {
-  useEffect(() => {
-    setMainContentLoaded(true);
-  }, [setMainContentLoaded]);
-
   return (
     <>
       {/* Social Buttons Section - Added below hero */}

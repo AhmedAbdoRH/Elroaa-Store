@@ -105,10 +105,7 @@ export default function ProductDetails() {
 
   // Extracted background styles for reuse
   const backgroundStyles = {
-    background: '#2a2a2a',
-    backgroundSize: 'cover',
-    backgroundRepeat: 'no-repeat',
-    backgroundAttachment: 'fixed',
+    background: 'var(--color-primary, #f5f6db)',
   };
 
   // تعديل تأثير الانتقال ليكون أبطأ: زيادة مدة الانتقال إلى 3500ms، مع تأخير 1000ms عند بدء التحريك
@@ -189,7 +186,7 @@ export default function ProductDetails() {
         <div className="text-xl text-secondary">{error || 'المنتج غير موجود'}</div>
         <button
           onClick={() => navigate('/')}
-          className="bg-secondary text-primary px-6 py-2 rounded-lg hover:bg-opacity-90"
+          className="bg-[#4B5E26] hover:bg-[#3B4B1B] text-[#f5f6db] px-6 py-2 rounded-lg transition-colors font-semibold"
         >
           العودة للرئيسية
         </button>
@@ -275,17 +272,17 @@ export default function ProductDetails() {
                 </div>
                 <div className="md:w-1/2 p-8">
                   <h1 className="text-3xl font-bold mb-4 text-secondary">{service.title}</h1>
-                  <p className="text-white mb-6 text-lg leading-relaxed">
+                  <p className="text-secondary/85 mb-6 text-lg leading-relaxed">
                     {service.description}
                   </p>
                   <div className="border-t border-gray-700 pt-6 mb-6">
                     <div className="text-2xl font-bold text-accent mb-6">
                       {service.price}
                     </div>
-                    <div className="flex gap-4">
+                    <div className="flex flex-wrap gap-4">
                       <button
                         onClick={handleContact}
-                        className="flex-1 bg-[#25D366] text-white py-3 px-6 rounded-lg font-bold hover:bg-opacity-90 flex items-center justify-center gap-2"
+                        className="flex-1 bg-[#4B5E26] hover:bg-[#3B4B1B] text-[#f5f6db] py-3 px-6 rounded-lg font-bold flex items-center justify-center gap-2 transition-colors"
                       >
                         <MessageCircle className="h-5 w-5" />
                         تواصل معنا للطلب
@@ -365,7 +362,7 @@ export default function ProductDetails() {
         <div className="flex justify-center pb-8">
           <button
             onClick={() => navigate('/')}
-            className="text-secondary hover:text-accent px-4 py-2 rounded-lg border border-secondary hover:border-accent" // Added border for better visibility
+            className="text-[#3B4B1B] hover:bg-[#4B5E26] hover:text-[#f5f6db] px-5 py-2.5 rounded-lg border border-[#4B5E26]/40 transition-colors font-semibold"
           >
             ← العودة للرئيسية
           </button>

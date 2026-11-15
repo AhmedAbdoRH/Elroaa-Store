@@ -188,7 +188,7 @@ export default function ProductDetails() {
     if (url.startsWith('/')) return window.location.origin + url;
     return url;
   };
-  const productImageForShare = toAbsoluteUrl(images[0] || '/logo-social.png');
+  const productImageForShare = toAbsoluteUrl(images[0] || '/favicon.png');
 
 
   // Extracted background styles for reuse - Removed to use global theme
@@ -196,7 +196,7 @@ export default function ProductDetails() {
   if (isLoading) {
     return (
       <div
-        className="min-h-screen flex items-center justify-center pt-24 bg-primary"
+        className="min-h-screen flex items-center justify-center pt-[116px] md:pt-24 bg-primary"
       >
         <div className="text-xl text-secondary">جاري التحميل...</div>
       </div>
@@ -206,12 +206,12 @@ export default function ProductDetails() {
   if (error || !service) {
     return (
       <div
-        className="min-h-screen flex flex-col items-center justify-center gap-4 pt-24 bg-primary"
+        className="min-h-screen flex flex-col items-center justify-center gap-4 pt-[116px] md:pt-24 bg-primary"
       >
         <div className="text-xl text-secondary">{error || 'المنتج غير موجود'}</div>
         <button
           onClick={() => navigate('/')}
-          className="bg-secondary text-primary px-6 py-2 rounded-lg hover:bg-opacity-90"
+          className="bg-[#4B5E26] hover:bg-[#3B4B1B] text-[#f5f6db] px-6 py-2 rounded-lg transition-colors font-semibold"
         >
           العودة للرئيسية
         </button>
@@ -220,7 +220,7 @@ export default function ProductDetails() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col pt-24 relative bg-primary">
+    <div className="min-h-screen flex flex-col pt-[116px] md:pt-24 relative bg-primary">
       {service && (
         <Helmet>
           <title>{`${service.title} | شركة الرؤى للتجارة والتوريدات والعطارة`}</title>
@@ -252,7 +252,7 @@ export default function ProductDetails() {
           {/* Back Button */}
           <button
             onClick={handleBack}
-            className="mb-4 flex items-center gap-2 text-secondary hover:text-secondary/80 transition-colors font-medium"
+            className="mb-4 flex items-center gap-2 text-[#3B4B1B] hover:text-[#4B5E26] transition-colors font-semibold"
           >
             <ArrowRight className="w-5 h-5" />
             <span>رجوع للقسم</span>
@@ -338,8 +338,8 @@ export default function ProductDetails() {
                               onClick={() => setSelectedWeight(50)}
                               className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
                                 selectedWeight === 50
-                                  ? 'bg-secondary text-primary'
-                                  : 'bg-secondary/20 hover:bg-secondary/30 text-secondary'
+                                  ? 'bg-[#4B5E26] text-[#f5f6db]'
+                                  : 'bg-[#4B5E26]/15 hover:bg-[#4B5E26]/25 text-[#3B4B1B]'
                               }`}
                             >
                               50 جم
@@ -348,8 +348,8 @@ export default function ProductDetails() {
                               onClick={() => setSelectedWeight(100)}
                               className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
                                 selectedWeight === 100
-                                  ? 'bg-secondary text-primary'
-                                  : 'bg-secondary/20 hover:bg-secondary/30 text-secondary'
+                                  ? 'bg-[#4B5E26] text-[#f5f6db]'
+                                  : 'bg-[#4B5E26]/15 hover:bg-[#4B5E26]/25 text-[#3B4B1B]'
                               }`}
                             >
                               100 جم
@@ -358,8 +358,8 @@ export default function ProductDetails() {
                               onClick={() => setSelectedWeight(250)}
                               className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
                                 selectedWeight === 250
-                                  ? 'bg-secondary text-primary'
-                                  : 'bg-secondary/20 hover:bg-secondary/30 text-secondary'
+                                  ? 'bg-[#4B5E26] text-[#f5f6db]'
+                                  : 'bg-[#4B5E26]/15 hover:bg-[#4B5E26]/25 text-[#3B4B1B]'
                               }`}
                             >
                               250 جم
@@ -368,8 +368,8 @@ export default function ProductDetails() {
                               onClick={() => setSelectedWeight(500)}
                               className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
                                 selectedWeight === 500
-                                  ? 'bg-secondary text-primary'
-                                  : 'bg-secondary/20 hover:bg-secondary/30 text-secondary'
+                                  ? 'bg-[#4B5E26] text-[#f5f6db]'
+                                  : 'bg-[#4B5E26]/15 hover:bg-[#4B5E26]/25 text-[#3B4B1B]'
                               }`}
                             >
                               500 جم
@@ -378,8 +378,8 @@ export default function ProductDetails() {
                               onClick={() => setSelectedWeight(1000)}
                               className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
                                 selectedWeight === 1000
-                                  ? 'bg-secondary text-primary'
-                                  : 'bg-secondary/20 hover:bg-secondary/30 text-secondary'
+                                  ? 'bg-[#4B5E26] text-[#f5f6db]'
+                                  : 'bg-[#4B5E26]/15 hover:bg-[#4B5E26]/25 text-[#3B4B1B]'
                               }`}
                             >
                               1 كجم
@@ -418,8 +418,8 @@ export default function ProductDetails() {
                             key={size.id}
                             onClick={() => setSelectedSize(size)}
                             className={`px-4 py-2 rounded-lg font-bold transition-colors ${ selectedSize?.id === size.id
-                                ? 'bg-secondary text-primary'
-                                : 'bg-gray-200 text-secondary hover:bg-gray-300'}`}
+                                ? 'bg-[#4B5E26] text-[#f5f6db]'
+                                : 'bg-[#4B5E26]/15 text-[#3B4B1B] hover:bg-[#4B5E26]/25'}`}
                           >
                             {size.size}
                           </button>
@@ -454,21 +454,21 @@ export default function ProductDetails() {
                   </div>
                   {/* بطاقة عرض حالة المخزون للعميل */}
                   {inventory.track_stock && (
-                    <div className="mb-6 p-4 rounded-xl border transition-all text-right shadow-sm bg-black/20 border-white/10 backdrop-blur-sm">
+                    <div className="mb-6 p-4 rounded-xl border transition-all text-right shadow-sm bg-[#4B5E26]/8 border-[#4B5E26]/20">
                       <div className="flex items-center justify-between gap-3 mb-2">
-                        <span className="text-xs font-semibold text-secondary/70">حالة توفر المخزون</span>
+                        <span className="text-xs font-semibold text-[#3B4B1B]">حالة توفر المخزون</span>
                         {inventory.stock_quantity === 0 ? (
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
-                            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-800 border border-amber-600/30">
+                            <span className="w-2 h-2 rounded-full bg-amber-600 animate-pulse"></span>
                             <span>(0) مخزون متبقي</span>
                           </span>
                         ) : inventory.stock_quantity <= 5 ? (
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-800 border border-amber-600/30">
                             <span>كمية محدودة!</span>
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#4B5E26]/15 text-[#2E3B16] border border-[#4B5E26]/30">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-[#4B5E26]" />
                             <span>متوفر بالمخزن</span>
                           </span>
                         )}
@@ -481,13 +481,13 @@ export default function ProductDetails() {
                             : `الرصيد المتبقي: ${inventory.stock_quantity} قطعة متوفرة`}
                         </span>
                         {inventory.stock_quantity > 0 && (
-                          <span className="text-xs text-secondary/60">جاهز للتجهيز والشحن</span>
+                          <span className="text-xs text-[#3B4B1B]/75">جاهز للتجهيز والشحن</span>
                         )}
                       </div>
 
                       {/* رسالة توضيحية عند وصول المخزون إلى 0 مع إبقاء زر الطلب نشطاً */}
                       {inventory.stock_quantity === 0 && (
-                        <div className="mt-2.5 pt-2.5 border-t border-white/10 text-xs text-amber-300/90 leading-relaxed">
+                        <div className="mt-2.5 pt-2.5 border-t border-[#4B5E26]/15 text-xs text-amber-900 leading-relaxed">
                           💡 <strong>ملاحظة هامة:</strong> زر إتمام الطلب متاح ونشط بالكامل. يمكنك متابعة طلبك بشكل طبيعي وسيقوم فريق المتجر بتوفير وتجهيز الكمية المطلوبة لك فوراً.
                         </div>
                       )}
@@ -544,7 +544,7 @@ export default function ProductDetails() {
                           toast.success('تمت إضافة المنتج إلى السلة');
                         }
                       }}
-                      className="flex-1 h-14 bg-[#25D366] hover:bg-opacity-90 text-white p-3 rounded-lg font-bold flex items-center justify-center transition-all cursor-pointer shadow-md active:scale-[0.99]"
+                      className="flex-1 h-14 bg-[#4B5E26] hover:bg-[#3B4B1B] text-[#f5f6db] p-3 rounded-lg font-bold flex items-center justify-center transition-all cursor-pointer shadow-md active:scale-[0.99]"
                       title="أضف إلى السلة"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -559,7 +559,7 @@ export default function ProductDetails() {
                   <div className="flex gap-2 items-center mt-3">
                     <button
                       onClick={handleShare}
-                      className="flex-1 h-10 bg-[#4f170c] text-white rounded-lg font-medium hover:bg-opacity-90 flex items-center justify-center gap-2 text-sm"
+                      className="flex-1 h-10 bg-[#3B4B1B] hover:bg-[#2E3B16] text-[#f5f6db] rounded-lg font-medium transition-colors flex items-center justify-center gap-2 text-sm"
                       title="مشاركة المنتج"
                     >
                       <Share2 className="h-4 w-4" />
@@ -567,7 +567,7 @@ export default function ProductDetails() {
                     </button>
                     <button
                       onClick={handleCopyLink}
-                      className="flex-1 h-10 bg-[#4f170c] text-white rounded-lg font-medium hover:bg-opacity-90 flex items-center justify-center gap-2 text-sm"
+                      className="flex-1 h-10 bg-[#3B4B1B] hover:bg-[#2E3B16] text-[#f5f6db] rounded-lg font-medium transition-colors flex items-center justify-center gap-2 text-sm"
                       title="نسخ رابط المنتج"
                     >
                       <Copy className="h-4 w-4" />
@@ -607,12 +607,14 @@ export default function ProductDetails() {
                   onClick={() => navigate(`/product/${item.id}`)}
                 >
                   <img
-                    src={imageUrl || '/placeholder-product.jpg'}
+                    src={imageUrl || '/favicon.png'}
                     alt={item.title}
                     className="w-full h-24 md:h-40 object-cover rounded"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
-                      target.src = '/placeholder-product.jpg';
+                      if (!target.src.endsWith('/favicon.png')) {
+                        target.src = '/favicon.png';
+                      }
                     }}
                   />
                   <div className="mt-2 text-sm md:text-base font-bold text-secondary truncate text-right">{item.title}</div>
@@ -663,7 +665,7 @@ export default function ProductDetails() {
       <div className="flex justify-center pb-8">
         <button
           onClick={() => navigate('/')}
-          className="text-secondary hover:text-accent px-4 py-2 rounded-lg border border-secondary hover:border-accent"
+          className="text-[#3B4B1B] hover:bg-[#4B5E26] hover:text-[#f5f6db] px-5 py-2.5 rounded-lg border border-[#4B5E26]/40 transition-colors font-semibold"
         >
           ← العودة للرئيسية
         </button>

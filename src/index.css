@@ -6,11 +6,13 @@
 
 :root {
   --color-primary: #f5f6db;
-  /* اللون الرئيسي */
+  /* لون الخلفية الكريمي الحالي */
   --color-secondary: #4f170c;
   /* لون الكتابة الرئيسي */
-  --color-accent: #2d1711;
-  /* لون الكتابة الفرعي */
+  --color-accent: #4B5E26;
+  /* اللون الزيتي الأساسي للهيدر والأزرار */
+  --color-olive: #4B5E26;
+  --color-olive-dark: #3B4B1B;
   --color-accent-light: #f5f6db;
   /* لون فرعي */
   --background-color: #f5f6db;
@@ -20,17 +22,17 @@
 
 html {
   direction: rtl;
+  scrollbar-gutter: stable;
 }
 
 body {
   font-family: var(--font-family, 'Cairo', sans-serif);
-  background-color: var(--background-color, #2a2a2a);
-  color: var(--color-secondary, #ffffff);
-  /* دعم التدرج اللوني للخلفية */
+  background-color: var(--background-color, #f5f6db);
+  color: var(--color-secondary, #4f170c);
+  /* دعم التدرج اللوني للخلفية بدون اهتزاز أثناء التمرير */
   background-image: var(--background-gradient, none);
   background-size: cover;
   background-repeat: no-repeat;
-  background-attachment: fixed;
 }
 
 .glass {

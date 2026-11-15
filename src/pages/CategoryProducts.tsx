@@ -77,13 +77,7 @@ export default function CategoryProducts() {
   if (isLoading) {
     return (
     <div
-      className="min-h-screen pt-24 flex items-center justify-center"
-      style={{
-        background: '#2a2a2a !important',
-        backgroundSize: 'cover',
-        backgroundRepeat: 'no-repeat',
-        backgroundAttachment: 'fixed',
-      }}
+      className="min-h-screen pt-[116px] md:pt-24 flex items-center justify-center bg-primary"
     >
         <div className="text-xl text-secondary">جاري التحميل...</div>
       </div>
@@ -93,18 +87,12 @@ export default function CategoryProducts() {
   if (error || !category) {
     return (
     <div
-      className="min-h-screen pt-24 flex flex-col items-center justify-center gap-4"
-      style={{
-        background: '#2a2a2a !important',
-        backgroundSize: 'cover',
-        backgroundRepeat: 'no-repeat',
-        backgroundAttachment: 'fixed',
-      }}
+      className="min-h-screen pt-[116px] md:pt-24 flex flex-col items-center justify-center gap-4 bg-primary"
     >
         <div className="text-xl text-secondary">{error || 'القسم غير موجود'}</div>
         <Link
           to="/"
-          className="bg-accent text-white px-6 py-2 rounded-lg hover:bg-accent-light transition-colors"
+          className="bg-[#4B5E26] hover:bg-[#3B4B1B] text-[#f5f6db] px-6 py-2 rounded-lg transition-colors font-semibold"
         >
           العودة للرئيسية
         </Link>
@@ -114,13 +102,7 @@ export default function CategoryProducts() {
 
   return (
     <div
-      className="min-h-screen pt-24"
-      style={{
-        background: '#2a2a2a !important',
-        backgroundSize: 'cover',
-        backgroundRepeat: 'no-repeat',
-        backgroundAttachment: 'fixed',
-      }}
+      className="min-h-screen pt-[116px] md:pt-24 bg-primary"
     >
       <Helmet>
         <title>{`${category.name} | شركة الرؤى للتجارة والتوريدات والعطارة`}</title>
@@ -135,9 +117,9 @@ export default function CategoryProducts() {
           <span>العودة للرئيسية</span>
         </button>
 
-        <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-8 border border-white/10 shadow-2xl shadow-black/40">
+        <div className="bg-[#4B5E26]/[0.04] rounded-2xl p-8 border border-[#4B5E26]/15 shadow-lg">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-4 text-accent">{category.name}</h1>
+            <h1 className="text-3xl font-bold mb-4 text-[#4B5E26]">{category.name}</h1>
             
             {/* Subcategories list - smaller and closer to title */}
             {subcategories.length > 0 && (
@@ -146,7 +128,7 @@ export default function CategoryProducts() {
                   <Link
                     key={sc.id}
                     to={`/subcategory/${sc.id}`}
-                    className="px-3 py-1.5 text-sm rounded-lg bg-white/20 text-white/90 hover:bg-white/30 hover:text-white transition-all duration-200 border border-white/8 hover:border-white/25"
+                    className="px-3.5 py-1.5 text-sm font-semibold rounded-lg bg-[#4B5E26]/10 text-[#3B4B1B] hover:bg-[#4B5E26] hover:text-[#f5f6db] transition-all duration-200 border border-[#4B5E26]/25"
                   >
                     {sc.name}
                   </Link>

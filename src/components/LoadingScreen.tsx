@@ -90,14 +90,13 @@ export default function LoadingScreen({
               </div>
             </div>
           ) : (
-            // Show actual logo if it loaded successfully
             <img
-              src={logoUrl?.includes('supabase.co') ? '/logo.webp' : (logoUrl || '/logo.webp')}
+              src={logoUrl?.includes('supabase.co') ? '/favicon.png' : (logoUrl || '/favicon.png')}
               alt="Loading Logo"
-              className="w-32 h-32 sm:w-40 sm:h-40 object-contain logo-animation"
+              className="w-32 h-32 sm:w-40 sm:h-40 object-contain rounded-full logo-animation"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
-                if (target.src !== '/logo.webp') {
+                if (!target.src.endsWith('/favicon.png')) {
                   target.src = '/favicon.png';
                 }
               }}

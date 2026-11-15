@@ -199,16 +199,18 @@ export default function ProductCard({
   };
 
   return (
-    <div className="group relative bg-primary rounded-xl border border-secondary/10 overflow-hidden transition-all duration-150 hover:scale-[1.02] hover:shadow-lg shadow-sm flex flex-col justify-between">
+    <div className="group relative bg-primary rounded-xl border border-[#4B5E26]/15 hover:border-[#4B5E26]/40 overflow-hidden transition-all duration-150 hover:scale-[1.02] hover:shadow-lg shadow-sm flex flex-col justify-between">
       <Link to={`/product/${id}`} className="block">
-        <div className="relative aspect-[4/3] w-full">
+        <div className="relative aspect-[4/3] w-full bg-[#4B5E26]/5">
           <img
-            src={imageUrl || '/placeholder-product.jpg'}
+            src={imageUrl || '/favicon.png'}
             alt={title}
             className="absolute inset-0 w-full h-full object-cover"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
-              target.src = '/placeholder-product.jpg';
+              if (!target.src.endsWith('/favicon.png')) {
+                target.src = '/favicon.png';
+              }
             }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
@@ -317,8 +319,8 @@ export default function ProductCard({
               onClick={handleAddToCart}
               disabled={isAdding || isAdded}
               className={`flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-all duration-300 font-semibold text-sm min-w-max ${isAdded
-                  ? 'bg-green-600 text-white'
-                  : `bg-accent text-primary hover:bg-opacity-90 shadow-md hover:shadow-lg`
+                  ? 'bg-[#3B4B1B] text-[#f5f6db]'
+                  : 'bg-[#4B5E26] text-[#f5f6db] hover:bg-[#3B4B1B] shadow-md hover:shadow-lg'
                 } ${isAdding ? 'opacity-75' : ''}`}
               title={isAdded ? 'تمت الإضافة' : 'أضف إلى السلة'}
             >

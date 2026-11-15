@@ -32,18 +32,18 @@ export default function BannerSlider({ banners }: BannerSliderProps) {
 
   return (
     <div
-      className={`relative w-full h-[170px] md:h-[100px] lg:h-[260px] xl:h-[300px] flex items-center justify-center overflow-hidden rounded-none mt-16 md:mt-8 fade-in-banner${fadeIn ? ' fade-in-active' : ''}`}
+      className={`relative w-full h-[170px] md:h-[220px] lg:h-[280px] xl:h-[320px] flex items-center justify-center overflow-hidden rounded-none mt-[104px] md:mt-[76px] fade-in-banner${fadeIn ? ' fade-in-active' : ''}`}
     >
       {/* تأثير Fade-in للبانر عند أول تحميل */}
       <style>{`
         .fade-in-banner {
           opacity: 0;
-          transform: translateY(40px);
-          transition: opacity 0.9s cubic-bezier(.4,0,.2,1), transform 0.9s cubic-bezier(.4,0,.2,1);
+          transform: translate3d(0, 12px, 0);
+          transition: opacity 0.6s cubic-bezier(.4,0,.2,1), transform 0.6s cubic-bezier(.4,0,.2,1);
         }
         .fade-in-banner.fade-in-active {
           opacity: 1;
-          transform: translateY(0);
+          transform: translate3d(0, 0, 0);
         }
       `}</style>
       {banners.map((banner, idx) => (

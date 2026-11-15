@@ -1,12 +1,8 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import ServiceCard from './ServiceCard';
-import FacebookButton from './FacebookButton';
 import { supabase } from '../lib/supabase';
 import type { Service, Category, Subcategory } from '../types/database';
 import { motion, AnimatePresence } from 'framer-motion';
-
-const lightGold = '#CA8A04';
-const brownDark = '#3d2c1d';
 
 export default function Services() {
   const [services, setServices] = useState<Service[]>([]);
@@ -20,6 +16,20 @@ export default function Services() {
   const [hasFeaturedProducts, setHasFeaturedProducts] = useState(false);
   const [hasBestSellerProducts, setHasBestSellerProducts] = useState(false);
   const [visibleCount, setVisibleCount] = useState<number>(24);
+  const productsGridRef = useRef<HTMLDivElement>(null);
+
+  const scrollToProducts = useCallback(() => {
+    window.setTimeout(() => {
+      const el = productsGridRef.current;
+      if (!el) return;
+      const headerOffset = window.innerWidth >= 768 ? 92 : 116;
+      const elementTop = el.getBoundingClientRect().top + window.scrollY;
+      window.scrollTo({
+        top: Math.max(0, elementTop - headerOffset),
+        behavior: 'smooth',
+      });
+    }, 100);
+  }, []);
 
   useEffect(() => {
     fetchCategories();
@@ -124,10 +134,12 @@ export default function Services() {
     setSelectedCategory(categoryId);
     setSelectedSubcategory(null); // Reset subcategory selection
     setOpenCategoryId(prev => (prev === categoryId ? null : categoryId));
+    scrollToProducts();
   };
 
   const handleSubcategoryClick = (subcategoryId: string | null) => {
     setSelectedSubcategory(subcategoryId);
+    scrollToProducts();
   };
 
   if (isLoading) {
@@ -152,24 +164,24 @@ export default function Services() {
   return (
     <section className="py-16" style={{ backgroundColor: 'var(--color-primary)' }} id="products">
       <motion.div
-        className="container mx-auto px-4 bg-secondary/5 backdrop-blur-xl rounded-2xl p-8 border border-secondary/10 shadow-2xl shadow-secondary/5"
+        className="container mx-auto px-4 bg-[#4B5E26]/[0.04] rounded-2xl p-8 border border-[#4B5E26]/15 shadow-lg"
         initial="hidden"
         animate="visible"
         variants={{
           hidden: { opacity: 0, y: 20 },
-          visible: { opacity: 1, y: 0, transition: { duration: 0.8, delayChildren: 0.3, staggerChildren: 0.2 } },
+          visible: { opacity: 1, y: 0, transition: { duration: 0.6, delayChildren: 0.2, staggerChildren: 0.1 } },
         }}
       >
         {/* العنوان المحسن للSEO */}
         <motion.div
           className="text-center mb-12"
           variants={{
-            hidden: { opacity: 0, y: -30 },
+            hidden: { opacity: 0, y: -20 },
             visible: { opacity: 1, y: 0 },
           }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
         >
-          <h2 className="text-3xl font-bold mb-2 text-secondary">
+          <h2 className="text-3xl font-bold mb-2 text-[#2E3B16]">
             {selectedSubcategory ? (
               <>
                 {subcategories.find(sc => sc.id === selectedSubcategory)?.name} -
@@ -206,7 +218,7 @@ export default function Services() {
           className="flex flex-wrap gap-2 justify-center mb-6"
           variants={{
             hidden: { opacity: 0 },
-            visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
+            visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
           }}
         >
           {/* All Products Button */}
@@ -215,13 +227,14 @@ export default function Services() {
               setSelectedCategory(null);
               setSelectedSubcategory(null);
               setOpenCategoryId(null);
+              scrollToProducts();
             }}
-            className={`flex-1 min-w-[140px] px-3 py-2 md:p-4 rounded-xl transition-all duration-300 text-sm md:text-base ${!selectedCategory
-                ? 'bg-accent text-primary font-bold shadow-md'
-                : 'bg-secondary/10 text-secondary hover:bg-secondary/20 hover:shadow-md'
+            className={`flex-1 min-w-[140px] px-3 py-2.5 md:p-4 rounded-xl transition-all duration-200 text-sm md:text-base ${!selectedCategory
+                ? 'bg-[#4B5E26] text-[#f5f6db] font-bold shadow-md'
+                : 'bg-[#4B5E26]/10 text-[#3B4B1B] border border-[#4B5E26]/20 hover:bg-[#4B5E26]/20 hover:shadow-md'
               }`}
             variants={{
-              hidden: { opacity: 0, y: 20 },
+              hidden: { opacity: 0, y: 12 },
               visible: { opacity: 1, y: 0 },
             }}
           >
@@ -235,17 +248,18 @@ export default function Services() {
                 setSelectedCategory('featured');
                 setSelectedSubcategory(null);
                 setOpenCategoryId(null);
+                scrollToProducts();
               }}
-              className={`flex-1 min-w-[140px] px-3 py-2 md:p-4 rounded-xl transition-all duration-300 ${selectedCategory === 'featured'
-                  ? 'bg-accent text-primary font-bold shadow-md'
-                  : 'bg-accent/20 text-accent hover:bg-accent/30 hover:shadow-md'
+              className={`flex-1 min-w-[140px] px-3 py-2.5 md:p-4 rounded-xl transition-all duration-200 ${selectedCategory === 'featured'
+                  ? 'bg-[#4B5E26] text-[#f5f6db] font-bold shadow-md'
+                  : 'bg-[#4B5E26]/15 text-[#3B4B1B] border border-[#4B5E26]/25 hover:bg-[#4B5E26]/25 hover:shadow-md'
                 }`}
               variants={{
-                hidden: { opacity: 0, y: 20 },
+                hidden: { opacity: 0, y: 12 },
                 visible: { opacity: 1, y: 0 },
               }}
             >
-              <h3 className="text-sm md:text-lg font-bold flex items-center gap-1 md:gap-2">
+              <h3 className="text-sm md:text-lg font-bold flex items-center justify-center gap-1 md:gap-2">
                 <span className="text-[#CA8A04]">✨</span> أحدث العروض
               </h3>
             </motion.button>
@@ -258,18 +272,19 @@ export default function Services() {
                 setSelectedCategory('best_sellers');
                 setSelectedSubcategory(null);
                 setOpenCategoryId(null);
+                scrollToProducts();
               }}
-              className={`flex-1 min-w-[140px] px-3 py-2 md:p-4 rounded-xl transition-all duration-300 ${selectedCategory === 'best_sellers'
-                  ? 'bg-red-500 text-white font-bold shadow-md'
-                  : 'bg-red-500/20 text-red-500 hover:bg-red-500/30 hover:shadow-md'
+              className={`flex-1 min-w-[140px] px-3 py-2.5 md:p-4 rounded-xl transition-all duration-200 ${selectedCategory === 'best_sellers'
+                  ? 'bg-[#3B4B1B] text-[#f5f6db] font-bold shadow-md'
+                  : 'bg-[#4B5E26]/15 text-[#3B4B1B] border border-[#4B5E26]/25 hover:bg-[#4B5E26]/25 hover:shadow-md'
                 }`}
               variants={{
-                hidden: { opacity: 0, y: 20 },
+                hidden: { opacity: 0, y: 12 },
                 visible: { opacity: 1, y: 0 },
               }}
             >
-              <h3 className="text-sm md:text-lg font-bold flex items-center gap-1 md:gap-2">
-                <span className="text-red-400">🔥</span> الأكثر مبيعاً
+              <h3 className="text-sm md:text-lg font-bold flex items-center justify-center gap-1 md:gap-2">
+                <span>🔥</span> الأكثر مبيعاً
               </h3>
             </motion.button>
           )}
@@ -280,7 +295,7 @@ export default function Services() {
           className="flex flex-wrap gap-2 justify-center mb-8"
           variants={{
             hidden: { opacity: 0 },
-            visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
+            visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
           }}
         >
           <AnimatePresence>
@@ -288,12 +303,12 @@ export default function Services() {
               <motion.button
                 key={category.id}
                 onClick={() => handleCategoryClick(category.id)}
-                className={`flex-1 min-w-[120px] px-3 py-2 md:p-4 rounded-xl transition-all duration-300 ${category.id === selectedCategory
-                    ? 'bg-accent text-primary font-bold shadow-md'
-                    : 'bg-secondary/10 text-secondary hover:bg-secondary/20 hover:shadow-md'
+                className={`flex-1 min-w-[120px] px-3 py-2.5 md:p-4 rounded-xl transition-all duration-200 ${category.id === selectedCategory
+                    ? 'bg-[#4B5E26] text-[#f5f6db] font-bold shadow-md'
+                    : 'bg-[#4B5E26]/10 text-[#3B4B1B] border border-[#4B5E26]/15 hover:bg-[#4B5E26]/20 hover:shadow-md'
                   }`}
                 variants={{
-                  hidden: { opacity: 0, y: 20 },
+                  hidden: { opacity: 0, y: 12 },
                   visible: { opacity: 1, y: 0 },
                 }}
               >
@@ -309,21 +324,17 @@ export default function Services() {
             className="mb-6"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.25 }}
           >
             <div className="flex flex-wrap gap-3 justify-center">
               {/* زر الكل */}
               <motion.button
                 onClick={() => handleSubcategoryClick(null)}
-                className={`px-4 py-1.5 md:px-6 md:py-2 rounded-full text-xs md:text-sm font-semibold transition-all duration-300 transform hover:scale-105 ${selectedSubcategory === null
-                    ? 'bg-accent text-primary shadow-xl'
-                    : 'bg-secondary/10 text-secondary border-2 border-secondary/20 hover:bg-secondary/20 hover:border-secondary/40 hover:shadow-lg'
+                className={`px-4 py-1.5 md:px-6 md:py-2 rounded-full text-xs md:text-sm font-semibold transition-all duration-200 ${selectedSubcategory === null
+                    ? 'bg-[#4B5E26] text-[#f5f6db] shadow-md'
+                    : 'bg-[#4B5E26]/10 text-[#3B4B1B] border border-[#4B5E26]/25 hover:bg-[#4B5E26]/20'
                   }`}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.2 }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileTap={{ scale: 0.96 }}
               >
                 الكل
               </motion.button>
@@ -332,20 +343,15 @@ export default function Services() {
               <AnimatePresence>
                 {subcategories
                   .filter(sc => sc.category_id === openCategoryId)
-                  .map((subcategory, idx) => (
+                  .map((subcategory) => (
                     <motion.button
                       key={subcategory.id}
                       onClick={() => handleSubcategoryClick(subcategory.id)}
-                      className={`px-4 py-1.5 md:px-6 md:py-2 rounded-full text-xs md:text-sm font-semibold transition-all duration-300 transform hover:scale-105 ${selectedSubcategory === subcategory.id
-                          ? 'bg-accent text-primary shadow-xl'
-                          : 'bg-secondary/10 text-secondary border-2 border-secondary/20 hover:bg-secondary/20 hover:border-secondary/40 hover:shadow-lg'
+                      className={`px-4 py-1.5 md:px-6 md:py-2 rounded-full text-xs md:text-sm font-semibold transition-all duration-200 ${selectedSubcategory === subcategory.id
+                          ? 'bg-[#4B5E26] text-[#f5f6db] shadow-md'
+                          : 'bg-[#4B5E26]/10 text-[#3B4B1B] border border-[#4B5E26]/25 hover:bg-[#4B5E26]/20'
                         }`}
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.8 }}
-                      transition={{ duration: 0.2, delay: idx * 0.05 }}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
+                      whileTap={{ scale: 0.96 }}
                     >
                       {subcategory.name}
                     </motion.button>
@@ -358,10 +364,11 @@ export default function Services() {
 
         {/* Products Grid */}
         <motion.div
+          ref={productsGridRef}
           className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8"
           variants={{
             hidden: { opacity: 0 },
-            visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
+            visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
           }}
         >
           <AnimatePresence mode="wait">
@@ -370,11 +377,11 @@ export default function Services() {
                 <motion.div
                   key={service.id}
                   variants={{
-                    hidden: { opacity: 0, y: 20 },
+                    hidden: { opacity: 0, y: 16 },
                     visible: { opacity: 1, y: 0 },
-                    exit: { opacity: 0, y: -20 }
+                    exit: { opacity: 0, y: -16 }
                   }}
-                  transition={{ duration: 0.4 }}
+                  transition={{ duration: 0.3 }}
                 >
                   <ServiceCard
                     id={service.id}
@@ -398,7 +405,7 @@ export default function Services() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 className="col-span-full text-center text-secondary text-xl"
-                transition={{ duration: 0.5 }}
+                transition={{ duration: 0.4 }}
               >
                 لا توجد منتجات في هذه الفئة.
               </motion.div>
@@ -411,7 +418,7 @@ export default function Services() {
             <button
               type="button"
               onClick={() => setVisibleCount((c) => c + 24)}
-              className="px-6 py-3 rounded-xl bg-accent text-primary font-bold shadow-md hover:shadow-lg transition-all duration-200"
+              className="px-6 py-3 rounded-xl bg-[#4B5E26] hover:bg-[#3B4B1B] text-[#f5f6db] font-bold shadow-md hover:shadow-lg transition-all duration-200"
             >
               تحميل المزيد
             </button>

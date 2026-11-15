@@ -24,7 +24,7 @@ const ToastNotification: React.FC<ToastNotificationProps> = ({
           transition={{ duration: 0.3, ease: 'easeOut' }}
           className="fixed top-4 left-4 right-4 md:left-1/2 md:right-auto md:-translate-x-1/2 md:w-auto z-50"
         >
-          <div className="bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-3 md:px-6 md:py-3 rounded-xl shadow-2xl flex items-center justify-between gap-2 md:gap-3">
+          <div className="bg-gradient-to-r from-[#4B5E26] to-[#3B4B1B] text-[#f5f6db] px-4 py-3 md:px-6 md:py-3 rounded-xl shadow-2xl flex items-center justify-between gap-2 md:gap-3 border border-[#657C38]/40">
             <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
               <Check className="w-5 h-5 flex-shrink-0" />
               <span className="font-medium text-sm md:text-base truncate">
