@@ -1,5 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import ServiceCard from './ServiceCard';
+import CategoryVisual from './CategoryVisual';
+import { syncCategoryImagesFromDB } from '../utils/categoryImagesManager';
 import { supabase } from '../lib/supabase';
 import type { Service, Category, Subcategory } from '../types/database';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -16,13 +18,13 @@ export default function Services() {
   const [hasFeaturedProducts, setHasFeaturedProducts] = useState(false);
   const [hasBestSellerProducts, setHasBestSellerProducts] = useState(false);
   const [visibleCount, setVisibleCount] = useState<number>(24);
-  const productsGridRef = useRef<HTMLDivElement>(null);
+  const resultsStartRef = useRef<HTMLDivElement>(null);
 
-  const scrollToProducts = useCallback(() => {
+  const scrollToResults = useCallback(() => {
     window.setTimeout(() => {
-      const el = productsGridRef.current;
+      const el = resultsStartRef.current;
       if (!el) return;
-      const headerOffset = window.innerWidth >= 768 ? 92 : 116;
+      const headerOffset = window.innerWidth >= 768 ? 88 : 112;
       const elementTop = el.getBoundingClientRect().top + window.scrollY;
       window.scrollTo({
         top: Math.max(0, elementTop - headerOffset),
@@ -35,6 +37,7 @@ export default function Services() {
     fetchCategories();
     fetchServices();
     fetchSubcategories();
+    syncCategoryImagesFromDB();
   }, []);
 
   const fetchCategories = async () => {
@@ -133,13 +136,13 @@ export default function Services() {
   const handleCategoryClick = (categoryId: string) => {
     setSelectedCategory(categoryId);
     setSelectedSubcategory(null); // Reset subcategory selection
-    setOpenCategoryId(prev => (prev === categoryId ? null : categoryId));
-    scrollToProducts();
+    setOpenCategoryId(categoryId);
+    scrollToResults();
   };
 
   const handleSubcategoryClick = (subcategoryId: string | null) => {
     setSelectedSubcategory(subcategoryId);
-    scrollToProducts();
+    scrollToResults();
   };
 
   if (isLoading) {
@@ -164,7 +167,7 @@ export default function Services() {
   return (
     <section className="py-16" style={{ backgroundColor: 'var(--color-primary)' }} id="products">
       <motion.div
-        className="container mx-auto px-4 bg-[#4B5E26]/[0.04] rounded-2xl p-8 border border-[#4B5E26]/15 shadow-lg"
+        className="container mx-auto px-3 sm:px-4 bg-[#4B5E26]/[0.04] rounded-2xl p-4 sm:p-8 border border-[#4B5E26]/15 shadow-lg"
         initial="hidden"
         animate="visible"
         variants={{
@@ -172,200 +175,227 @@ export default function Services() {
           visible: { opacity: 1, y: 0, transition: { duration: 0.6, delayChildren: 0.2, staggerChildren: 0.1 } },
         }}
       >
-        {/* العنوان المحسن للSEO */}
+        {/* عنوان القسم الرئيسي */}
         <motion.div
-          className="text-center mb-12"
+          className="text-center mb-6 sm:mb-8"
           variants={{
             hidden: { opacity: 0, y: -20 },
             visible: { opacity: 1, y: 0 },
           }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
         >
-          <h2 className="text-3xl font-bold mb-2 text-[#2E3B16]">
-            {selectedSubcategory ? (
-              <>
-                {subcategories.find(sc => sc.id === selectedSubcategory)?.name} -
-                {categories.find(c => c.id === selectedCategory)?.name}
-              </>
-            ) : selectedCategory ? (
-              categories.find(c => c.id === selectedCategory)?.name || 'منتجاتنا'
-            ) : (
-              'منتجاتنا'
-            )}
+          <h2 className="text-2xl sm:text-3xl font-bold mb-2 text-[#2E3B16] inline-flex items-center justify-center gap-2">
+            <span>بتدور على إيه؟</span>
           </h2>
-
-          {/* SEO-optimized description */}
-          <div className="max-w-3xl mx-auto text-secondary/80 text-lg leading-relaxed mb-3">
-            {selectedSubcategory ? (
-              <p>
-                اكتشف مجموعة واسعة من <strong>{subcategories.find(sc => sc.id === selectedSubcategory)?.name}</strong>
-                في قسم <strong>{categories.find(c => c.id === selectedCategory)?.name}</strong> من
-                <strong> شركة الرؤى للتجارة والتوريدات والعطارة</strong>. نقدم أجود أنواع الأعشاب والتوابل والزيوت العطرية
-                بأسعار تنافسية وجودة عالية.
-              </p>
-            ) : selectedCategory ? (
-              <p>
-                تصفح مجموعة متنوعة من <strong>{categories.find(c => c.id === selectedCategory)?.name}</strong>
-                من <strong>شركة الرؤى للتجارة والتوريدات والعطارة</strong>. توابل، أعشاب، زيوت عطرية،
-                مكسرات وأكثر بأسعار مناسبة وجودة مضمونة طبقاً للمواصفات القياسية.
-              </p>
-            ) : null}
-          </div>
-        </motion.div>
-
-        {/* Special Categories */}
-        <motion.div
-          className="flex flex-wrap gap-2 justify-center mb-6"
-          variants={{
-            hidden: { opacity: 0 },
-            visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
-          }}
-        >
-          {/* All Products Button */}
-          <motion.button
-            onClick={() => {
-              setSelectedCategory(null);
-              setSelectedSubcategory(null);
-              setOpenCategoryId(null);
-              scrollToProducts();
-            }}
-            className={`flex-1 min-w-[140px] px-3 py-2.5 md:p-4 rounded-xl transition-all duration-200 text-sm md:text-base ${!selectedCategory
-                ? 'bg-[#4B5E26] text-[#f5f6db] font-bold shadow-md'
-                : 'bg-[#4B5E26]/10 text-[#3B4B1B] border border-[#4B5E26]/20 hover:bg-[#4B5E26]/20 hover:shadow-md'
-              }`}
-            variants={{
-              hidden: { opacity: 0, y: 12 },
-              visible: { opacity: 1, y: 0 },
-            }}
-          >
-            جميع المنتجات
-          </motion.button>
-
-          {/* Featured Products Category */}
-          {hasFeaturedProducts && (
-            <motion.button
-              onClick={() => {
-                setSelectedCategory('featured');
-                setSelectedSubcategory(null);
-                setOpenCategoryId(null);
-                scrollToProducts();
-              }}
-              className={`flex-1 min-w-[140px] px-3 py-2.5 md:p-4 rounded-xl transition-all duration-200 ${selectedCategory === 'featured'
-                  ? 'bg-[#4B5E26] text-[#f5f6db] font-bold shadow-md'
-                  : 'bg-[#4B5E26]/15 text-[#3B4B1B] border border-[#4B5E26]/25 hover:bg-[#4B5E26]/25 hover:shadow-md'
-                }`}
-              variants={{
-                hidden: { opacity: 0, y: 12 },
-                visible: { opacity: 1, y: 0 },
-              }}
-            >
-              <h3 className="text-sm md:text-lg font-bold flex items-center justify-center gap-1 md:gap-2">
-                <span className="text-[#CA8A04]">✨</span> أحدث العروض
-              </h3>
-            </motion.button>
-          )}
-
-          {/* Best Sellers Category */}
-          {hasBestSellerProducts && (
-            <motion.button
-              onClick={() => {
-                setSelectedCategory('best_sellers');
-                setSelectedSubcategory(null);
-                setOpenCategoryId(null);
-                scrollToProducts();
-              }}
-              className={`flex-1 min-w-[140px] px-3 py-2.5 md:p-4 rounded-xl transition-all duration-200 ${selectedCategory === 'best_sellers'
-                  ? 'bg-[#3B4B1B] text-[#f5f6db] font-bold shadow-md'
-                  : 'bg-[#4B5E26]/15 text-[#3B4B1B] border border-[#4B5E26]/25 hover:bg-[#4B5E26]/25 hover:shadow-md'
-                }`}
-              variants={{
-                hidden: { opacity: 0, y: 12 },
-                visible: { opacity: 1, y: 0 },
-              }}
-            >
-              <h3 className="text-sm md:text-lg font-bold flex items-center justify-center gap-1 md:gap-2">
-                <span>🔥</span> الأكثر مبيعاً
-              </h3>
-            </motion.button>
-          )}
         </motion.div>
 
         {/* Regular Categories */}
         <motion.div
-          className="flex flex-wrap gap-2 justify-center mb-8"
+          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 md:gap-3 mb-5"
           variants={{
             hidden: { opacity: 0 },
-            visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
+            visible: { opacity: 1, transition: { staggerChildren: 0.06 } },
           }}
         >
           <AnimatePresence>
-            {categories.map((category) => (
-              <motion.button
-                key={category.id}
-                onClick={() => handleCategoryClick(category.id)}
-                className={`flex-1 min-w-[120px] px-3 py-2.5 md:p-4 rounded-xl transition-all duration-200 ${category.id === selectedCategory
-                    ? 'bg-[#4B5E26] text-[#f5f6db] font-bold shadow-md'
-                    : 'bg-[#4B5E26]/10 text-[#3B4B1B] border border-[#4B5E26]/15 hover:bg-[#4B5E26]/20 hover:shadow-md'
+            {categories.map((category) => {
+              const isSelected = category.id === selectedCategory;
+              return (
+                <motion.button
+                  key={category.id}
+                  onClick={() => handleCategoryClick(category.id)}
+                  className={`flex items-center gap-2.5 md:gap-3 px-2.5 py-2.5 md:px-4 md:py-3 rounded-xl transition-all duration-200 text-right ${
+                    isSelected
+                      ? 'bg-[#4B5E26] text-[#f5f6db] font-bold shadow-md ring-2 ring-[#3B4B1B]/30'
+                      : 'bg-[#4B5E26]/10 text-[#3B4B1B] border border-[#4B5E26]/15 hover:bg-[#4B5E26]/20 hover:shadow-md'
                   }`}
-                variants={{
-                  hidden: { opacity: 0, y: 12 },
-                  visible: { opacity: 1, y: 0 },
-                }}
-              >
-                <h3 className="text-sm md:text-lg font-bold text-center">{category.name}</h3>
-              </motion.button>
-            ))}
+                  variants={{
+                    hidden: { opacity: 0, y: 12 },
+                    visible: { opacity: 1, y: 0 },
+                  }}
+                >
+                  <CategoryVisual
+                    categoryId={category.id}
+                    categoryName={category.name}
+                    customImageUrl={category.image_url}
+                    isActive={isSelected}
+                    size="md"
+                  />
+                  <h3 className="text-xs sm:text-sm md:text-base font-bold leading-snug line-clamp-2 flex-1">
+                    {category.name}
+                  </h3>
+                </motion.button>
+              );
+            })}
           </AnimatePresence>
         </motion.div>
 
-        {/* Subcategories Section */}
-        {openCategoryId && (
-          <motion.div
-            className="mb-6"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.25 }}
-          >
-            <div className="flex flex-wrap gap-3 justify-center">
-              {/* زر الكل */}
-              <motion.button
-                onClick={() => handleSubcategoryClick(null)}
-                className={`px-4 py-1.5 md:px-6 md:py-2 rounded-full text-xs md:text-sm font-semibold transition-all duration-200 ${selectedSubcategory === null
-                    ? 'bg-[#4B5E26] text-[#f5f6db] shadow-md'
-                    : 'bg-[#4B5E26]/10 text-[#3B4B1B] border border-[#4B5E26]/25 hover:bg-[#4B5E26]/20'
-                  }`}
-                whileTap={{ scale: 0.96 }}
+        {/* Special Highlights: أحدث العروض & الأكثر مبيعاً (أسفل الأقسام الرئيسية بشكل مصغر ومميز) */}
+        {(hasFeaturedProducts || hasBestSellerProducts || selectedCategory !== null) && (
+          <div className="flex flex-wrap items-center justify-center gap-2.5 mb-6">
+            {hasFeaturedProducts && (
+              <button
+                type="button"
+                onClick={() => {
+                  const next = selectedCategory === 'featured' ? null : 'featured';
+                  setSelectedCategory(next);
+                  setSelectedSubcategory(null);
+                  setOpenCategoryId(null);
+                  if (next) scrollToResults();
+                }}
+                className={`px-4 py-1.5 sm:px-5 sm:py-2 rounded-full text-xs sm:text-sm font-bold transition-all duration-200 flex items-center gap-1.5 border ${
+                  selectedCategory === 'featured'
+                    ? 'bg-[#CA8A04] text-white border-[#B45309] shadow-md scale-[1.03]'
+                    : 'bg-[#CA8A04]/12 text-[#854D0E] border-[#CA8A04]/40 hover:bg-[#CA8A04]/25'
+                }`}
               >
-                الكل
-              </motion.button>
+                <span>✨</span>
+                <span>أحدث العروض</span>
+              </button>
+            )}
 
-              {/* الأقسام الفرعية */}
-              <AnimatePresence>
-                {subcategories
-                  .filter(sc => sc.category_id === openCategoryId)
-                  .map((subcategory) => (
-                    <motion.button
-                      key={subcategory.id}
-                      onClick={() => handleSubcategoryClick(subcategory.id)}
-                      className={`px-4 py-1.5 md:px-6 md:py-2 rounded-full text-xs md:text-sm font-semibold transition-all duration-200 ${selectedSubcategory === subcategory.id
-                          ? 'bg-[#4B5E26] text-[#f5f6db] shadow-md'
-                          : 'bg-[#4B5E26]/10 text-[#3B4B1B] border border-[#4B5E26]/25 hover:bg-[#4B5E26]/20'
-                        }`}
-                      whileTap={{ scale: 0.96 }}
-                    >
-                      {subcategory.name}
-                    </motion.button>
-                  ))}
-              </AnimatePresence>
-            </div>
+            {hasBestSellerProducts && (
+              <button
+                type="button"
+                onClick={() => {
+                  const next = selectedCategory === 'best_sellers' ? null : 'best_sellers';
+                  setSelectedCategory(next);
+                  setSelectedSubcategory(null);
+                  setOpenCategoryId(null);
+                  if (next) scrollToResults();
+                }}
+                className={`px-4 py-1.5 sm:px-5 sm:py-2 rounded-full text-xs sm:text-sm font-bold transition-all duration-200 flex items-center gap-1.5 border ${
+                  selectedCategory === 'best_sellers'
+                    ? 'bg-[#4f170c] text-[#f5f6db] border-[#3d1108] shadow-md scale-[1.03]'
+                    : 'bg-[#4f170c]/10 text-[#4f170c] border-[#4f170c]/30 hover:bg-[#4f170c]/20'
+                }`}
+              >
+                <span>🔥</span>
+                <span>الأكثر مبيعاً</span>
+              </button>
+            )}
 
-          </motion.div>
+            {selectedCategory !== null && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedCategory(null);
+                  setSelectedSubcategory(null);
+                  setOpenCategoryId(null);
+                }}
+                className="px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-semibold bg-[#4B5E26]/10 text-[#3B4B1B] border border-[#4B5E26]/25 hover:bg-[#4B5E26]/20 transition-colors"
+              >
+                عرض الكل ✕
+              </button>
+            )}
+          </div>
         )}
 
-        {/* Products Grid */}
-        <motion.div
-          ref={productsGridRef}
-          className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8"
+        {/* بداية عرض وصف القسم المختار + الأقسام الفرعية + المنتجات */}
+        <div ref={resultsStartRef} className="pt-2">
+          {/* وصف القسم المختار فوق الأقسام الفرعية */}
+          {(() => {
+            const activeCategoryObj =
+              selectedCategory && selectedCategory !== 'featured' && selectedCategory !== 'best_sellers'
+                ? categories.find(c => c.id === selectedCategory)
+                : null;
+            const activeSubcatObj = selectedSubcategory
+              ? subcategories.find(sc => sc.id === selectedSubcategory)
+              : null;
+
+            const headingText = activeSubcatObj
+              ? `${activeSubcatObj.name} - ${activeCategoryObj?.name || ''}`
+              : activeCategoryObj
+                ? activeCategoryObj.name
+                : selectedCategory === 'featured'
+                  ? 'أحدث العروض'
+                  : selectedCategory === 'best_sellers'
+                    ? 'الأكثر مبيعاً'
+                    : null;
+
+            if (!headingText) return null;
+
+            return (
+              <div className="mb-5 p-4 rounded-xl bg-[#4B5E26]/[0.08] border border-[#4B5E26]/20 text-center">
+                <h3 className="text-lg sm:text-xl font-bold text-[#2E3B16] mb-1.5">
+                  {headingText}
+                </h3>
+                <div className="max-w-3xl mx-auto text-secondary/80 text-xs sm:text-sm md:text-base leading-relaxed">
+                  {activeSubcatObj ? (
+                    <p>
+                      {activeSubcatObj.description || (
+                        <>
+                          اكتشف مجموعة مميزة من <strong>{activeSubcatObj.name}</strong> في قسم{' '}
+                          <strong>{activeCategoryObj?.name}</strong> من{' '}
+                          <strong>شركة الرؤى للتجارة والتوريدات والعطارة</strong> بأعلى جودة وأفضل سعر.
+                        </>
+                      )}
+                    </p>
+                  ) : activeCategoryObj ? (
+                    <p>
+                      {activeCategoryObj.description || (
+                        <>
+                          تصفح مجموعة متنوعة من <strong>{activeCategoryObj.name}</strong> من{' '}
+                          <strong>شركة الرؤى للتجارة والتوريدات والعطارة</strong> بجودة مضمونة وأسعار تنافسية.
+                        </>
+                      )}
+                    </p>
+                  ) : selectedCategory === 'featured' ? (
+                    <p>تصفح أحدث العروض والتخفيضات المميزة من شركة الرؤى للتجارة والتوريدات والعطارة.</p>
+                  ) : (
+                    <p>تصفح المنتجات الأكثر طلباً ومبيعاً لدى عملائنا في متجر الرؤى.</p>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* Subcategories Section (تحت وصف القسم وفوق المنتجات) */}
+          {openCategoryId && subcategories.some(sc => sc.category_id === openCategoryId) && (
+            <motion.div
+              className="mb-6"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.25 }}
+            >
+              <div className="flex flex-wrap gap-2 justify-center">
+                {/* زر الكل */}
+                <motion.button
+                  onClick={() => handleSubcategoryClick(null)}
+                  className={`px-3.5 py-1.5 md:px-5 md:py-1.5 rounded-full text-xs md:text-sm font-semibold transition-all duration-200 ${selectedSubcategory === null
+                      ? 'bg-[#4B5E26] text-[#f5f6db] shadow-md'
+                      : 'bg-[#4B5E26]/10 text-[#3B4B1B] border border-[#4B5E26]/25 hover:bg-[#4B5E26]/20'
+                    }`}
+                  whileTap={{ scale: 0.96 }}
+                >
+                  الكل
+                </motion.button>
+
+                {/* الأقسام الفرعية */}
+                <AnimatePresence>
+                  {subcategories
+                    .filter(sc => sc.category_id === openCategoryId)
+                    .map((subcategory) => (
+                      <motion.button
+                        key={subcategory.id}
+                        onClick={() => handleSubcategoryClick(subcategory.id)}
+                        className={`px-3.5 py-1.5 md:px-5 md:py-1.5 rounded-full text-xs md:text-sm font-semibold transition-all duration-200 ${selectedSubcategory === subcategory.id
+                            ? 'bg-[#4B5E26] text-[#f5f6db] shadow-md'
+                            : 'bg-[#4B5E26]/10 text-[#3B4B1B] border border-[#4B5E26]/25 hover:bg-[#4B5E26]/20'
+                          }`}
+                        whileTap={{ scale: 0.96 }}
+                      >
+                        {subcategory.name}
+                      </motion.button>
+                    ))}
+                </AnimatePresence>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Products Grid */}
+          <motion.div
+            className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-8"
           variants={{
             hidden: { opacity: 0 },
             visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
@@ -411,7 +441,8 @@ export default function Services() {
               </motion.div>
             )}
           </AnimatePresence>
-        </motion.div>
+          </motion.div>
+        </div>
 
         {filteredServices().length > visibleCount && (
           <div className="flex justify-center mt-10">

@@ -215,13 +215,13 @@ export default function ProductCard({
           />
           <div className="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
         </div>
-        <div className="p-5 pb-2">
-          <h3 className="text-lg font-bold mb-2 text-secondary flex items-center gap-2">
-            {title}
-            <Sparkles className={`h-4 w-4 text-accent`} />
+        <div className="p-3.5 sm:p-5 pb-2">
+          <h3 className="text-sm md:text-base font-bold mb-1.5 text-secondary flex items-start gap-1.5 leading-snug">
+            <span className="line-clamp-2 flex-1">{title}</span>
+            <Sparkles className="h-3.5 w-3.5 text-accent shrink-0 mt-0.5" />
           </h3>
           {description && (
-            <p className="text-sm text-secondary/70 line-clamp-2 mb-3">
+            <p className="text-xs sm:text-sm text-secondary/70 line-clamp-2 mb-2.5">
               {description}
             </p>
           )}
@@ -248,17 +248,17 @@ export default function ProductCard({
         </div>
       </Link>
 
-      <div className="px-6 pb-4">
-        <div className="flex justify-between items-end gap-3">
+      <div className="px-3.5 sm:px-6 pb-3.5 sm:pb-4">
+        <div className="flex justify-between items-end gap-2 sm:gap-3">
           <div className="flex flex-col items-end flex-1">
             {has_weight_pricing ? (
               <>
                 <div className="flex flex-col items-end">
                   <div className="flex items-center gap-1">
-                    <span className={`font-bold text-lg sm:text-xl text-accent`}>
+                    <span className="font-bold text-base sm:text-lg text-accent">
                       {((displaySalePrice || displayPrice || 0) / 10).toFixed(1)}
                     </span>
-                    <span className={`font-bold text-lg sm:text-xl text-accent`}>ج</span>
+                    <span className="font-bold text-base sm:text-lg text-accent">ج</span>
                   </div>
                   <span className="text-xs text-secondary/40">/100 جرام</span>
                 </div>
@@ -275,10 +275,10 @@ export default function ProductCard({
             ) : has_multiple_sizes && (displayPrice || displaySalePrice) ? (
               <>
                 <div className="flex items-center gap-1">
-                  <span className={`font-bold text-lg sm:text-xl text-accent`}>
+                  <span className="font-bold text-base sm:text-lg text-accent">
                     {displaySalePrice || displayPrice}
                   </span>
-                  <span className={`font-bold text-lg sm:text-xl text-accent`}>ج</span>
+                  <span className="font-bold text-base sm:text-lg text-accent">ج</span>
                 </div>
                 {pricingStrategy === 'smart-fallback' || hasMultiplePrices ? (
                   <span className="text-xs text-secondary/50">ابتداءً من</span>
@@ -289,21 +289,21 @@ export default function ProductCard({
             ) : displaySalePrice ? (
               <>
                 <div className="flex items-center gap-1">
-                  <span className={`font-bold text-lg sm:text-xl text-accent`}>{displaySalePrice}</span>
-                  <span className={`font-bold text-lg sm:text-xl text-accent`}>ج</span>
+                  <span className="font-bold text-base sm:text-lg text-accent">{displaySalePrice}</span>
+                  <span className="font-bold text-base sm:text-lg text-accent">ج</span>
                 </div>
                 {displayPrice && (
                   <div className="flex items-center gap-1">
-                    <span className="text-sm text-secondary/40 line-through">{displayPrice}</span>
-                    <span className="text-sm text-secondary/40 line-through">ج</span>
+                    <span className="text-xs sm:text-sm text-secondary/40 line-through">{displayPrice}</span>
+                    <span className="text-xs sm:text-sm text-secondary/40 line-through">ج</span>
                   </div>
                 )}
               </>
             ) : displayPrice ? (
               <>
                 <div className="flex items-center gap-1">
-                  <span className={`font-bold text-lg sm:text-xl text-accent`}>{displayPrice}</span>
-                  <span className={`font-bold text-lg sm:text-xl text-accent`}>ج</span>
+                  <span className="font-bold text-base sm:text-lg text-accent">{displayPrice}</span>
+                  <span className="font-bold text-base sm:text-lg text-accent">ج</span>
                 </div>
                 {pricingStrategy === 'smart-fallback' && (
                   <span className="text-xs text-secondary/50">ابتداءً من</span>

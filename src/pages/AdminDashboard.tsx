@@ -15,6 +15,12 @@ import {
   syncInventoryFromDB,
   subscribeToInventory
 } from '../utils/inventoryManager';
+import CategoryVisual from '../components/CategoryVisual';
+import {
+  getCategoryImageUrl,
+  setCategoryImageUrl,
+  syncCategoryImagesFromDB
+} from '../utils/categoryImagesManager';
 
 const brownDark = '#3d2c1d';
 const successGreen = '#228B22'; // Natural green color
@@ -112,7 +118,8 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
   const [productCategoryFilter, setProductCategoryFilter] = useState<string>('all');
   const [productSubcategoryFilter, setProductSubcategoryFilter] = useState<string | null>(null);
 
-  const [newCategory, setNewCategory] = useState({ name: '', description: '' });
+  const [newCategory, setNewCategory] = useState({ name: '', description: '', image_url: '' });
+  const [uploadingCategoryImage, setUploadingCategoryImage] = useState(false);
   const [newSubcategory, setNewSubcategory] = useState({ category_id: '', name_ar: '', description_ar: '' });
   const [newService, setNewService] = useState({
     title: '',
@@ -467,8 +474,8 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
         .order('created_at', { ascending: false });
       if (servicesError) throw servicesError;
 
-      // مزامنة المخزون وسجل الطلبات من قاعدة البيانات
-      await syncInventoryFromDB();
+      // مزامنة المخزون وصور الأقسام وسجل الطلبات من قاعدة البيانات
+      await Promise.all([syncInventoryFromDB(), syncCategoryImagesFromDB()]);
       const enrichedServices = enrichServicesWithInventory(servicesData || []);
       setServices(enrichedServices);
       setOrdersLog(getLocalOrdersLog());
@@ -785,6 +792,34 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
 
   
 
+  const handleCategoryImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setUploadingCategoryImage(true);
+    try {
+      if (!file.type.startsWith('image/')) {
+        throw new Error('الرجاء اختيار ملف صورة صالح');
+      }
+
+      const fileToUpload = await resizeImageIfNeeded(file, 120);
+      const fileExt = fileToUpload.name.split('.').pop() || 'webp';
+      const filePath = `category_${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage.from('services').upload(filePath, fileToUpload);
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage.from('services').getPublicUrl(filePath);
+      setNewCategory(prev => ({ ...prev, image_url: publicUrl }));
+      setSuccessMsg('تم رفع صورة القسم بنجاح!');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'حدث خطأ غير متوقع';
+      setError(`خطأ في رفع صورة القسم: ${msg}`);
+    } finally {
+      setUploadingCategoryImage(false);
+    }
+  };
+
   const handleAddCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCategory.name.trim()) {
@@ -793,9 +828,18 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
     }
     setIsLoading(true);
     try {
-      const { error } = await supabase.from('categories').insert([newCategory]);
+      const { data: insertedCat, error } = await supabase
+        .from('categories')
+        .insert([{ name: newCategory.name, description: newCategory.description }])
+        .select()
+        .single();
       if (error) throw error;
-      setNewCategory({ name: '', description: '' });
+
+      if (insertedCat?.id && newCategory.image_url.trim()) {
+        await setCategoryImageUrl(insertedCat.id, newCategory.image_url.trim());
+      }
+
+      setNewCategory({ name: '', description: '', image_url: '' });
       await fetchData();
       setSuccessMsg("تمت إضافة القسم بنجاح!");
     } catch (err: any) {
@@ -807,7 +851,11 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
 
   const handleEditCategory = (category: Category) => {
     setEditingCategory(category.id);
-    setNewCategory({ name: category.name, description: category.description || '' });
+    setNewCategory({
+      name: category.name,
+      description: category.description || '',
+      image_url: getCategoryImageUrl(category.id) || category.image_url || ''
+    });
     const formElement = document.getElementById('category-form');
     formElement?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
@@ -826,7 +874,9 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
         .eq('id', editingCategory);
       if (error) throw error;
 
-      setNewCategory({ name: '', description: '' });
+      await setCategoryImageUrl(editingCategory, newCategory.image_url.trim() || null);
+
+      setNewCategory({ name: '', description: '', image_url: '' });
       setEditingCategory(null);
       await fetchData();
       setSuccessMsg("تم تحديث القسم بنجاح!");
@@ -839,7 +889,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
 
   const handleCancelEditCategory = () => {
     setEditingCategory(null);
-    setNewCategory({ name: '', description: '' });
+    setNewCategory({ name: '', description: '', image_url: '' });
   };
 
   const handleDeleteConfirmation = async () => {
@@ -853,6 +903,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
         await supabase.from('services').delete().eq('category_id', deleteModal.id);
         // Then delete the category
         await supabase.from('categories').delete().eq('id', deleteModal.id);
+        await setCategoryImageUrl(String(deleteModal.id), null);
         message = "تم حذف القسم والمنتجات المرتبطة به.";
       } else if (deleteModal.type === 'service') {
         await supabase.from('services').delete().eq('id', deleteModal.id);
@@ -3613,8 +3664,61 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                       <form onSubmit={editingCategory ? handleUpdateCategory : handleAddCategory} className="mb-8 space-y-4" id="category-form">
                         <input type="text" placeholder="اسم القسم" value={newCategory.name} onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })} className="w-full p-3 rounded text-white bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" required disabled={isLoading}/>
                         <textarea placeholder="وصف القسم (اختياري)" value={newCategory.description} onChange={(e) => setNewCategory({ ...newCategory, description: e.target.value })} rows={3} className="w-full p-3 rounded text-white bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" disabled={isLoading}/>
+
+                        {/* صورة / أيقونة القسم الرئيسي */}
+                        <div className="p-4 rounded-lg bg-gray-800/80 border border-gray-600 space-y-3">
+                          <div className="flex items-center justify-between flex-wrap gap-3">
+                            <div className="flex items-center gap-3">
+                              <CategoryVisual
+                                categoryName={newCategory.name || 'قسم'}
+                                customImageUrl={newCategory.image_url || null}
+                                size="lg"
+                              />
+                              <div>
+                                <div className="text-sm font-bold text-white">صورة القسم الرئيسي (تظهر بجانب اسم القسم في المتجر)</div>
+                                <div className="text-xs text-gray-400">
+                                  {newCategory.image_url
+                                    ? 'سيتم عرض الصورة المخصصة التي اخترتها'
+                                    : 'يتم عرض أيقونة متجهة تلقائية مناسبة لاسم القسم عند تركها فارغة'}
+                                </div>
+                              </div>
+                            </div>
+                            {newCategory.image_url && (
+                              <button
+                                type="button"
+                                onClick={() => setNewCategory(prev => ({ ...prev, image_url: '' }))}
+                                className="text-xs bg-red-500/20 hover:bg-red-500/30 text-red-300 px-3 py-1.5 rounded-md border border-red-500/30 transition-colors"
+                              >
+                                حذف الصورة والعودة للأيقونة التلقائية
+                              </button>
+                            )}
+                          </div>
+
+                          <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+                            <label className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-md font-semibold text-sm flex items-center justify-center gap-2 transition-colors shrink-0">
+                              <Upload size={16} />
+                              <span>{uploadingCategoryImage ? 'جاري الرفع...' : 'رفع صورة للقسم'}</span>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleCategoryImageUpload}
+                                className="hidden"
+                                disabled={isLoading || uploadingCategoryImage}
+                              />
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="أو الصق رابط صورة القسم مباشرة (اختياري)"
+                              value={newCategory.image_url}
+                              onChange={(e) => setNewCategory({ ...newCategory, image_url: e.target.value })}
+                              className="flex-1 p-2.5 rounded text-white text-sm bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              disabled={isLoading || uploadingCategoryImage}
+                            />
+                          </div>
+                        </div>
+
                         <div className="flex gap-3">
-                          <button type="submit" className="flex-grow bg-blue-600 text-white py-2.5 px-4 rounded-md font-bold hover:bg-blue-700 flex items-center justify-center gap-2 disabled:opacity-50" disabled={isLoading}>
+                          <button type="submit" className="flex-grow bg-blue-600 text-white py-2.5 px-4 rounded-md font-bold hover:bg-blue-700 flex items-center justify-center gap-2 disabled:opacity-50" disabled={isLoading || uploadingCategoryImage}>
                             {editingCategory ? <><Save size={20} /> حفظ التعديلات</> : <><Plus size={20} /> إضافة قسم</>}
                           </button>
                           {editingCategory && (
@@ -3628,7 +3732,13 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                       <h3 className="text-lg font-semibold mb-4 text-white border-b border-gray-600 pb-2">الأقسام الحالية</h3>
                       <div className="space-y-3">
                         {categories.map((category) => (
-                          <div key={category.id} className={`p-4 rounded-md bg-gray-900/50 border border-gray-700 flex justify-between items-center transition-all ${editingCategory === category.id ? 'ring-2 ring-blue-500' : ''}`}>
+                          <div key={category.id} className={`p-4 rounded-md bg-gray-900/50 border border-gray-700 flex justify-between items-center gap-3 transition-all ${editingCategory === category.id ? 'ring-2 ring-blue-500' : ''}`}>
+                            <CategoryVisual
+                              categoryId={category.id}
+                              categoryName={category.name}
+                              customImageUrl={category.image_url}
+                              size="md"
+                            />
                             <div className="flex-1 overflow-hidden">
                               <h4 className="font-bold text-white text-lg truncate">{category.name}</h4>
                               {category.description && <p className="text-gray-400 text-sm mt-1 line-clamp-2">{category.description}</p>}
