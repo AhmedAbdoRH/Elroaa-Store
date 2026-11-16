@@ -66,13 +66,56 @@ export interface OrderItemRecord {
   is_zero_stock?: boolean;
 }
 
+export type OrderStatus = 'pending' | 'processing' | 'completed' | 'cancelled';
+
+export interface CustomerDeliveryInfo {
+  full_name: string;
+  phone: string;
+  address: string;
+}
+
+export interface Customer {
+  id: string;
+  phone: string;
+  full_name: string;
+  address: string;
+  password?: string | null;
+  has_password?: boolean;
+  created_at: string;
+  updated_at?: string;
+}
+
+export interface CustomerOrder {
+  id: string;
+  customer_id?: string | null;
+  customer_phone: string;
+  customer_name: string;
+  customer_address: string;
+  items: OrderItemRecord[];
+  total: string;
+  has_zero_stock: boolean;
+  status: OrderStatus;
+  created_at: string;
+}
+
+export interface CustomerWithOrders extends Customer {
+  orders: CustomerOrder[];
+  orders_count: number;
+  total_spent: number;
+  last_order_at?: string | null;
+}
+
 export interface OrderRecord {
   id: string;
   created_at: string;
   total: string;
   items: OrderItemRecord[];
   has_zero_stock: boolean;
-  status?: 'pending' | 'completed' | 'cancelled';
+  status?: OrderStatus;
+  customer_id?: string | null;
+  customer_name?: string;
+  customer_phone?: string;
+  customer_address?: string;
 }
 
 export interface Banner {

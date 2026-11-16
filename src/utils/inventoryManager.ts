@@ -230,7 +230,13 @@ export async function deductStockForOrder(
     price?: string;
     size?: string;
   }>,
-  totalPrice: string
+  totalPrice: string,
+  customerInfo?: {
+    customer_id?: string | null;
+    full_name?: string;
+    phone?: string;
+    address?: string;
+  }
 ): Promise<{
   hasZeroStock: boolean;
   zeroStockItemTitles: string[];
@@ -299,7 +305,11 @@ export async function deductStockForOrder(
     total: totalPrice,
     items: orderItems,
     has_zero_stock: hasZeroStock,
-    status: 'pending'
+    status: 'pending',
+    customer_id: customerInfo?.customer_id ?? null,
+    customer_name: customerInfo?.full_name,
+    customer_phone: customerInfo?.phone,
+    customer_address: customerInfo?.address
   };
 
   // Update orders log in memory and localStorage

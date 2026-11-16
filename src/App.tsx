@@ -29,6 +29,10 @@ import { sanitizeStoreSettings } from './utils/storeBranding';
 import { ThemeProvider } from './theme/ThemeContext';
 import FacebookButton from './components/FacebookButton';
 import ClickParticleEffect from './components/ClickParticleEffect';
+import { CustomerProvider } from './contexts/CustomerContext';
+import CustomerAuthModal from './components/CustomerAuthModal';
+import CustomerProfile from './pages/CustomerProfile';
+import InfiniteMarqueeStrip from './components/InfiniteMarqueeStrip';
 
 // PrivateRoute component with professional loading spinner
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -265,8 +269,9 @@ function App() {
 
   return (
     <ThemeProvider>
-      <CartProvider>
-        <ClickParticleEffect />
+      <CustomerProvider>
+        <CartProvider>
+          <ClickParticleEffect />
         <Helmet>
           <title>{storeSettings?.meta_title || storeSettings?.store_name || 'شركة الرؤى للتجارة والتوريدات والعطارة | أفضل أنواع الأعشاب والتوابل في مصر'}</title>
           <meta name="description" content={storeSettings?.meta_description || storeSettings?.store_description || 'شركة الرؤى للتجارة والتوريدات والعطارة - نقدم أفضل أنواع الأعشاب الطبيعية، التوابل، والزيوت العطرية بأسعار تنافسية وجودة عالية.'} />
@@ -337,6 +342,11 @@ function App() {
                 <ContactUs />
               </Layout>
             } />
+            <Route path="/profile" element={
+              <Layout banners={banners} storeSettings={storeSettings}>
+                <CustomerProfile />
+              </Layout>
+            } />
             <Route path="/" element={
               <Layout banners={banners} storeSettings={storeSettings}>
                 <StaggeredHome
@@ -347,9 +357,11 @@ function App() {
           </Routes>
         </Router>
         <Cart />
+        <CustomerAuthModal />
         <ToastNotificationWrapper />
       </CartProvider>
-    </ThemeProvider>
+    </CustomerProvider>
+  </ThemeProvider>
   );
 }
 
@@ -417,7 +429,7 @@ function StaggeredHome({
   return (
     <>
       {/* Social Buttons Section - Added below hero */}
-      <div className="pt-4 -mb-8" style={{ backgroundColor: 'var(--color-primary)' }}>
+      <div className="pt-4 pb-2" style={{ backgroundColor: 'var(--color-primary)' }}>
         <div className="container mx-auto px-4">
           <div className="flex flex-wrap justify-center items-center gap-6">
             <div className="flex justify-center">
@@ -429,6 +441,9 @@ function StaggeredHome({
           </div>
         </div>
       </div>
+
+      {/* Infinite News-Ticker Marquee Strip */}
+      <InfiniteMarqueeStrip />
 
       {/* Services component */}
       <Services />

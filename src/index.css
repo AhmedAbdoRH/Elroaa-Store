@@ -101,3 +101,48 @@ button.telegram-button .svg-wrapper {
 button.telegram-button:hover svg {
   transform: scale(1.1);
 }
+
+/* Infinite Horizontal Marquee News Ticker */
+@keyframes marquee-scroll-ltr {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes marquee-scroll-rtl {
+  0% {
+    transform: translate3d(-50%, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-marquee-ltr {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll-ltr var(--marquee-duration, 34s) linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee-rtl {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll-rtl var(--marquee-duration, 42s) linear infinite;
+  will-change: transform;
+}
+
+.marquee-container:hover .animate-marquee-ltr,
+.marquee-container:hover .animate-marquee-rtl {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee-ltr,
+  .animate-marquee-rtl {
+    animation-duration: 90s;
+  }
+}

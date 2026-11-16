@@ -1,6 +1,14 @@
 import { createContext, useContext, useState, useMemo, useCallback, ReactNode, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { deductStockForOrder, syncInventoryFromDB } from '../utils/inventoryManager';
+import type { CustomerDeliveryInfo } from '../types/database';
+import {
+  getLocalSystemV2Enabled,
+  isValidPhone,
+  normalizePhone,
+  recordCustomerOrder,
+  upsertCustomerOnOrder,
+} from '../utils/customerManager';
 
 export interface CartItem {
   id: string;
@@ -26,7 +34,7 @@ interface CartContextType {
   toggleCart: (open?: boolean) => void;
   itemCount: number;
   cartTotal: string;
-  sendOrderViaWhatsApp: () => Promise<void>;
+  sendOrderViaWhatsApp: (customerInfo?: CustomerDeliveryInfo) => Promise<boolean>;
   showToast: boolean;
   toastProductName: string;
   hideToast: () => void;
@@ -193,15 +201,98 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return total.toFixed(2);
   }, [cartItems]);
 
-  const sendOrderViaWhatsApp = async () => {
+  const sendOrderViaWhatsApp = async (customerInfo?: CustomerDeliveryInfo): Promise<boolean> => {
     if (cartItems.length === 0) {
       toast.warning('السلة فارغة، أضف منتجات أولاً');
-      return;
+      return false;
+    }
+
+    const systemV2Enabled = getLocalSystemV2Enabled();
+
+    if (!systemV2Enabled) {
+      setIsSubmittingOrder(true);
+      try {
+        const { hasZeroStock, zeroStockItemTitles, orderRecord } = await deductStockForOrder(
+          cartItems.map(item => ({
+            productId: item.productId,
+            title: item.title,
+            quantity: item.quantity,
+            price: item.price,
+            size: item.size
+          })),
+          cartTotal
+        );
+
+        const orderDetails = cartItems.map(item => {
+          const isItemZeroStock = item.track_stock && (item.stock_quantity ?? 0) <= 0;
+          const zeroStockTag = isItemZeroStock ? ' *(مخزون صفري: 0 - تحت الطلب)*' : '';
+          return `- ${item.title}${item.size ? ` (${item.size})` : ''} (${item.quantity} × ${item.price} ج)${zeroStockTag}`;
+        }).join('%0A');
+
+        let message = `*طلب جديد من المتجر الإلكتروني*%0A`;
+        message += `رقم الطلب: ${orderRecord.id}%0A`;
+        message += `------------------------%0A`;
+        message += `${orderDetails}%0A`;
+        message += `------------------------%0A`;
+        message += `*الإجمالي: ${cartTotal} ج*%0A`;
+
+        if (hasZeroStock) {
+          message += `%0A⚠️ *تنبيه للتاجر*: يتضمن هذا الطلب منتجات تم شراؤها بمخزون صفري (0 متبقي):%0A`;
+          zeroStockItemTitles.forEach(title => {
+            message += `• ${title}%0A`;
+          });
+          message += `*(يرجى مراجعة المخزن وتوفير وتجهيز الكمية المطلوبة للعميل)*%0A`;
+        }
+
+        message += `%0Aشكراً لكم!`;
+
+        window.open(`https://wa.me/201003046674?text=${message}`, '_blank');
+
+        if (hasZeroStock) {
+          toast.info('تم تأكيد طلبك بنجاح! سيتم تجهيز وتوريد المنتجات المطلوبة لك فوراً.', { autoClose: 5000 });
+        } else {
+          toast.success('تم إرسال الطلب بنجاح وتحديث المخزون!');
+        }
+
+        clearCart();
+        toggleCart(false);
+        return true;
+      } catch (err: unknown) {
+        console.error('Error completing order:', err);
+        toast.error('حدث خطأ أثناء معالجة الطلب، يرجى المحاولة ثانية');
+        return false;
+      } finally {
+        setIsSubmittingOrder(false);
+      }
+    }
+
+    const cleanName = (customerInfo?.full_name || '').trim();
+    const normalizedPhone = normalizePhone(customerInfo?.phone || '');
+    const cleanAddress = (customerInfo?.address || '').trim();
+
+    if (!cleanName) {
+      toast.warning('يرجى إدخال الاسم بالكامل قبل إتمام الطلب');
+      return false;
+    }
+    if (!isValidPhone(normalizedPhone)) {
+      toast.warning('يرجى إدخال رقم تليفون صحيح (8 أرقام على الأقل)');
+      return false;
+    }
+    if (!cleanAddress) {
+      toast.warning('يرجى إدخال عنوان التوصيل بالتفصيل');
+      return false;
     }
 
     setIsSubmittingOrder(true);
     try {
-      // 1. Deduct stock automatically and check for zero stock items
+      // 1. Upsert customer profile by phone (works for guests & registered customers)
+      const { customer } = await upsertCustomerOnOrder({
+        full_name: cleanName,
+        phone: normalizedPhone,
+        address: cleanAddress,
+      });
+
+      // 2. Deduct stock automatically and check for zero stock items
       const { hasZeroStock, zeroStockItemTitles, orderRecord } = await deductStockForOrder(
         cartItems.map(item => ({
           productId: item.productId,
@@ -210,19 +301,37 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           price: item.price,
           size: item.size
         })),
-        cartTotal
+        cartTotal,
+        {
+          customer_id: customer.id,
+          full_name: customer.full_name,
+          phone: customer.phone,
+          address: customer.address,
+        }
       );
 
-      // 2. Format order details for WhatsApp
+      // 3. Persist order in customer_orders database linked to customer phone & ID
+      await recordCustomerOrder({
+        orderId: orderRecord.id,
+        customer,
+        items: orderRecord.items,
+        total: cartTotal,
+        hasZeroStock,
+      });
+
+      // 4. Format order details for WhatsApp
       const orderDetails = cartItems.map(item => {
         const isItemZeroStock = item.track_stock && (item.stock_quantity ?? 0) <= 0;
         const zeroStockTag = isItemZeroStock ? ' *(مخزون صفري: 0 - تحت الطلب)*' : '';
         return `- ${item.title}${item.size ? ` (${item.size})` : ''} (${item.quantity} × ${item.price} ج)${zeroStockTag}`;
       }).join('%0A');
 
-      // 3. Build WhatsApp message with merchant warning if zero stock occurred
+      // 5. Build WhatsApp message with customer details & zero-stock warning
       let message = `*طلب جديد من المتجر الإلكتروني*%0A`;
       message += `رقم الطلب: ${orderRecord.id}%0A`;
+      message += `👤 *العميل:* ${customer.full_name}%0A`;
+      message += `📞 *التليفون:* ${customer.phone}%0A`;
+      message += `📍 *العنوان:* ${customer.address}%0A`;
       message += `------------------------%0A`;
       message += `${orderDetails}%0A`;
       message += `------------------------%0A`;
@@ -238,21 +347,23 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       message += `%0Aشكراً لكم!`;
 
-      // 4. Open WhatsApp
+      // 6. Open WhatsApp
       window.open(`https://wa.me/201003046674?text=${message}`, '_blank');
 
       if (hasZeroStock) {
         toast.info('تم تأكيد طلبك بنجاح! سيتم تجهيز وتوريد المنتجات المطلوبة لك فوراً.', { autoClose: 5000 });
       } else {
-        toast.success('تم إرسال الطلب بنجاح وتحديث المخزون!');
+        toast.success('تم إرسال الطلب بنجاح وحفظه في سجل طلباتك!');
       }
 
-      // 5. Clear cart and close
+      // 7. Clear cart and close
       clearCart();
       toggleCart(false);
-    } catch (err: any) {
+      return true;
+    } catch (err: unknown) {
       console.error('Error completing order:', err);
       toast.error('حدث خطأ أثناء معالجة الطلب، يرجى المحاولة ثانية');
+      return false;
     } finally {
       setIsSubmittingOrder(false);
     }
@@ -285,9 +396,9 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 };
 
 export const useCart = () => {
-  const context = useContext(CartContext);
-  if (context === undefined) {
-    throw new Error('useCart must be used within a CartProvider');
-  }
-  return context;
+  const context = useContext(CartContext);
+  if (context === undefined) {
+    throw new Error('useCart must be used within a CartProvider');
+  }
+  return context;
 };

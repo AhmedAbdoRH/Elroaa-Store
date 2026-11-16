@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import type { Category, Service, Banner, StoreSettings, Testimonial, Subcategory, OrderRecord } from '../types/database'; // Added Subcategory type
+import type { Category, Service, Banner, StoreSettings, Testimonial, Subcategory, OrderRecord, CustomerWithOrders, CustomerOrder, OrderStatus } from '../types/database'; // Added Subcategory type
 import { sanitizeStoreSettings } from '../utils/storeBranding';
-import { Trash2, Edit, Plus, Save, X, Upload, ChevronDown, ChevronUp, Facebook, Instagram, Twitter, Palette, Store, Image, List, Package, Eye, EyeOff, Home, ArrowUp, Sparkles, Flame, Filter, Layers, Boxes, Warehouse, AlertTriangle, ShoppingCart, RefreshCw, CheckCircle2 } from 'lucide-react';
+import { Trash2, Edit, Plus, Save, X, Upload, ChevronDown, ChevronUp, Facebook, Instagram, Twitter, Palette, Store, Image, List, Package, Eye, EyeOff, Home, ArrowUp, Sparkles, Flame, Filter, Layers, Boxes, Warehouse, AlertTriangle, ShoppingCart, RefreshCw, CheckCircle2, Users, Phone, MapPin, Copy, Check } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {
@@ -21,6 +21,15 @@ import {
   setCategoryImageUrl,
   syncCategoryImagesFromDB
 } from '../utils/categoryImagesManager';
+import {
+  fetchAllCustomersWithOrders,
+  updateCustomerOrderStatus,
+  CUSTOMER_SQL_MIGRATION,
+  normalizePhone,
+  getLocalSystemV2Enabled,
+  fetchSystemV2EnabledFromDB,
+  activateSystemV2Permanently,
+} from '../utils/customerManager';
 
 const brownDark = '#3d2c1d';
 const successGreen = '#228B22'; // Natural green color
@@ -91,10 +100,20 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
   const [editingCategory, setEditingCategory] = useState<string | null>(null);
   const [editingBanner, setEditingBanner] = useState<string | null>(null);
   const [deleteModal, setDeleteModal] = useState<{ id: string | number; type: 'category' | 'service' | 'banner' | 'subcategory' } | null>(null);
-  const [activeTab, setActiveTab] = useState<'products' | 'banners' | 'testimonials' | 'store' | 'inventory_orders'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'banners' | 'testimonials' | 'store' | 'inventory_orders' | 'customers'>('products');
   const [ordersLog, setOrdersLog] = useState<OrderRecord[]>([]);
   const [ordersFilter, setOrdersFilter] = useState<'all' | 'zero_stock'>('all');
   const [quickStockInput, setQuickStockInput] = useState<Record<number, number>>({});
+  const [customersList, setCustomersList] = useState<CustomerWithOrders[]>([]);
+  const [customerOrdersList, setCustomerOrdersList] = useState<CustomerOrder[]>([]);
+  const [customerTablesReady, setCustomerTablesReady] = useState<boolean>(true);
+  const [customerSearch, setCustomerSearch] = useState<string>('');
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
+  const [copiedSql, setCopiedSql] = useState<boolean>(false);
+  const [showSqlPreview, setShowSqlPreview] = useState<boolean>(false);
+  const [updatingOrderStatusId, setUpdatingOrderStatusId] = useState<string | null>(null);
+  const [isSystemV2Enabled, setIsSystemV2Enabled] = useState<boolean>(() => getLocalSystemV2Enabled());
+  const [activatingSystemV2, setActivatingSystemV2] = useState<boolean>(false);
 
   // Remove BG switch state and original image backup (session only)
   const [removeBgSwitch, setRemoveBgSwitch] = useState(false);
@@ -474,11 +493,24 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
         .order('created_at', { ascending: false });
       if (servicesError) throw servicesError;
 
-      // مزامنة المخزون وصور الأقسام وسجل الطلبات من قاعدة البيانات
-      await Promise.all([syncInventoryFromDB(), syncCategoryImagesFromDB()]);
+      // مزامنة المخزون وصور الأقسام وسجل الطلبات وحالة النظام المطور 2.0 وقاعدة بيانات العملاء
+      const [, , systemV2Enabled, customersResult] = await Promise.all([
+        syncInventoryFromDB(),
+        syncCategoryImagesFromDB(),
+        fetchSystemV2EnabledFromDB(),
+        fetchAllCustomersWithOrders().catch(() => ({
+          customers: [] as CustomerWithOrders[],
+          orders: [] as CustomerOrder[],
+          tablesReady: true,
+        })),
+      ]);
       const enrichedServices = enrichServicesWithInventory(servicesData || []);
       setServices(enrichedServices);
       setOrdersLog(getLocalOrdersLog());
+      setIsSystemV2Enabled(systemV2Enabled);
+      setCustomersList(customersResult.customers);
+      setCustomerOrdersList(customersResult.orders);
+      setCustomerTablesReady(customersResult.tablesReady);
 
       const { data: subcatsData, error: subcatsError } = await supabase
         .from('subcategories')
@@ -1757,6 +1789,26 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
               ) : null}
             </button>
 
+            {isSystemV2Enabled && (
+              <button
+                onClick={() => setActiveTab('customers')}
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-lg font-bold transition-all duration-300 transform
+                  ${activeTab === 'customers'
+                    ? 'bg-blue-500 text-white shadow-lg -translate-y-1'
+                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white'}`}
+              >
+                <div className="flex items-center gap-3">
+                  <Users className="h-5 w-5" />
+                  <span>العملاء والطلبات</span>
+                </div>
+                {customersList.length > 0 && (
+                  <span className="bg-emerald-900/80 text-emerald-200 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                    {customersList.length}
+                  </span>
+                )}
+              </button>
+            )}
+
             <button
               onClick={() => setActiveTab('banners')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-bold transition-all duration-300 transform
@@ -1798,6 +1850,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                         <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                             {activeTab === 'products' && <><Package className="w-7 h-7 text-blue-400" /> إدارة المنتجات</>}
                             {activeTab === 'inventory_orders' && <><Warehouse className="w-7 h-7 text-blue-400" /> إدارة المخزون وتنبيهات الطلبات</>}
+                            {activeTab === 'customers' && <><Users className="w-7 h-7 text-emerald-400" /> قاعدة بيانات العملاء وسجل الطلبات</>}
                             {activeTab === 'banners' && <><Image className="w-7 h-7 text-blue-400" /> إدارة البانرات</>}
                             {activeTab === 'testimonials' && <><List className="w-7 h-7 text-blue-400" /> إدارة آراء العملاء</>}
                             {activeTab === 'store' && <><Store className="w-7 h-7 text-blue-400" /> إعدادات المتجر</>}
@@ -1805,6 +1858,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                         <p className="text-gray-400 mt-1 text-sm">
                             {activeTab === 'products' && 'إدارة المنتجات والأقسام المرتبطة بها وتتبع مخزونها.'}
                             {activeTab === 'inventory_orders' && 'متابعة حركة المخزون، سجل طلبات العملاء، وتنبيهات الطلبات المكتملة بمخزون صفري.'}
+                            {activeTab === 'customers' && 'عرض ملفات العملاء المرتبطة بأرقام هواتفهم، عناوين التوصيل، وسجل طلبات كل عميل.'}
                             {activeTab === 'banners' && 'يمكنك إضافة بانر نصي أو صور أو شريطي.'}
                             {activeTab === 'testimonials' && 'إدارة وتعديل آراء وتقييمات العملاء.'}
                             {activeTab === 'store' && 'تعديل إعدادات المتجر والمعلومات العامة.'}
@@ -1822,6 +1876,10 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                                 ⚠️ {ordersLog.filter(o => o.has_zero_stock).length} طلب بمخزون صفري
                               </span>
                             )}
+                        </>}
+                        {activeTab === 'customers' && <>
+                            <span className="bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-full">{customersList.length} عميل</span>
+                            <span className="bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full">{customerOrdersList.length} طلب مسجل</span>
                         </>}
                         {activeTab === 'banners' && <span className="bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full">{banners.length} بانر</span>}
                         {activeTab === 'testimonials' && <span className="bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full">{testimonials.length} رأي</span>}
@@ -2160,6 +2218,313 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
               </div>
             )}
             
+            {isSystemV2Enabled && activeTab === 'customers' && (
+              <div className="space-y-6">
+                {(!customerTablesReady || showSqlPreview) && (
+                  <div className="bg-amber-950/50 border border-amber-500/60 rounded-xl p-5 shadow-lg space-y-3">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div className="flex items-start gap-2.5">
+                        <AlertTriangle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <h3 className="font-bold text-amber-200 text-sm">
+                            أوامر SQL لتفعيل جداول النظام المطور 2.0 في Supabase (customers و customer_orders)
+                          </h3>
+                          <p className="text-xs text-amber-100/80 mt-1">
+                            انسخ أوامر SQL التالية وقم بتشغيلها مرة واحدة في Supabase SQL Editor لتفعيل قاعدة بيانات العملاء والطلبات المستقلة بشكل كامل.
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            await navigator.clipboard.writeText(CUSTOMER_SQL_MIGRATION);
+                            setCopiedSql(true);
+                            toast.success('تم نسخ كود SQL بنجاح');
+                            setTimeout(() => setCopiedSql(false), 3000);
+                          }}
+                          className="bg-amber-500 hover:bg-amber-400 text-gray-900 font-bold text-xs px-3 py-2 rounded-lg flex items-center gap-1.5 transition-colors"
+                        >
+                          {copiedSql ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                          <span>{copiedSql ? 'تم النسخ' : 'نسخ كود SQL'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setShowSqlPreview((prev) => !prev)}
+                          className="bg-gray-800 hover:bg-gray-700 text-amber-200 text-xs px-3 py-2 rounded-lg border border-amber-500/30"
+                        >
+                          {showSqlPreview ? 'إخفاء الكود' : 'عرض الكود'}
+                        </button>
+                      </div>
+                    </div>
+                    {showSqlPreview && (
+                      <pre
+                        dir="ltr"
+                        className="bg-gray-950 text-emerald-300 text-[11px] p-3 rounded-lg overflow-x-auto border border-gray-700 max-h-72"
+                      >
+                        {CUSTOMER_SQL_MIGRATION}
+                      </pre>
+                    )}
+                  </div>
+                )}
+
+                {/* KPI Stats */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="bg-gray-800/80 border border-gray-700 rounded-xl p-5 shadow-lg">
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-400 text-xs font-semibold">إجمالي العملاء</span>
+                      <Users className="w-5 h-5 text-emerald-400" />
+                    </div>
+                    <p className="text-3xl font-extrabold text-white mt-2 font-mono">{customersList.length}</p>
+                    <span className="text-xs text-gray-400 mt-1 block">عميل برقم هاتف مميز</span>
+                  </div>
+
+                  <div className="bg-gray-800/80 border border-gray-700 rounded-xl p-5 shadow-lg">
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-400 text-xs font-semibold">حسابات مسجلة</span>
+                      <CheckCircle2 className="w-5 h-5 text-blue-400" />
+                    </div>
+                    <p className="text-3xl font-extrabold text-white mt-2 font-mono">
+                      {customersList.filter((c) => c.has_password).length}
+                    </p>
+                    <span className="text-xs text-gray-400 mt-1 block">لديهم كلمة مرور لدخول الحساب</span>
+                  </div>
+
+                  <div className="bg-gray-800/80 border border-gray-700 rounded-xl p-5 shadow-lg">
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-400 text-xs font-semibold">طلبات كزائر</span>
+                      <Phone className="w-5 h-5 text-amber-400" />
+                    </div>
+                    <p className="text-3xl font-extrabold text-white mt-2 font-mono">
+                      {customersList.filter((c) => !c.has_password).length}
+                    </p>
+                    <span className="text-xs text-gray-400 mt-1 block">يمكنهم التفعيل بكلمة مرور لاحقاً</span>
+                  </div>
+
+                  <div className="bg-gray-800/80 border border-gray-700 rounded-xl p-5 shadow-lg">
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-400 text-xs font-semibold">إجمالي الطلبات</span>
+                      <ShoppingCart className="w-5 h-5 text-purple-400" />
+                    </div>
+                    <p className="text-3xl font-extrabold text-white mt-2 font-mono">{customerOrdersList.length}</p>
+                    <span className="text-xs text-gray-400 mt-1 block">طلب مرتبط بالعملاء</span>
+                  </div>
+                </div>
+
+                {/* Search and Refresh */}
+                <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-5 shadow-lg space-y-4">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div className="flex-1 min-w-[240px]">
+                      <input
+                        type="text"
+                        value={customerSearch}
+                        onChange={(e) => setCustomerSearch(e.target.value)}
+                        placeholder="ابحث باسم العميل أو رقم التليفون..."
+                        className="w-full p-2.5 rounded-lg bg-gray-900 border border-gray-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setShowSqlPreview((prev) => !prev)}
+                        className="bg-gray-700 hover:bg-gray-600 text-amber-300 text-xs font-bold px-3 py-2.5 rounded-lg border border-amber-500/30 transition-colors"
+                      >
+                        {showSqlPreview ? 'إخفاء أوامر SQL' : 'أوامر SQL'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          const res = await fetchAllCustomersWithOrders();
+                          setCustomersList(res.customers);
+                          setCustomerOrdersList(res.orders);
+                          setCustomerTablesReady(res.tablesReady);
+                          toast.success('تم تحديث بيانات العملاء والطلبات');
+                        }}
+                        className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg flex items-center gap-2 transition-colors"
+                      >
+                        <RefreshCw className="w-4 h-4" />
+                        <span>تحديث القائمة</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {(() => {
+                    const q = customerSearch.trim().toLowerCase();
+                    const qDigits = normalizePhone(customerSearch);
+                    const filteredCustomers = customersList.filter((cust) => {
+                      if (!q) return true;
+                      const matchName = cust.full_name.toLowerCase().includes(q);
+                      const matchAddress = (cust.address || '').toLowerCase().includes(q);
+                      const matchPhone =
+                        cust.phone.includes(q) || (qDigits.length > 0 && normalizePhone(cust.phone).includes(qDigits));
+                      return matchName || matchAddress || matchPhone;
+                    });
+
+                    if (filteredCustomers.length === 0) {
+                      return (
+                        <div className="text-center py-12 text-gray-400">
+                          <Users className="w-12 h-12 mx-auto text-gray-600 mb-3" />
+                          <p className="text-base font-semibold text-gray-300">
+                            {customersList.length === 0
+                              ? 'لا يوجد عملاء مسجلون بعد'
+                              : 'لا توجد نتائج مطابقة لبحثك'}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            سيظهر هنا كل عميل بمجرد إتمام طلبه من السلة أو تسجيل حساب برقم تليفونه.
+                          </p>
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div className="space-y-3">
+                        {filteredCustomers.map((cust) => {
+                          const isExpanded = selectedCustomerId === cust.id;
+                          return (
+                            <div
+                              key={cust.id}
+                              className="rounded-xl border border-gray-700 bg-gray-900/60 overflow-hidden transition-all"
+                            >
+                              <div className="p-4 flex flex-wrap items-center justify-between gap-4">
+                                <div className="space-y-1.5 min-w-[220px] flex-1">
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <h4 className="font-bold text-white text-base">{cust.full_name}</h4>
+                                    {cust.has_password ? (
+                                      <span className="text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2 py-0.5 rounded-full">
+                                        حساب مسجل
+                                      </span>
+                                    ) : (
+                                      <span className="text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded-full">
+                                        طلب كزائر
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="flex flex-wrap items-center gap-4 text-xs text-gray-300">
+                                    <span className="flex items-center gap-1 font-mono" dir="ltr">
+                                      <Phone className="w-3.5 h-3.5 text-blue-400" />
+                                      {cust.phone}
+                                    </span>
+                                    {cust.address && (
+                                      <span className="flex items-center gap-1 text-gray-300">
+                                        <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                                        {cust.address}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+
+                                <div className="flex items-center gap-3">
+                                  <div className="text-left bg-gray-800/90 px-3 py-1.5 rounded-lg border border-gray-700">
+                                    <span className="block text-[10px] text-gray-400">عدد الطلبات</span>
+                                    <span className="font-mono font-bold text-white text-sm">{cust.orders_count}</span>
+                                  </div>
+                                  <div className="text-left bg-gray-800/90 px-3 py-1.5 rounded-lg border border-gray-700">
+                                    <span className="block text-[10px] text-gray-400">إجمالي المشتريات</span>
+                                    <span className="font-mono font-bold text-emerald-400 text-sm">{cust.total_spent} ج</span>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() => setSelectedCustomerId(isExpanded ? null : cust.id)}
+                                    className="bg-blue-600/20 hover:bg-blue-600 text-blue-300 hover:text-white border border-blue-500/40 px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors"
+                                  >
+                                    <span>{isExpanded ? 'إخفاء الطلبات' : `عرض الطلبات (${cust.orders_count})`}</span>
+                                    {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                                  </button>
+                                </div>
+                              </div>
+
+                              {isExpanded && (
+                                <div className="border-t border-gray-700 bg-gray-950/60 p-4 space-y-3">
+                                  {cust.orders.length === 0 ? (
+                                    <p className="text-xs text-gray-400 text-center py-3">
+                                      لم يقم هذا العميل بأي طلبات حتى الآن (أنشأ حساباً فقط).
+                                    </p>
+                                  ) : (
+                                    cust.orders.map((ord) => (
+                                      <div
+                                        key={ord.id}
+                                        className="rounded-lg border border-gray-700/80 bg-gray-900 p-3.5 space-y-2.5"
+                                      >
+                                        <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-gray-800">
+                                          <div className="flex items-center gap-2">
+                                            <span className="font-mono font-bold text-xs text-blue-400">#{ord.id}</span>
+                                            <span className="text-[11px] text-gray-400">
+                                              {new Date(ord.created_at).toLocaleString('ar-EG', {
+                                                year: 'numeric',
+                                                month: 'short',
+                                                day: 'numeric',
+                                                hour: '2-digit',
+                                                minute: '2-digit',
+                                              })}
+                                            </span>
+                                          </div>
+                                          <div className="flex items-center gap-2">
+                                            <select
+                                              value={ord.status}
+                                              disabled={updatingOrderStatusId === ord.id}
+                                              onChange={async (e) => {
+                                                const nextStatus = e.target.value as OrderStatus;
+                                                setUpdatingOrderStatusId(ord.id);
+                                                const ok = await updateCustomerOrderStatus(ord.id, nextStatus);
+                                                if (ok) {
+                                                  const refreshed = await fetchAllCustomersWithOrders();
+                                                  setCustomersList(refreshed.customers);
+                                                  setCustomerOrdersList(refreshed.orders);
+                                                  toast.success('تم تحديث حالة الطلب');
+                                                } else {
+                                                  toast.error('تعذر تحديث حالة الطلب');
+                                                }
+                                                setUpdatingOrderStatusId(null);
+                                              }}
+                                              className="bg-gray-800 border border-gray-600 text-xs text-white rounded-md px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                            >
+                                              <option value="pending">قيد الانتظار</option>
+                                              <option value="processing">جاري التجهيز</option>
+                                              <option value="completed">مكتمل</option>
+                                              <option value="cancelled">ملغي</option>
+                                            </select>
+                                            <span className="font-bold text-emerald-400 text-sm">{ord.total} ج</span>
+                                          </div>
+                                        </div>
+
+                                        {ord.customer_address && (
+                                          <p className="text-[11px] text-gray-400 flex items-center gap-1">
+                                            <MapPin className="w-3 h-3 text-amber-400 shrink-0" />
+                                            <span>عنوان التوصيل: {ord.customer_address}</span>
+                                          </p>
+                                        )}
+
+                                        <div className="space-y-1">
+                                          {ord.items.map((it, idx) => (
+                                            <div
+                                              key={idx}
+                                              className="flex items-center justify-between text-xs bg-gray-800/60 px-2.5 py-1.5 rounded border border-gray-800"
+                                            >
+                                              <span className="text-gray-200 font-medium">
+                                                {it.title}
+                                                {it.size ? ` (${it.size})` : ''}
+                                              </span>
+                                              <span className="text-gray-300 font-mono">
+                                                {it.quantity} × {it.price} ج
+                                              </span>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    ))
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
+            )}
+
             {activeTab === 'inventory_orders' && (
               <div className="space-y-6">
                 {/* الإحصائيات السريعة للمخزون والطلبات */}
@@ -2375,6 +2740,30 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                               <span className="font-bold text-emerald-400 text-base">{order.total} ج</span>
                             </div>
                           </div>
+
+                          {/* بيانات العميل المرفقة بالطلب */}
+                          {isSystemV2Enabled && (order.customer_name || order.customer_phone || order.customer_address) && (
+                            <div className="mb-3 p-2.5 rounded-lg bg-gray-800/70 border border-gray-700/80 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-200">
+                              {order.customer_name && (
+                                <span className="font-bold text-white flex items-center gap-1">
+                                  <Users className="w-3.5 h-3.5 text-emerald-400" />
+                                  {order.customer_name}
+                                </span>
+                              )}
+                              {order.customer_phone && (
+                                <span className="font-mono text-blue-300 flex items-center gap-1" dir="ltr">
+                                  <Phone className="w-3.5 h-3.5 text-blue-400" />
+                                  {order.customer_phone}
+                                </span>
+                              )}
+                              {order.customer_address && (
+                                <span className="text-gray-300 flex items-center gap-1">
+                                  <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                                  {order.customer_address}
+                                </span>
+                              )}
+                            </div>
+                          )}
 
                           {/* تنبيه التاجر للمخزون الصفري */}
                           {order.has_zero_stock && (
@@ -3771,13 +4160,44 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
         </div>
       </div>
       
-      <footer className="w-full flex justify-center py-8 mt-10">
+      <footer className="w-full flex flex-col items-center justify-center gap-4 py-8 mt-10">
         <button
           onClick={() => { window.location.href = '/'; }}
           className="bg-white/10 backdrop-blur-md text-white font-bold px-8 py-3 rounded-lg shadow-lg transition-colors border border-white/20 hover:bg-white/20"
         >
           ← العودة للصفحة الرئيسية
         </button>
+
+        {!isSystemV2Enabled && (
+          <button
+            type="button"
+            disabled={activatingSystemV2}
+            onClick={async () => {
+              setActivatingSystemV2(true);
+              try {
+                await activateSystemV2Permanently();
+                setIsSystemV2Enabled(true);
+                const res = await fetchAllCustomersWithOrders().catch(() => ({
+                  customers: [] as CustomerWithOrders[],
+                  orders: [] as CustomerOrder[],
+                  tablesReady: false,
+                }));
+                setCustomersList(res.customers);
+                setCustomerOrdersList(res.orders);
+                setCustomerTablesReady(res.tablesReady);
+                setShowSqlPreview(true);
+                setActiveTab('customers');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                toast.success('تم تفعيل النظام المطور 2.0 بشكل دائم وعرض أوامر SQL المطلوبة.');
+              } finally {
+                setActivatingSystemV2(false);
+              }
+            }}
+            className="text-[11px] font-normal text-white/20 hover:text-white/45 transition-colors cursor-pointer select-none px-3 py-1 rounded disabled:opacity-40"
+          >
+            {activatingSystemV2 ? 'جاري التفعيل...' : 'تفعيل النظام المطور 2.0'}
+          </button>
+        )}
       </footer>
     </div> 
   );

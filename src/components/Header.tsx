@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, Search, ShoppingCart, X, ChevronDown, Mic, MicOff } from 'lucide-react';
+import { Menu, Search, ShoppingCart, X, ChevronDown, Mic, MicOff, User } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import type { Category, StoreSettings, Service } from '../types/database';
 import { useCart } from '../contexts/CartContext';
+import { useCustomer } from '../contexts/CustomerContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 
@@ -68,6 +69,8 @@ export default function Header({ storeSettings }: HeaderProps) {
     itemCount,
     isCartOpen,
   } = useCart();
+
+  const { isCustomerSystemEnabled, customer, openAuthModal } = useCustomer();
 
   useEffect(() => {
     setLogoSrc(storeSettings?.logo_url || '/favicon.png');
@@ -492,6 +495,29 @@ export default function Header({ storeSettings }: HeaderProps) {
               </ul>
             </nav>
 
+            {isCustomerSystemEnabled && (
+              customer ? (
+                <Link
+                  to="/profile"
+                  className="p-2 md:px-3 md:py-2 rounded-xl bg-[#3A4522] hover:bg-[#D1A94F] text-[#F7F3E9] hover:text-[#2B3318] border border-[#D1A94F]/35 transition-colors flex items-center gap-1.5 text-xs md:text-sm font-bold whitespace-nowrap shrink-0"
+                  title="حسابي وطلباتي"
+                >
+                  <User className="h-4 w-4 shrink-0" />
+                  <span>{customer.full_name.split(' ')[0] || 'حسابي'}</span>
+                </Link>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => openAuthModal('login')}
+                  className="p-2 md:px-3 md:py-2 rounded-xl bg-[#3A4522] hover:bg-[#D1A94F] text-[#F7F3E9] hover:text-[#2B3318] border border-[#D1A94F]/35 transition-colors flex items-center gap-1.5 text-xs md:text-sm font-bold whitespace-nowrap shrink-0"
+                  title="تسجيل الدخول / حسابي"
+                >
+                  <User className="h-4 w-4 shrink-0" />
+                  <span>دخول</span>
+                </button>
+              )
+            )}
+
             <button
               type="button"
               onClick={() => toggleCart(!isCartOpen)}
@@ -613,7 +639,31 @@ export default function Header({ storeSettings }: HeaderProps) {
                   </Link>
                 ))}
               </div>
-              <div className="pt-2 border-t border-[#D1A94F]/25">
+              <div className="pt-2 border-t border-[#D1A94F]/25 space-y-2">
+                {isCustomerSystemEnabled && (
+                  customer ? (
+                    <Link
+                      to="/profile"
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#3A4522] text-[#E3C778] font-bold text-base"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <User className="h-5 w-5" />
+                      <span>حسابي ({customer.full_name.split(' ')[0]})</span>
+                    </Link>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        openAuthModal('login');
+                      }}
+                      className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-[#3A4522] text-[#E3C778] font-bold text-base text-right"
+                    >
+                      <User className="h-5 w-5" />
+                      <span>تسجيل الدخول / حسابي</span>
+                    </button>
+                  )
+                )}
                 <a
                   href="#contact"
                   className="block px-3 py-2 rounded-lg text-[#F7F3E9] hover:bg-[#3A4522] font-bold text-lg"

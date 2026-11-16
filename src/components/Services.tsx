@@ -165,7 +165,7 @@ export default function Services() {
   }
 
   return (
-    <section className="py-16" style={{ backgroundColor: 'var(--color-primary)' }} id="products">
+    <section className="pt-5 pb-16" style={{ backgroundColor: 'var(--color-primary)' }} id="products">
       <motion.div
         className="container mx-auto px-3 sm:px-4 bg-[#2B3318]/[0.03] rounded-2xl p-4 sm:p-8 border border-[#3A4522]/15 shadow-lg"
         initial="hidden"
