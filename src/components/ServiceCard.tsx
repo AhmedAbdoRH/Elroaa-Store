@@ -199,9 +199,9 @@ export default function ProductCard({
   };
 
   return (
-    <div className="group relative bg-[#F7F3E9] rounded-xl border border-[#3A4522]/15 hover:border-[#D1A94F] overflow-hidden transition-all duration-150 hover:scale-[1.02] hover:shadow-lg shadow-sm flex flex-col justify-between">
+    <div className="group relative bg-[#F7F3E9] rounded-lg sm:rounded-xl border border-[#3A4522]/15 hover:border-[#D1A94F] overflow-hidden transition-all duration-150 sm:hover:scale-[1.02] hover:shadow-lg shadow-sm flex flex-col justify-between">
       <Link to={`/product/${id}`} className="block">
-        <div className="relative aspect-[4/3] w-full bg-[#2B3318]/5">
+        <div className="relative aspect-square sm:aspect-[4/3] w-full bg-[#2B3318]/5">
           <img
             src={imageUrl || '/favicon.png'}
             alt={title}
@@ -215,32 +215,32 @@ export default function ProductCard({
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#F7F3E9]/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
         </div>
-        <div className="p-3.5 sm:p-5 pb-2">
-          <h3 className="text-sm md:text-base font-bold mb-1.5 text-[#2B3318] flex items-start gap-1.5 leading-snug">
+        <div className="p-1.5 sm:p-4 pb-1 sm:pb-2">
+          <h3 className="text-[11px] sm:text-sm md:text-base font-bold mb-1 text-[#2B3318] flex items-start gap-1 leading-tight sm:leading-snug min-h-[1.9rem] sm:min-h-0">
             <span className="line-clamp-2 flex-1">{title}</span>
-            <Sparkles className="h-3.5 w-3.5 text-[#D1A94F] shrink-0 mt-0.5" />
+            <Sparkles className="hidden sm:inline-block h-3.5 w-3.5 text-[#D1A94F] shrink-0 mt-0.5" />
           </h3>
           {description && (
-            <p className="text-xs sm:text-sm text-[#3A4522]/80 line-clamp-2 mb-2.5">
+            <p className="hidden sm:line-clamp-2 text-xs sm:text-sm text-[#3A4522]/80 mb-2">
               {description}
             </p>
           )}
 
           {/* مؤشر المخزون المتاح للعميل بوضوح */}
           {isTrackingStock && (
-            <div className="mb-2">
+            <div className="mb-1 sm:mb-2">
               {stockQty === 0 ? (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-amber-500/15 text-amber-700 border border-amber-500/30">
-                  <span className="w-2 h-2 rounded-full bg-amber-600 animate-pulse"></span>
-                  <span>(0) مخزون متبقي</span>
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded text-[9px] sm:text-xs font-bold bg-amber-500/15 text-amber-700 border border-amber-500/30">
+                  <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-amber-600 animate-pulse"></span>
+                  <span>(0) متبقي</span>
                 </span>
               ) : stockQty && stockQty <= 5 ? (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-amber-500/10 text-amber-800 border border-amber-500/20">
-                  <span>متبقي {stockQty} فقط</span>
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded text-[9px] sm:text-xs font-semibold bg-amber-500/10 text-amber-800 border border-amber-500/20">
+                  <span>متبقي {stockQty}</span>
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-500/10 text-emerald-800 border border-emerald-500/20">
-                  <span>المخزون: {stockQty} قطعة</span>
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded text-[9px] sm:text-xs font-medium bg-emerald-500/10 text-emerald-800 border border-emerald-500/20">
+                  <span>المخزون: {stockQty}</span>
                 </span>
               )}
             </div>
@@ -248,88 +248,87 @@ export default function ProductCard({
         </div>
       </Link>
 
-      <div className="px-3.5 sm:px-6 pb-3.5 sm:pb-4">
-        <div className="flex justify-between items-end gap-2 sm:gap-3">
-          <div className="flex flex-col items-end flex-1">
+      <div className="px-1.5 sm:px-4 pb-2 sm:pb-4 pt-0.5">
+        <div className="flex justify-between items-end gap-1 sm:gap-2">
+          <div className="flex flex-col items-end flex-1 min-w-0">
             {has_weight_pricing ? (
               <>
                 <div className="flex flex-col items-end">
-                  <div className="flex items-center gap-1">
-                    <span className={`font-bold text-base sm:text-lg ${displaySalePrice ? 'text-[#B12704]' : 'text-[#2B3318]'}`}>
+                  <div className="flex items-center gap-0.5 sm:gap-1">
+                    <span className={`font-bold text-xs sm:text-base md:text-lg tabular-nums ${displaySalePrice ? 'text-[#B12704]' : 'text-[#2B3318]'}`}>
                       {((displaySalePrice || displayPrice || 0) / 10).toFixed(1)}
                     </span>
-                    <span className={`font-bold text-base sm:text-lg ${displaySalePrice ? 'text-[#B12704]' : 'text-[#2B3318]'}`}>ج</span>
+                    <span className={`font-bold text-[10px] sm:text-base ${displaySalePrice ? 'text-[#B12704]' : 'text-[#2B3318]'}`}>ج</span>
                   </div>
-                  <span className="text-xs text-[#3A4522]/55">/100 جرام</span>
+                  <span className="text-[9px] sm:text-xs text-[#3A4522]/55 leading-none">/100 جم</span>
                 </div>
                 {displaySalePrice && displayPrice && (
-                  <div className="flex flex-col items-end">
-                    <div className="flex items-center gap-1">
-                      <span className="text-xs sm:text-sm text-[#3A4522]/45 line-through">{((displayPrice || 0) / 10).toFixed(1)}</span>
-                      <span className="text-xs sm:text-sm text-[#3A4522]/45 line-through">ج</span>
-                    </div>
-                    <span className="text-xs text-[#3A4522]/40">/100 جرام</span>
+                  <div className="flex items-center gap-0.5 sm:gap-1 mt-0.5">
+                    <span className="text-[9px] sm:text-xs text-[#3A4522]/45 line-through tabular-nums">{((displayPrice || 0) / 10).toFixed(1)}</span>
+                    <span className="text-[9px] sm:text-xs text-[#3A4522]/45 line-through">ج</span>
                   </div>
                 )}
               </>
             ) : has_multiple_sizes && (displayPrice || displaySalePrice) ? (
               <>
-                <div className="flex items-center gap-1">
-                  <span className={`font-bold text-base sm:text-lg ${displaySalePrice ? 'text-[#B12704]' : 'text-[#2B3318]'}`}>
+                <div className="flex items-center gap-0.5 sm:gap-1">
+                  <span className={`font-bold text-xs sm:text-base md:text-lg tabular-nums ${displaySalePrice ? 'text-[#B12704]' : 'text-[#2B3318]'}`}>
                     {displaySalePrice || displayPrice}
                   </span>
-                  <span className={`font-bold text-base sm:text-lg ${displaySalePrice ? 'text-[#B12704]' : 'text-[#2B3318]'}`}>ج</span>
+                  <span className={`font-bold text-[10px] sm:text-base ${displaySalePrice ? 'text-[#B12704]' : 'text-[#2B3318]'}`}>ج</span>
                 </div>
                 {pricingStrategy === 'smart-fallback' || hasMultiplePrices ? (
-                  <span className="text-xs text-[#3A4522]/60">ابتداءً من</span>
+                  <span className="text-[9px] sm:text-xs text-[#3A4522]/60 leading-none">ابتداءً من</span>
                 ) : (
-                  <span className="text-xs text-[#3A4522]/60">سعر موحد</span>
+                  <span className="text-[9px] sm:text-xs text-[#3A4522]/60 leading-none">سعر موحد</span>
                 )}
               </>
             ) : displaySalePrice ? (
               <>
-                <div className="flex items-center gap-1">
-                  <span className="font-bold text-base sm:text-lg text-[#B12704]">{displaySalePrice}</span>
-                  <span className="font-bold text-base sm:text-lg text-[#B12704]">ج</span>
+                <div className="flex items-center gap-0.5 sm:gap-1">
+                  <span className="font-bold text-xs sm:text-base md:text-lg text-[#B12704] tabular-nums">{displaySalePrice}</span>
+                  <span className="font-bold text-[10px] sm:text-base text-[#B12704]">ج</span>
                 </div>
                 {displayPrice && (
-                  <div className="flex items-center gap-1">
-                    <span className="text-xs sm:text-sm text-[#3A4522]/45 line-through">{displayPrice}</span>
-                    <span className="text-xs sm:text-sm text-[#3A4522]/45 line-through">ج</span>
+                  <div className="flex items-center gap-0.5 sm:gap-1">
+                    <span className="text-[9px] sm:text-xs text-[#3A4522]/45 line-through tabular-nums">{displayPrice}</span>
+                    <span className="text-[9px] sm:text-xs text-[#3A4522]/45 line-through">ج</span>
                   </div>
                 )}
               </>
             ) : displayPrice ? (
               <>
-                <div className="flex items-center gap-1">
-                  <span className="font-bold text-base sm:text-lg text-[#2B3318]">{displayPrice}</span>
-                  <span className="font-bold text-base sm:text-lg text-[#2B3318]">ج</span>
+                <div className="flex items-center gap-0.5 sm:gap-1">
+                  <span className="font-bold text-xs sm:text-base md:text-lg text-[#2B3318] tabular-nums">{displayPrice}</span>
+                  <span className="font-bold text-[10px] sm:text-base text-[#2B3318]">ج</span>
                 </div>
                 {pricingStrategy === 'smart-fallback' && (
-                  <span className="text-xs text-[#3A4522]/60">ابتداءً من</span>
+                  <span className="text-[9px] sm:text-xs text-[#3A4522]/60 leading-none">ابتداءً من</span>
                 )}
               </>
             ) : (
-              <span className="text-sm text-[#3A4522]/60 text-right">يرجى التواصل للاستفسار عن السعر</span>
+              <span className="text-[10px] sm:text-sm text-[#3A4522]/60 text-right">تواصل للسعر</span>
             )}
           </div>
 
-          <div className="flex gap-2 flex-shrink-0">
+          <div className="flex flex-shrink-0">
             <button
+              type="button"
               onClick={handleAddToCart}
               disabled={isAdding || isAdded}
-              className={`flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg transition-all duration-300 font-bold text-sm min-w-max border ${isAdded
+              className={`flex items-center justify-center gap-1 p-1.5 sm:px-3 sm:py-2 rounded-md sm:rounded-lg transition-all duration-300 font-bold text-xs sm:text-sm border ${isAdded
                   ? 'bg-[#2B3318] text-[#E3C778] border-[#D1A94F]'
                   : 'bg-[#E3C778] text-[#2B3318] border-[#D1A94F]/70 hover:bg-[#D1A94F] shadow-sm hover:shadow-md'
                 } ${isAdding ? 'opacity-75' : ''}`}
               title={isAdded ? 'تمت الإضافة' : 'أضف إلى السلة'}
+              aria-label="أضف إلى السلة"
             >
               {isAdding ? (
-                <div className="w-4 h-4 border-2 border-[#2B3318] border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-[#2B3318] border-t-transparent rounded-full animate-spin"></div>
               ) : isAdded ? (
-                <Check className="h-4 w-4" />
+                <Check className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               ) : (
-                <ShoppingCart className="h-4 w-4" />
+                <ShoppingCart className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               )}
               <span className="hidden sm:inline text-xs">سلة</span>
             </button>

@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
+import { LayoutGrid, ChevronDown, ChevronUp } from 'lucide-react';
 import ServiceCard from './ServiceCard';
 import CategoryVisual from './CategoryVisual';
 import { syncCategoryImagesFromDB } from '../utils/categoryImagesManager';
@@ -18,6 +19,7 @@ export default function Services() {
   const [hasFeaturedProducts, setHasFeaturedProducts] = useState(false);
   const [hasBestSellerProducts, setHasBestSellerProducts] = useState(false);
   const [visibleCount, setVisibleCount] = useState<number>(24);
+  const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
   const resultsStartRef = useRef<HTMLDivElement>(null);
 
   const scrollToResults = useCallback(() => {
@@ -137,6 +139,7 @@ export default function Services() {
     setSelectedCategory(categoryId);
     setSelectedSubcategory(null); // Reset subcategory selection
     setOpenCategoryId(categoryId);
+    setIsCategoriesOpen(false);
     scrollToResults();
   };
 
@@ -165,9 +168,9 @@ export default function Services() {
   }
 
   return (
-    <section className="pt-5 pb-16" style={{ backgroundColor: 'var(--color-primary)' }} id="products">
+    <section className="pt-4 pb-16" style={{ backgroundColor: 'var(--color-primary)' }} id="products">
       <motion.div
-        className="container mx-auto px-3 sm:px-4 bg-[#2B3318]/[0.03] rounded-2xl p-4 sm:p-8 border border-[#3A4522]/15 shadow-lg"
+        className="container mx-auto px-2 sm:px-4 bg-[#2B3318]/[0.03] rounded-2xl p-2.5 sm:p-6 md:p-8 border border-[#3A4522]/15 shadow-lg"
         initial="hidden"
         animate="visible"
         variants={{
@@ -177,62 +180,50 @@ export default function Services() {
       >
         {/* عنوان القسم الرئيسي */}
         <motion.div
-          className="text-center mb-6 sm:mb-8"
+          className="text-center mb-4 sm:mb-6"
           variants={{
             hidden: { opacity: 0, y: -20 },
             visible: { opacity: 1, y: 0 },
           }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
         >
-          <h2 className="text-2xl sm:text-3xl font-bold mb-2 text-[#2B3318] inline-flex items-center justify-center gap-2">
+          <h2 className="text-xl sm:text-3xl font-bold mb-1 text-[#2B3318] inline-flex items-center justify-center gap-2">
             <span>بتدور على إيه؟</span>
           </h2>
         </motion.div>
 
-        {/* Regular Categories */}
-        <motion.div
-          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 md:gap-3 mb-5"
-          variants={{
-            hidden: { opacity: 0 },
-            visible: { opacity: 1, transition: { staggerChildren: 0.06 } },
-          }}
-        >
-          <AnimatePresence>
-            {categories.map((category) => {
-              const isSelected = category.id === selectedCategory;
+        {/* شريط الأزرار الرئيسي: زر الأقسام + أحدث العروض + الأكثر مبيعاً */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-2.5 mb-4">
+          <div className="flex flex-nowrap items-center justify-center gap-1.5 sm:gap-2.5 max-w-full">
+            {(() => {
+              const activeCategoryName =
+                selectedCategory && selectedCategory !== 'featured' && selectedCategory !== 'best_sellers'
+                  ? categories.find((c) => c.id === selectedCategory)?.name
+                  : null;
               return (
-                <motion.button
-                  key={category.id}
-                  onClick={() => handleCategoryClick(category.id)}
-                  className={`flex items-center gap-2.5 md:gap-3 px-2.5 py-2.5 md:px-4 md:py-3 rounded-xl transition-all duration-200 text-right ${
-                    isSelected
-                      ? 'bg-[#2B3318] text-[#F7F3E9] font-bold shadow-md ring-2 ring-[#D1A94F]'
-                      : 'bg-[#F7F3E9] text-[#2B3318] border border-[#3A4522]/20 hover:border-[#D1A94F] hover:bg-[#E3C778]/20 shadow-sm hover:shadow-md'
+                <button
+                  type="button"
+                  onClick={() => setIsCategoriesOpen((prev) => !prev)}
+                  aria-expanded={isCategoriesOpen}
+                  className={`px-2.5 py-1.5 sm:px-5 sm:py-2.5 rounded-full text-[11px] sm:text-sm font-bold transition-all duration-200 flex items-center gap-1 sm:gap-2 border shadow-sm cursor-pointer whitespace-nowrap shrink-0 ${
+                    isCategoriesOpen || activeCategoryName
+                      ? 'bg-[#2B3318] text-[#E3C778] border-[#D1A94F] shadow-md'
+                      : 'bg-[#E3C778] text-[#2B3318] border-[#D1A94F] hover:bg-[#D1A94F]'
                   }`}
-                  variants={{
-                    hidden: { opacity: 0, y: 12 },
-                    visible: { opacity: 1, y: 0 },
-                  }}
                 >
-                  <CategoryVisual
-                    categoryId={category.id}
-                    categoryName={category.name}
-                    customImageUrl={category.image_url}
-                    isActive={isSelected}
-                    size="md"
-                  />
-                  <h3 className="text-xs sm:text-sm md:text-base font-bold leading-snug line-clamp-2 flex-1">
-                    {category.name}
-                  </h3>
-                </motion.button>
+                  <LayoutGrid className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                  <span className="truncate max-w-[95px] sm:max-w-none">
+                    {activeCategoryName ? `الأقسام: ${activeCategoryName}` : 'الأقسام'}
+                  </span>
+                  {isCategoriesOpen ? (
+                    <ChevronUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                  ) : (
+                    <ChevronDown className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                  )}
+                </button>
               );
-            })}
-          </AnimatePresence>
-        </motion.div>
+            })()}
 
-        {/* Special Highlights: أحدث العروض & الأكثر مبيعاً */}
-        {(hasFeaturedProducts || hasBestSellerProducts || selectedCategory !== null) && (
-          <div className="flex flex-wrap items-center justify-center gap-2.5 mb-6">
             {hasFeaturedProducts && (
               <button
                 type="button"
@@ -241,9 +232,10 @@ export default function Services() {
                   setSelectedCategory(next);
                   setSelectedSubcategory(null);
                   setOpenCategoryId(null);
+                  setIsCategoriesOpen(false);
                   if (next) scrollToResults();
                 }}
-                className={`px-4 py-1.5 sm:px-5 sm:py-2 rounded-full text-xs sm:text-sm font-bold transition-all duration-200 flex items-center gap-1.5 border ${
+                className={`px-2.5 py-1.5 sm:px-5 sm:py-2.5 rounded-full text-[11px] sm:text-sm font-bold transition-all duration-200 flex items-center gap-1 sm:gap-1.5 border whitespace-nowrap shrink-0 ${
                   selectedCategory === 'featured'
                     ? 'bg-[#B12704] text-[#F7F3E9] border-[#8A1E03] shadow-md scale-[1.03]'
                     : 'bg-[#B12704]/10 text-[#B12704] border-[#B12704]/35 hover:bg-[#B12704]/20'
@@ -262,9 +254,10 @@ export default function Services() {
                   setSelectedCategory(next);
                   setSelectedSubcategory(null);
                   setOpenCategoryId(null);
+                  setIsCategoriesOpen(false);
                   if (next) scrollToResults();
                 }}
-                className={`px-4 py-1.5 sm:px-5 sm:py-2 rounded-full text-xs sm:text-sm font-bold transition-all duration-200 flex items-center gap-1.5 border ${
+                className={`px-2.5 py-1.5 sm:px-5 sm:py-2.5 rounded-full text-[11px] sm:text-sm font-bold transition-all duration-200 flex items-center gap-1 sm:gap-1.5 border whitespace-nowrap shrink-0 ${
                   selectedCategory === 'best_sellers'
                     ? 'bg-[#2B3318] text-[#E3C778] border-[#D1A94F] shadow-md scale-[1.03]'
                     : 'bg-[#E3C778]/35 text-[#2B3318] border-[#D1A94F]/60 hover:bg-[#E3C778]/70'
@@ -274,22 +267,83 @@ export default function Services() {
                 <span>الأكثر مبيعاً</span>
               </button>
             )}
-
-            {selectedCategory !== null && (
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedCategory(null);
-                  setSelectedSubcategory(null);
-                  setOpenCategoryId(null);
-                }}
-                className="px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-semibold bg-[#3A4522]/10 text-[#2B3318] border border-[#3A4522]/25 hover:bg-[#3A4522] hover:text-[#F7F3E9] transition-colors"
-              >
-                عرض الكل ✕
-              </button>
-            )}
           </div>
-        )}
+
+          {selectedCategory !== null && (
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedCategory(null);
+                setSelectedSubcategory(null);
+                setOpenCategoryId(null);
+              }}
+              className="px-3 py-1 sm:px-4 sm:py-2.5 rounded-full text-[11px] sm:text-sm font-semibold bg-[#3A4522]/10 text-[#2B3318] border border-[#3A4522]/25 hover:bg-[#3A4522] hover:text-[#F7F3E9] transition-colors whitespace-nowrap"
+            >
+              عرض الكل ✕
+            </button>
+          )}
+        </div>
+
+        {/* قائمة الأقسام المنسدلة (مضغوطة وتحت بعضها) */}
+        <AnimatePresence>
+          {isCategoriesOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0, y: -4 }}
+              animate={{ opacity: 1, height: 'auto', y: 0 }}
+              exit={{ opacity: 0, height: 0, y: -4 }}
+              transition={{ duration: 0.18, ease: 'easeOut' }}
+              className="overflow-hidden mb-4"
+            >
+              <div className="max-w-[230px] sm:max-w-[260px] mx-auto bg-[#F7F3E9]/95 rounded-xl border border-[#D1A94F]/50 p-1.5 shadow-md">
+                <div className="flex flex-col gap-0.5 max-h-60 overflow-y-auto pr-0.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedCategory(null);
+                      setSelectedSubcategory(null);
+                      setOpenCategoryId(null);
+                      setIsCategoriesOpen(false);
+                    }}
+                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors text-right ${
+                      selectedCategory === null
+                        ? 'bg-[#2B3318] text-[#E3C778]'
+                        : 'text-[#2B3318] hover:bg-[#E3C778]/30'
+                    }`}
+                  >
+                    <span>كل المنتجات</span>
+                  </button>
+
+                  {categories.map((category) => {
+                    const isSelected = category.id === selectedCategory;
+                    return (
+                      <button
+                        key={category.id}
+                        type="button"
+                        onClick={() => handleCategoryClick(category.id)}
+                        className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg transition-colors text-right ${
+                          isSelected
+                            ? 'bg-[#2B3318] text-[#F7F3E9] font-bold'
+                            : 'text-[#2B3318] hover:bg-[#E3C778]/30 font-medium'
+                        }`}
+                      >
+                        <CategoryVisual
+                          categoryId={category.id}
+                          categoryName={category.name}
+                          customImageUrl={category.image_url}
+                          isActive={isSelected}
+                          size="xs"
+                        />
+                        <span className="text-xs leading-tight truncate flex-1">
+                          {category.name}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* بداية عرض وصف القسم المختار + الأقسام الفرعية + المنتجات */}
         <div ref={resultsStartRef} className="pt-2">
@@ -393,9 +447,9 @@ export default function Services() {
             </motion.div>
           )}
 
-          {/* Products Grid */}
+          {/* Products Grid: 3 columns on mobile, 3-4 on tablet/desktop */}
           <motion.div
-            className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-8"
+            className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-1.5 sm:gap-4 md:gap-6"
           variants={{
             hidden: { opacity: 0 },
             visible: { opacity: 1, transition: { staggerChildren: 0.08 } },

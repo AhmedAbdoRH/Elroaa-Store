@@ -122,7 +122,7 @@ export default function SubcategoryProducts() {
       <Helmet>
         <title>{`${subcategory.name} | شركة الرؤى للتجارة والتوريدات والعطارة`}</title>
       </Helmet>
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-2 sm:px-4 py-6 sm:py-8">
         {/* Back Button */}
         <button
           onClick={handleBack}
@@ -133,7 +133,7 @@ export default function SubcategoryProducts() {
         </button>
 
         {/* Breadcrumbs */}
-        <div className="mb-8 text-secondary">
+        <div className="mb-6 sm:mb-8 text-secondary text-sm">
           <Link to="/" className="hover:text-accent transition-colors">الرئيسية</Link>
           {category && (
             <>
@@ -147,10 +147,10 @@ export default function SubcategoryProducts() {
           <span className="text-accent">{subcategory.name}</span>
         </div>
 
-        <div className="bg-[#2B3318]/[0.04] rounded-2xl p-8 border border-[#D1A94F]/25 shadow-lg">
-          <h1 className="text-3xl font-bold mb-12 text-[#2B3318]">{subcategory.name}</h1>
+        <div className="bg-[#2B3318]/[0.04] rounded-2xl p-3 sm:p-8 border border-[#D1A94F]/25 shadow-lg">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-10 text-[#2B3318]">{subcategory.name}</h1>
           {subcategory.description && (
-            <p className="text-[#3A4522]/80 mb-8">{subcategory.description}</p>
+            <p className="text-[#3A4522]/80 mb-6 sm:mb-8">{subcategory.description}</p>
           )}
 
           {services.length === 0 ? (
@@ -158,7 +158,7 @@ export default function SubcategoryProducts() {
               لا توجد منتجات في هذا القسم الفرعي حالياً
             </p>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-1.5 sm:gap-4 md:gap-6">
               {services.map((service) => (
                 <ServiceCard
                   key={service.id}

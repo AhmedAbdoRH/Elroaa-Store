@@ -6,7 +6,7 @@ interface CategoryVisualProps {
   categoryName: string;
   customImageUrl?: string | null;
   isActive?: boolean;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'xs' | 'sm' | 'md' | 'lg';
 }
 
 function normalizeArabic(text: string): string {
@@ -374,11 +374,13 @@ export default function CategoryVisual({
   }, [categoryId, customImageUrl]);
 
   const sizeClasses =
-    size === 'sm'
-      ? 'w-8 h-8 rounded-lg'
-      : size === 'lg'
-        ? 'w-12 h-12 rounded-xl'
-        : 'w-9 h-9 md:w-11 md:h-11 rounded-xl';
+    size === 'xs'
+      ? 'w-5 h-5 rounded-md'
+      : size === 'sm'
+        ? 'w-8 h-8 rounded-lg'
+        : size === 'lg'
+          ? 'w-12 h-12 rounded-xl'
+          : 'w-9 h-9 md:w-11 md:h-11 rounded-xl';
 
   const iconKey = detectCategoryKey(categoryName);
 
@@ -403,7 +405,7 @@ export default function CategoryVisual({
 
   return (
     <div
-      className={`${sizeClasses} p-1.5 flex items-center justify-center flex-shrink-0 border shadow-sm transition-colors ${
+      className={`${sizeClasses} ${size === 'xs' ? 'p-0.5' : 'p-1.5'} flex items-center justify-center flex-shrink-0 border shadow-sm transition-colors ${
         isActive
           ? 'bg-[#F7F3E9] border-[#D1A94F]'
           : 'bg-[#F7F3E9] border-[#3A4522]/20'

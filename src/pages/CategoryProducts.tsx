@@ -107,7 +107,7 @@ export default function CategoryProducts() {
       <Helmet>
         <title>{`${category.name} | شركة الرؤى للتجارة والتوريدات والعطارة`}</title>
       </Helmet>
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-2 sm:px-4 py-6 sm:py-8">
         {/* Back Button */}
         <button
           onClick={handleBack}
@@ -117,9 +117,9 @@ export default function CategoryProducts() {
           <span>العودة للرئيسية</span>
         </button>
 
-        <div className="bg-[#2B3318]/[0.04] rounded-2xl p-8 border border-[#D1A94F]/25 shadow-lg">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-4 text-[#2B3318]">{category.name}</h1>
+        <div className="bg-[#2B3318]/[0.04] rounded-2xl p-3 sm:p-8 border border-[#D1A94F]/25 shadow-lg">
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-4 text-[#2B3318]">{category.name}</h1>
             
             {/* Subcategories list - smaller and closer to title */}
             {subcategories.length > 0 && (
@@ -146,7 +146,7 @@ export default function CategoryProducts() {
               لا توجد منتجات في هذا القسم حالياً
             </p>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-1.5 sm:gap-4 md:gap-6">
               {services.map((service) => (
                 <ServiceCard
                   key={service.id}
