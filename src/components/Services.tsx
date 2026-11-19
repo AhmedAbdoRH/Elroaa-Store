@@ -19,8 +19,12 @@ export default function Services() {
   const [hasFeaturedProducts, setHasFeaturedProducts] = useState(false);
   const [hasBestSellerProducts, setHasBestSellerProducts] = useState(false);
   const [visibleCount, setVisibleCount] = useState<number>(24);
+  const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
   const resultsStartRef = useRef<HTMLDivElement>(null);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+  const isLoadingMoreRef = useRef<boolean>(false);
+  const loadMoreTimerRef = useRef<number | null>(null);
 
   const scrollToResults = useCallback(() => {
     window.setTimeout(() => {
@@ -131,9 +135,52 @@ export default function Services() {
     return filtered;
   }, [selectedCategory, selectedSubcategory, services]);
 
+  const currentFiltered = filteredServices();
+  const totalFiltered = currentFiltered.length;
+  const hasMore = visibleCount < totalFiltered;
+
   useEffect(() => {
+    if (loadMoreTimerRef.current !== null) {
+      window.clearTimeout(loadMoreTimerRef.current);
+      loadMoreTimerRef.current = null;
+    }
+    isLoadingMoreRef.current = false;
+    setIsLoadingMore(false);
     setVisibleCount(24);
   }, [selectedCategory, selectedSubcategory]);
+
+  useEffect(() => {
+    return () => {
+      if (loadMoreTimerRef.current !== null) {
+        window.clearTimeout(loadMoreTimerRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!hasMore) return;
+    const target = loadMoreRef.current;
+    if (!target) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting && !isLoadingMoreRef.current) {
+          isLoadingMoreRef.current = true;
+          setIsLoadingMore(true);
+          loadMoreTimerRef.current = window.setTimeout(() => {
+            setVisibleCount((prev) => Math.min(prev + 24, totalFiltered));
+            isLoadingMoreRef.current = false;
+            setIsLoadingMore(false);
+            loadMoreTimerRef.current = null;
+          }, 1500);
+        }
+      },
+      { rootMargin: '60px 0px', threshold: 0.01 }
+    );
+
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [hasMore, visibleCount, totalFiltered]);
 
   const handleCategoryClick = (categoryId: string) => {
     setSelectedCategory(categoryId);
@@ -456,8 +503,8 @@ export default function Services() {
           }}
         >
           <AnimatePresence mode="wait">
-            {filteredServices().length > 0 ? (
-              filteredServices().slice(0, visibleCount).map((service) => (
+            {currentFiltered.length > 0 ? (
+              currentFiltered.slice(0, visibleCount).map((service) => (
                 <motion.div
                   key={service.id}
                   variants={{
@@ -498,15 +545,16 @@ export default function Services() {
           </motion.div>
         </div>
 
-        {filteredServices().length > visibleCount && (
-          <div className="flex justify-center mt-10">
-            <button
-              type="button"
-              onClick={() => setVisibleCount((c) => c + 24)}
-              className="px-6 py-3 rounded-xl bg-[#E3C778] hover:bg-[#D1A94F] text-[#2B3318] border border-[#D1A94F] font-bold shadow-md hover:shadow-lg transition-all duration-200"
-            >
-              تحميل المزيد
-            </button>
+        {hasMore && (
+          <div
+            ref={loadMoreRef}
+            className="flex items-center justify-center mt-8 py-4 min-h-[56px]"
+            aria-live="polite"
+            aria-label={isLoadingMore ? 'جاري التحميل' : undefined}
+          >
+            {isLoadingMore && (
+              <span className="w-9 h-9 sm:w-10 sm:h-10 border-[3.5px] border-[#D1A94F]/35 border-t-[#2B3318] rounded-full animate-spin" />
+            )}
           </div>
         )}
       </motion.div>
